@@ -152,6 +152,8 @@ void beginCapture();
 int captureResult(Binding* b);
 bool menuTap(float* x, float* y);
 bool menuTouch(float* x, float* y);
+bool pointerDown(float* x, float* y);   // dedo/mouse apretado, coordenadas de pantalla completa
+bool pointerHover(float* x, float* y);  // mouse en PC, coordenadas de pantalla completa
 bool menuPointer(float* x, float* y);
 void setCursorMenus(bool menus);
 int menuWheel();

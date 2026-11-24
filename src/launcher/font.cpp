@@ -62,12 +62,12 @@ void Font::draw(const std::string& s, float x, float y, float scale, SDL_Color c
 
 Font& uiFont() {
     static Font f; static bool done = false;
-    if (!done) { done = true; f.load("v2/assets/lang/fonts/PalatinoLinotype"); }
+    if (!done) { done = true; f.load("data/ui/font_v1"); }
     return f;
 }
 Font& titleFont() {
     static Font f; static bool done = false;
-    if (!done) { done = true; f.load("v2/assets/lang/fonts/PalatinoLinotypeBig"); }
+    if (!done) { done = true; f.load("data/ui/font_v1"); }
     return f;
 }
 

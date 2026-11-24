@@ -4,7 +4,7 @@
 
 namespace vc {
 
-// Fuente de mapa de bits de Vascolet 2 (lang/fonts/*.png + .xml con la posición de cada letra).
+// Fuente de mapa de bits (png + xml con la posición de cada letra). Se usa la letra de Vascolet 1.
 class Font {
 public:
     bool load(const std::string& base); // ej: "v2/assets/lang/fonts/PalatinoLinotype"

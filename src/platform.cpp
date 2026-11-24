@@ -1662,6 +1662,23 @@ void hideCursorThisFrame() {}
 bool menuPointer(float*, float*) { return false; }
 #endif
 
+// Dedo apoyado (o botón del mouse apretado) en coordenadas lógicas de pantalla completa.
+bool pointerDown(float* x, float* y) {
+#ifndef __ANDROID__
+    if (g_mouseDown) { const SDL_FPoint p = mouseLogical(); *x = p.x; *y = p.y; return true; }
+#endif
+    for (auto& f : g_menuFingers) if (f.second.menu) { *x = f.second.cur.x; *y = f.second.cur.y; return true; }
+    return false;
+}
+// Posición del mouse (para resaltar botones en PC), en coordenadas lógicas de pantalla completa.
+bool pointerHover(float* x, float* y) {
+#ifndef __ANDROID__
+    if (g_mouseSeen && (SDL_GetWindowFlags(g_win) & SDL_WINDOW_MOUSE_FOCUS)) { const SDL_FPoint p = mouseLogical(); *x = p.x; *y = p.y; return true; }
+#endif
+    (void)x; (void)y;
+    return false;
+}
+
 bool menuTouch(float* x, float* y) {
 #ifndef __ANDROID__
     if (mouseDrag(x, y)) return true;
@@ -1919,6 +1936,8 @@ void touchLayoutReset() {}
 void touchMapEdit(bool) {}
 bool menuTap(float*, float*) { return false; }
 bool menuTouch(float*, float*) { return false; }
+bool pointerDown(float*, float*) { return false; }
+bool pointerHover(float*, float*) { return false; }
 void setCursorMenus(bool) {}
 int menuWheel() { return 0; }
 void hideCursorThisFrame() {}
