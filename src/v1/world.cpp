@@ -148,6 +148,7 @@ bool World::load(int level, const Counters& carry) {
 void World::refitCamera() {
     cam.w = (float)LOGICAL_W; cam.h = (float)LOGICAL_H;
     cam.minX = boundX0; cam.minY = boundY0;
+    cam.zoneY = 0.72f;   // el piso queda más abajo, como en el original
     cam.init(boundX1, boundY1, hero.cx(), hero.bottom());
     camX = cam.x; camY = cam.y; prevCamX = camX; prevCamY = camY;
 }
@@ -304,7 +305,7 @@ void World::updateHero(float dt) {
 
     const bool L = plat::held(plat::BTN_LEFT), R = plat::held(plat::BTN_RIGHT);
     const bool U = plat::held(plat::BTN_UP), D = plat::held(plat::BTN_DOWN);
-    const bool jump = plat::pressed(plat::BTN_JUMP) || plat::pressed(plat::BTN_SHOOT);
+    const bool jump = plat::pressed(plat::BTN_JUMP) || plat::pressed(plat::BTN_SHOOT) || plat::pressed(plat::BTN_ACCEPT);
 
     // Escaleras (no se puede trepar montado en el dinosaurio).
     const float midX = h.cx();
