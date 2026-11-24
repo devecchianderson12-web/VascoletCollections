@@ -1,0 +1,1180 @@
+# base 008b0000
+### textures 02de72a8
+TEX assets/images/elements/signs_tile.png
+TEX assets/images/elements/tile_gates.png
+TEX assets/images/elements/tile_platforms.png
+TEX assets/images/enemies/anim_lava_tile.png
+TEX assets/images/enemies/coinEffect.png
+TEX assets/images/enemies/enemies_tile.png
+TEX assets/images/enemies/enemies_tile_2.png
+TEX assets/images/enemies/pixel.png
+TEX assets/images/menuElements/back_hud.png
+TEX assets/images/menuElements/buttons_tile.png
+TEX assets/images/menuElements/items.png
+TEX assets/images/menuElements/menu.jpg
+TEX assets/images/menuElements/opciones_tile.png
+TEX assets/images/tiles/tileset_prehistory.png
+TEX assets/images/vascolet/frames_AVD_tile.png
+TEX assets/images/vascolet/frames_AVP_tile.png
+TEX assets/images/vascolet/frames_AV_tile.png
+TEX assets/lang/images/menu/banner.png
+TEX assets/lang/images/white_font_new.png
+TEX assets/lang/images/white_font_new_outline.png
+### imagemaps 02de8e38
+IMAGEMAP HUD_BACKGROUND 2
+F 0 assets/images/menuElements/back_hud.png 0 0 600 92 0 0 -4.23013e-12
+F 1 assets/images/menuElements/back_hud.png 0 92 600 92 0 0 -6.0774e-12
+IMAGEMAP HUD_CEREALS 2
+F 0 assets/images/menuElements/items.png 78 11 71 55 0 27 -2.42766e-12
+F 1 assets/images/menuElements/items.png 686 11 71 55 0 27 -2.8682e-12
+IMAGEMAP HUD_HERO 1
+F 0 assets/images/menuElements/items.png 152 0 76 76 0 0 -5.87846e-12
+IMAGEMAP HUD_KEYS 4
+F 0 assets/images/menuElements/items.png 228 0 76 76 0 0 -3.49346e-12
+F 1 assets/images/menuElements/items.png 304 0 76 76 0 0 -2.28555e-12
+F 2 assets/images/menuElements/items.png 380 0 76 76 0 0 -3.15241e-12
+F 3 assets/images/menuElements/items.png 456 0 76 76 0 0 -2.91083e-12
+IMAGEMAP HUD_MILK_GLASSES 2
+F 0 assets/images/menuElements/items.png 13 3 50 70 0 35 -6.36162e-12
+F 1 assets/images/menuElements/items.png 621 3 50 70 0 35 -3.25188e-12
+IMAGEMAP MENU 1
+F 0 assets/images/menuElements/menu.jpg 0 0 2048 1024 0 0 -6.75949e-12
+IMAGEMAP MENU_BUTTON 4
+F 0 assets/images/menuElements/buttons_tile.png 0 5 249 70 124.5 35 -3.66171e-12
+F 1 assets/images/menuElements/buttons_tile.png 250 5 249 70 124.5 35 -2.04393e-12
+F 2 assets/images/menuElements/buttons_tile.png 0 85 249 70 124.5 35 -7.12902e-12
+F 3 assets/images/menuElements/buttons_tile.png 250 85 249 70 124.5 35 -2.66924e-12
+IMAGEMAP OPTIONS 6
+F 0 assets/images/menuElements/opciones_tile.png 0 0 290 640 0 0 -2.76873e-12
+F 1 assets/images/menuElements/opciones_tile.png 300 0 50 60 0 0 -3.63559e-12
+F 2 assets/images/menuElements/opciones_tile.png 350 0 50 60 0 0 -3.35135e-12
+F 3 assets/images/menuElements/opciones_tile.png 300 60 40 40 0 0 -3.53609e-12
+F 4 assets/images/menuElements/opciones_tile.png 340 60 40 40 0 0 -2.38503e-12
+F 5 assets/images/menuElements/opciones_tile.png 380 60 40 40 0 0 -3.39398e-12
+IMAGEMAP PAUSE_DIALOG 2
+F 0 assets/lang/images/menu/banner.png 10 24 280 548 140 274 -4.82684e-12
+F 1 assets/lang/images/menu/banner.png 16 608 368 263 184 131.5 -4.62789e-12
+IMAGEMAP PIXEL 1
+F 0 assets/images/enemies/pixel.png 0 0 1 1 0.5 0.5 -6.84475e-12
+IMAGEMAP SMALL_BUTTON 4
+F 0 assets/images/menuElements/buttons_tile.png 5 162 139 56 69.5 28 -5.39543e-12
+F 1 assets/images/menuElements/buttons_tile.png 155 162 139 56 69.5 28 -7.0437e-12
+F 2 assets/images/menuElements/buttons_tile.png 5 222 139 56 69.5 28 -6.56054e-12
+F 3 assets/images/menuElements/buttons_tile.png 155 222 139 56 69.5 28 -2.71184e-12
+### imagemaps 0df2aec8
+IMAGEMAP BLUE_KEY 1
+F 0 assets/images/menuElements/items.png 456 0 76 76 38 76 -1.50537e-11
+IMAGEMAP CEREALS 1
+F 0 assets/images/menuElements/items.png 76 0 76 76 38 76 -2.57395e-11
+IMAGEMAP COIN 1
+F 0 assets/images/menuElements/items.png 532 0 76 76 38 76 -2.53991e-11
+IMAGEMAP GREEN_KEY 1
+F 0 assets/images/menuElements/items.png 380 0 76 76 38 76 -9.40249e-12
+IMAGEMAP LIVES 1
+F 0 assets/images/menuElements/items.png 152 0 76 76 38 76 -1.40068e-11
+IMAGEMAP MICROWAVE 1
+F 0 assets/images/menuElements/items.png 760 0 76 76 38 76 -1.00847e-11
+IMAGEMAP RED_KEY 1
+F 0 assets/images/menuElements/items.png 304 0 76 76 38 76 -2.8355e-11
+IMAGEMAP VASCOLETS 1
+F 0 assets/images/menuElements/items.png 0 0 76 76 38 76 -1.16763e-11
+IMAGEMAP YELLOW_KEY 1
+F 0 assets/images/menuElements/items.png 228 0 76 76 38 76 -2.34664e-11
+### imagemaps 0eb70008
+IMAGEMAP D_PIXEL 1
+F 0 assets/images/enemies/pixel.png 0 0 1 1 0.5 0.5 -2.49331e-11
+IMAGEMAP D_VASCOLET 16
+F 0 assets/images/vascolet/frames_AVD_tile.png 0 0 200 220 100 213 -2.20908e-11
+F 1 assets/images/vascolet/frames_AVD_tile.png 200 0 200 220 100 213 -2.03855e-11
+F 2 assets/images/vascolet/frames_AVD_tile.png 400 0 200 220 100 213 -2.0954e-11
+F 3 assets/images/vascolet/frames_AVD_tile.png 600 0 200 220 100 213 -1.92487e-11
+F 4 assets/images/vascolet/frames_AVD_tile.png 800 0 200 220 100 213 -1.95897e-11
+F 5 assets/images/vascolet/frames_AVD_tile.png 0 220 200 220 100 213 -2.07266e-11
+F 6 assets/images/vascolet/frames_AVD_tile.png 200 220 200 220 100 213 -1.75434e-11
+F 7 assets/images/vascolet/frames_AVD_tile.png 400 220 200 220 100 213 -1.78845e-11
+F 8 assets/images/vascolet/frames_AVD_tile.png 600 220 200 220 100 213 -1.64068e-11
+F 9 assets/images/vascolet/frames_AVD_tile.png 800 220 200 220 100 213 -1.47015e-11
+F 10 assets/images/vascolet/frames_AVD_tile.png 0 440 200 220 100 213 -1.90213e-11
+F 11 assets/images/vascolet/frames_AVD_tile.png 200 440 200 220 100 213 -1.58383e-11
+F 12 assets/images/vascolet/frames_AVD_tile.png 400 440 200 220 100 213 -2.37961e-11
+F 13 assets/images/vascolet/frames_AVD_tile.png 600 440 200 220 100 213 -1.61794e-11
+F 14 assets/images/vascolet/frames_AVD_tile.png 800 440 200 220 100 213 0
+F 15 assets/images/vascolet/frames_AVD_tile.png 0 660 200 220 100 213 -2.41371e-11
+IMAGEMAP D_VASCOLET_DEAD 1
+F 0 assets/images/vascolet/frames_AVD_tile.png 800 440 200 220 100 213 -2.64217e-11
+IMAGEMAP PIXEL 1
+F 0 assets/images/enemies/pixel.png 0 0 1 1 0.5 0.5 -1.07615e-11
+IMAGEMAP P_PIXEL 1
+F 0 assets/images/enemies/pixel.png 0 0 1 1 0.5 0.5 -2.55016e-11
+IMAGEMAP P_VASCOLET 5
+F 0 assets/images/vascolet/frames_AVP_tile.png 0 0 142 230 71 156 -1.89189e-11
+F 1 assets/images/vascolet/frames_AVP_tile.png 142 0 142 230 71 156 -2.76728e-11
+F 2 assets/images/vascolet/frames_AVP_tile.png 284 0 142 230 71 156 -2.38074e-11
+F 3 assets/images/vascolet/frames_AVP_tile.png 0 230 142 230 71 156 -2.77865e-11
+F 4 assets/images/vascolet/frames_AVP_tile.png 142 230 142 230 71 156 -2.09654e-11
+IMAGEMAP P_VASCOLET_DEAD 1
+F 0 assets/images/vascolet/frames_AV_tile.png 0 460 142 230 71 153 -1.94873e-11
+IMAGEMAP VASCOLET 24
+F 0 assets/images/vascolet/frames_AV_tile.png 0 0 142 230 71 153 -1.22964e-11
+F 1 assets/images/vascolet/frames_AV_tile.png 142 0 142 230 71 153 -1.21826e-11
+F 2 assets/images/vascolet/frames_AV_tile.png 284 0 142 230 71 153 -1.14436e-11
+F 3 assets/images/vascolet/frames_AV_tile.png 426 0 142 230 71 153 -7.46431e-12
+F 4 assets/images/vascolet/frames_AV_tile.png 568 0 142 230 71 153 -1.16142e-11
+F 5 assets/images/vascolet/frames_AV_tile.png 710 0 142 230 71 153 -1.37174e-11
+F 6 assets/images/vascolet/frames_AV_tile.png 852 0 142 230 71 153 -1.3888e-11
+F 7 assets/images/vascolet/frames_AV_tile.png 0 230 142 230 71 153 -9.73835e-12
+F 8 assets/images/vascolet/frames_AV_tile.png 142 230 142 230 71 153 -1.133e-11
+F 9 assets/images/vascolet/frames_AV_tile.png 284 230 142 230 71 153 -1.00226e-11
+F 10 assets/images/vascolet/frames_AV_tile.png 426 230 142 230 71 153 -1.0591e-11
+F 11 assets/images/vascolet/frames_AV_tile.png 568 230 142 230 71 153 -9.90889e-12
+F 12 assets/images/vascolet/frames_AV_tile.png 710 230 142 230 71 153 -2.69795e-11
+F 13 assets/images/vascolet/frames_AV_tile.png 852 230 142 230 71 153 -9.16993e-12
+F 14 assets/images/vascolet/frames_AV_tile.png 0 460 142 230 71 153 -9.34046e-12
+F 15 assets/images/vascolet/frames_AV_tile.png 142 460 142 230 71 153 -7.74853e-12
+F 16 assets/images/vascolet/frames_AV_tile.png 284 460 142 230 71 153 -7.63485e-12
+F 17 assets/images/vascolet/frames_AV_tile.png 426 460 142 230 71 153 -9.05625e-12
+F 18 assets/images/vascolet/frames_AV_tile.png 568 460 142 230 71 153 -2.52742e-11
+F 19 assets/images/vascolet/frames_AV_tile.png 710 460 142 230 71 153 -8.31696e-12
+F 20 assets/images/vascolet/frames_AV_tile.png 852 460 142 230 71 153 -2.83437e-11
+F 21 assets/images/vascolet/frames_AV_tile.png 0 690 142 230 71 153 -8.48749e-12
+F 22 assets/images/vascolet/frames_AV_tile.png 142 690 142 230 71 153 -1.36038e-11
+F 23 assets/images/vascolet/frames_AV_tile.png 284 690 142 230 71 153 -2.86848e-11
+IMAGEMAP VASCOLET_DEAD 1
+F 0 assets/images/vascolet/frames_AV_tile.png 0 460 142 230 71 153 -2.48306e-11
+### imagemaps 0df2afd0
+IMAGEMAP BIRD 1
+F 0 assets/images/elements/signs_tile.png 80 0 80 156 40 156 -2.11675e-11
+IMAGEMAP BLUE_DOOR_CASTLE 1
+F 0 assets/images/elements/tile_gates.png 240 0 80 304 40 0 -1.86663e-11
+IMAGEMAP BLUE_DOOR_EGYPT 1
+F 0 assets/images/elements/tile_gates.png 880 0 80 304 40 0 -9.16252e-12
+IMAGEMAP BLUE_DOOR_FUTURE 1
+F 0 assets/images/elements/tile_gates.png 560 304 80 304 40 0 -2.77612e-11
+IMAGEMAP BLUE_DOOR_PIRATES 1
+F 0 assets/images/elements/tile_gates.png 560 0 80 304 40 0 -8.19617e-12
+IMAGEMAP BLUE_DOOR_PREHISTORY 1
+F 0 assets/images/elements/tile_gates.png 240 304 80 304 40 0 -1.27436e-11
+IMAGEMAP GREEN_DOOR_CASTLE 1
+F 0 assets/images/elements/tile_gates.png 80 0 80 304 40 512 -8.08281e-12
+IMAGEMAP GREEN_DOOR_EGYPT 1
+F 0 assets/images/elements/tile_gates.png 720 0 80 304 40 512 -1.20046e-11
+IMAGEMAP GREEN_DOOR_FUTURE 1
+F 0 assets/images/elements/tile_gates.png 400 304 80 304 40 512 -2.63186e-12
+IMAGEMAP GREEN_DOOR_PIRATES 1
+F 0 assets/images/elements/tile_gates.png 400 0 80 304 40 512 -1.74158e-11
+IMAGEMAP GREEN_DOOR_PREHISTORY 1
+F 0 assets/images/elements/tile_gates.png 80 304 80 304 40 512 -1.14363e-11
+IMAGEMAP MENU 1
+F 0 assets/images/menuElements/menu.jpg 0 0 2048 1024 0 0 -8.94782e-12
+IMAGEMAP PLATFORM_CASTLE_LARGE 1
+F 0 assets/images/elements/tile_platforms.png 160 240 240 60 120 48 -1.30278e-11
+IMAGEMAP PLATFORM_CASTLE_SMALL 1
+F 0 assets/images/elements/tile_platforms.png 0 240 160 60 80 48 -1.85526e-11
+IMAGEMAP PLATFORM_EGYPT_LARGE 1
+F 0 assets/images/elements/tile_platforms.png 160 60 240 60 120 50 -1.69864e-11
+IMAGEMAP PLATFORM_EGYPT_SMALL 1
+F 0 assets/images/elements/tile_platforms.png 0 60 160 60 80 50 -1.08804e-11
+IMAGEMAP PLATFORM_FUTURE_LARGE 1
+F 0 assets/images/elements/tile_platforms.png 160 0 240 60 120 55 -1.52554e-11
+IMAGEMAP PLATFORM_FUTURE_SMALL 1
+F 0 assets/images/elements/tile_platforms.png 0 0 160 60 80 55 -1.71884e-11
+IMAGEMAP PLATFORM_LARGE 1
+F 0 assets/images/elements/tile_platforms.png 160 60 240 60 120 50 -2.66384e-11
+IMAGEMAP PLATFORM_PIRATES_LARGE 1
+F 0 assets/images/elements/tile_platforms.png 160 180 240 60 120 49 -1.07541e-11
+IMAGEMAP PLATFORM_PIRATES_SMALL 1
+F 0 assets/images/elements/tile_platforms.png 0 180 160 60 80 49 -1.42784e-11
+IMAGEMAP PLATFORM_PREHISTORY_LARGE 1
+F 0 assets/images/elements/tile_platforms.png 160 120 240 60 120 45 -1.54828e-11
+IMAGEMAP PLATFORM_PREHISTORY_SMALL 1
+F 0 assets/images/elements/tile_platforms.png 0 120 160 60 80 45 -1.371e-11
+IMAGEMAP PLATFORM_SMALL 1
+F 0 assets/images/elements/tile_platforms.png 0 60 160 60 80 50 -1.1051e-11
+IMAGEMAP RED_DOOR_CASTLE 1
+F 0 assets/images/elements/tile_gates.png 0 0 80 304 40 512 -1.03562e-11
+IMAGEMAP RED_DOOR_EGYPT 1
+F 0 assets/images/elements/tile_gates.png 640 0 80 304 40 512 -8.76461e-12
+IMAGEMAP RED_DOOR_FUTURE 1
+F 0 assets/images/elements/tile_gates.png 320 304 80 304 40 512 -2.60344e-12
+IMAGEMAP RED_DOOR_PIRATES 1
+F 0 assets/images/elements/tile_gates.png 320 0 80 304 40 512 -1.66199e-11
+IMAGEMAP RED_DOOR_PREHISTORY 1
+F 0 assets/images/elements/tile_gates.png 0 304 80 304 40 512 -1.04699e-11
+IMAGEMAP SAVE 1
+F 0 assets/images/elements/signs_tile.png 80 0 80 156 40 156 -1.98032e-11
+IMAGEMAP SIGN 1
+F 0 assets/images/elements/signs_tile.png 0 0 80 156 40 156 -2.32138e-11
+IMAGEMAP Tiles 338
+F 0 assets/images/tiles/tileset_prehistory.png 0 0 76 76 0 0 -3.17215e-10
+F 1 assets/images/tiles/tileset_prehistory.png 76 0 76 76 0 0 -1.08401e-10
+F 2 assets/images/tiles/tileset_prehistory.png 152 0 76 76 0 0 -1.03399e-10
+F 3 assets/images/tiles/tileset_prehistory.png 228 0 76 76 0 0 -1.10221e-10
+F 4 assets/images/tiles/tileset_prehistory.png 304 0 76 76 0 0 -6.42914e-11
+F 5 assets/images/tiles/tileset_prehistory.png 380 0 76 76 0 0 -5.37461e-11
+F 6 assets/images/tiles/tileset_prehistory.png 456 0 76 76 0 0 -8.79369e-11
+F 7 assets/images/tiles/tileset_prehistory.png 532 0 76 76 0 0 -1.03854e-10
+F 8 assets/images/tiles/tileset_prehistory.png 608 0 76 76 0 0 -7.06579e-11
+F 9 assets/images/tiles/tileset_prehistory.png 684 0 76 76 0 0 -7.29318e-11
+F 10 assets/images/tiles/tileset_prehistory.png 760 0 76 76 0 0 -4.57879e-11
+F 11 assets/images/tiles/tileset_prehistory.png 836 0 76 76 0 0 -1.12495e-10
+F 12 assets/images/tiles/tileset_prehistory.png 912 0 76 76 0 0 -5.03354e-11
+F 13 assets/images/tiles/tileset_prehistory.png 0 76 76 76 0 0 -4.91985e-11
+F 14 assets/images/tiles/tileset_prehistory.png 76 76 76 76 0 0 -7.11128e-11
+F 15 assets/images/tiles/tileset_prehistory.png 152 76 76 76 0 0 -6.61105e-11
+F 16 assets/images/tiles/tileset_prehistory.png 228 76 76 76 0 0 -7.74793e-11
+F 17 assets/images/tiles/tileset_prehistory.png 304 76 76 76 0 0 -7.52048e-11
+F 18 assets/images/tiles/tileset_prehistory.png 380 76 76 76 0 0 -9.93057e-11
+F 19 assets/images/tiles/tileset_prehistory.png 456 76 76 76 0 0 -5.35187e-11
+F 20 assets/images/tiles/tileset_prehistory.png 532 76 76 76 0 0 -1.0158e-10
+F 21 assets/images/tiles/tileset_prehistory.png 608 76 76 76 0 0 -8.65735e-11
+F 22 assets/images/tiles/tileset_prehistory.png 684 76 76 76 0 0 -8.20261e-11
+F 23 assets/images/tiles/tileset_prehistory.png 760 76 76 76 0 0 -4.41963e-11
+F 24 assets/images/tiles/tileset_prehistory.png 836 76 76 76 0 0 -4.53332e-11
+F 25 assets/images/tiles/tileset_prehistory.png 912 76 76 76 0 0 -4.51818e-10
+F 26 assets/images/tiles/tileset_prehistory.png 0 152 76 76 0 0 -3.6814e-10
+F 27 assets/images/tiles/tileset_prehistory.png 76 152 76 76 0 0 -5.80685e-11
+F 28 assets/images/tiles/tileset_prehistory.png 152 152 76 76 0 0 -2.98742e-11
+F 29 assets/images/tiles/tileset_prehistory.png 228 152 76 76 0 0 -5.69316e-11
+F 30 assets/images/tiles/tileset_prehistory.png 304 152 76 76 0 0 -4.11797e-10
+F 31 assets/images/tiles/tileset_prehistory.png 380 152 76 76 0 0 -3.32849e-11
+F 32 assets/images/tiles/tileset_prehistory.png 456 152 76 76 0 0 -5.46579e-11
+F 33 assets/images/tiles/tileset_prehistory.png 532 152 76 76 0 0 -5.57948e-11
+F 34 assets/images/tiles/tileset_prehistory.png 608 152 76 76 0 0 -4.0452e-10
+F 35 assets/images/tiles/tileset_prehistory.png 684 152 76 76 0 0 -4.20896e-10
+F 36 assets/images/tiles/tileset_prehistory.png 760 152 76 76 0 0 -4.60913e-10
+F 37 assets/images/tiles/tileset_prehistory.png 836 152 76 76 0 0 -3.23753e-11
+F 38 assets/images/tiles/tileset_prehistory.png 912 152 76 76 0 0 -3.01016e-11
+F 39 assets/images/tiles/tileset_prehistory.png 0 228 76 76 0 0 -3.48764e-11
+F 40 assets/images/tiles/tileset_prehistory.png 76 228 76 76 0 0 -3.7832e-11
+F 41 assets/images/tiles/tileset_prehistory.png 152 228 76 76 0 0 -3.44218e-11
+F 42 assets/images/tiles/tileset_prehistory.png 228 228 76 76 0 0 -3.82871e-11
+F 43 assets/images/tiles/tileset_prehistory.png 304 228 76 76 0 0 -3.9424e-11
+F 44 assets/images/tiles/tileset_prehistory.png 380 228 76 76 0 0 -4.26068e-11
+F 45 assets/images/tiles/tileset_prehistory.png 456 228 76 76 0 0 -4.28342e-11
+F 46 assets/images/tiles/tileset_prehistory.png 532 228 76 76 0 0 -4.03331e-11
+F 47 assets/images/tiles/tileset_prehistory.png 608 228 76 76 0 0 -4.48181e-10
+F 48 assets/images/tiles/tileset_prehistory.png 684 228 76 76 0 0 -3.84511e-10
+F 49 assets/images/tiles/tileset_prehistory.png 760 228 76 76 0 0 -4.24529e-10
+F 50 assets/images/tiles/tileset_prehistory.png 836 228 76 76 0 0 -3.4995e-10
+F 51 assets/images/tiles/tileset_prehistory.png 912 228 76 76 0 0 -2.53549e-10
+F 52 assets/images/tiles/tileset_prehistory.png 0 304 76 76 0 0 -3.77235e-10
+F 53 assets/images/tiles/tileset_prehistory.png 76 304 76 76 0 0 -2.55368e-10
+F 54 assets/images/tiles/tileset_prehistory.png 152 304 76 76 0 0 -3.59045e-10
+F 55 assets/images/tiles/tileset_prehistory.png 228 304 76 76 0 0 -3.86331e-10
+F 56 assets/images/tiles/tileset_prehistory.png 304 304 76 76 0 0 -5.1245e-11
+F 57 assets/images/tiles/tileset_prehistory.png 380 304 76 76 0 0 -3.59818e-12
+F 58 assets/images/tiles/tileset_prehistory.png 456 304 76 76 0 0 -1.74e-11
+F 59 assets/images/tiles/tileset_prehistory.png 532 304 76 76 0 0 -1.03479e-11
+F 60 assets/images/tiles/tileset_prehistory.png 608 304 76 76 0 0 -9.04051e-12
+F 61 assets/images/tiles/tileset_prehistory.png 684 304 76 76 0 0 -1.54673e-11
+F 62 assets/images/tiles/tileset_prehistory.png 760 304 76 76 0 0 -1.71726e-11
+F 63 assets/images/tiles/tileset_prehistory.png 836 304 76 76 0 0 -8.7563e-12
+F 64 assets/images/tiles/tileset_prehistory.png 912 304 76 76 0 0 -9.72266e-12
+F 65 assets/images/tiles/tileset_prehistory.png 0 380 76 76 0 0 -1.13142e-11
+F 66 assets/images/tiles/tileset_prehistory.png 76 380 76 76 0 0 -1.42706e-11
+F 67 assets/images/tiles/tileset_prehistory.png 152 380 76 76 0 0 -9.77949e-12
+F 68 assets/images/tiles/tileset_prehistory.png 228 380 76 76 0 0 -1.66042e-11
+F 69 assets/images/tiles/tileset_prehistory.png 304 380 76 76 0 0 -1.07458e-11
+F 70 assets/images/tiles/tileset_prehistory.png 380 380 76 76 0 0 -1.26216e-11
+F 71 assets/images/tiles/tileset_prehistory.png 456 380 76 76 0 0 -1.86506e-11
+F 72 assets/images/tiles/tileset_prehistory.png 532 380 76 76 0 0 -1.85369e-11
+F 73 assets/images/tiles/tileset_prehistory.png 608 380 76 76 0 0 -1.14279e-11
+F 74 assets/images/tiles/tileset_prehistory.png 684 380 76 76 0 0 -9.15421e-12
+F 75 assets/images/tiles/tileset_prehistory.png 760 380 76 76 0 0 -1.04615e-11
+F 76 assets/images/tiles/tileset_prehistory.png 836 380 76 76 0 0 -1.103e-11
+F 77 assets/images/tiles/tileset_prehistory.png 912 380 76 76 0 0 -1.20532e-11
+F 78 assets/images/tiles/tileset_prehistory.png 0 456 76 76 0 0 -8.07416e-12
+F 79 assets/images/tiles/tileset_prehistory.png 76 456 76 76 0 0 -8.47207e-12
+F 80 assets/images/tiles/tileset_prehistory.png 152 456 76 76 0 0 -1.19963e-11
+F 81 assets/images/tiles/tileset_prehistory.png 228 456 76 76 0 0 -1.30195e-11
+F 82 assets/images/tiles/tileset_prehistory.png 304 456 76 76 0 0 -1.35879e-11
+F 83 assets/images/tiles/tileset_prehistory.png 380 456 76 76 0 0 -1.52399e-11
+F 84 assets/images/tiles/tileset_prehistory.png 456 456 76 76 0 0 -1.27353e-11
+F 85 assets/images/tiles/tileset_prehistory.png 532 456 76 76 0 0 -8.18787e-12
+F 86 assets/images/tiles/tileset_prehistory.png 608 456 76 76 0 0 -1.33037e-11
+F 87 assets/images/tiles/tileset_prehistory.png 684 456 76 76 0 0 -1.37016e-11
+F 88 assets/images/tiles/tileset_prehistory.png 760 456 76 76 0 0 -1.43269e-11
+F 89 assets/images/tiles/tileset_prehistory.png 836 456 76 76 0 0 -1.60358e-11
+F 90 assets/images/tiles/tileset_prehistory.png 912 456 76 76 0 0 -2.77454e-11
+F 91 assets/images/tiles/tileset_prehistory.png 0 532 76 76 0 0 -2.77187e-12
+F 92 assets/images/tiles/tileset_prehistory.png 76 532 76 76 0 0 -2.60136e-12
+F 93 assets/images/tiles/tileset_prehistory.png 152 532 76 76 0 0 -2.53031e-12
+F 94 assets/images/tiles/tileset_prehistory.png 228 532 76 76 0 0 -2.62675e-11
+F 95 assets/images/tiles/tileset_prehistory.png 304 532 76 76 0 0 -2.19473e-11
+F 96 assets/images/tiles/tileset_prehistory.png 380 532 76 76 0 0 -2.56991e-11
+F 97 assets/images/tiles/tileset_prehistory.png 456 532 76 76 0 0 -2.45925e-12
+F 98 assets/images/tiles/tileset_prehistory.png 532 532 76 76 0 0 -2.62978e-12
+F 99 assets/images/tiles/tileset_prehistory.png 608 532 76 76 0 0 -1.89081e-12
+F 100 assets/images/tiles/tileset_prehistory.png 684 532 76 76 0 0 -2.00149e-11
+F 101 assets/images/tiles/tileset_prehistory.png 760 532 76 76 0 0 -2.31979e-11
+F 102 assets/images/tiles/tileset_prehistory.png 836 532 76 76 0 0 -2.05833e-11
+F 103 assets/images/tiles/tileset_prehistory.png 912 532 76 76 0 0 -2.3882e-12
+F 104 assets/images/tiles/tileset_prehistory.png 0 608 76 76 0 0 -2.51306e-11
+F 105 assets/images/tiles/tileset_prehistory.png 76 608 76 76 0 0 -2.17202e-11
+F 106 assets/images/tiles/tileset_prehistory.png 152 608 76 76 0 0 -2.11515e-11
+F 107 assets/images/tiles/tileset_prehistory.png 228 608 76 76 0 0 -2.06134e-12
+F 108 assets/images/tiles/tileset_prehistory.png 304 608 76 76 0 0 -2.78608e-12
+F 109 assets/images/tiles/tileset_prehistory.png 380 608 76 76 0 0 -1.97875e-11
+F 110 assets/images/tiles/tileset_prehistory.png 456 608 76 76 0 0 -2.30842e-11
+F 111 assets/images/tiles/tileset_prehistory.png 532 608 76 76 0 0 -2.43348e-11
+F 112 assets/images/tiles/tileset_prehistory.png 608 608 76 76 0 0 -2.45622e-11
+F 113 assets/images/tiles/tileset_prehistory.png 684 608 76 76 0 0 -2.64949e-11
+F 114 assets/images/tiles/tileset_prehistory.png 760 608 76 76 0 0 -2.76318e-11
+F 115 assets/images/tiles/tileset_prehistory.png 836 608 76 76 0 0 -2.88823e-11
+F 116 assets/images/tiles/tileset_prehistory.png 912 608 76 76 0 0 -1.81976e-12
+F 117 assets/images/tiles/tileset_prehistory.png 0 684 76 76 0 0 -2.03292e-12
+F 118 assets/images/tiles/tileset_prehistory.png 76 684 76 76 0 0 -1.96187e-12
+F 119 assets/images/tiles/tileset_prehistory.png 152 684 76 76 0 0 -2.21766e-12
+F 120 assets/images/tiles/tileset_prehistory.png 228 684 76 76 0 0 -2.20345e-12
+F 121 assets/images/tiles/tileset_prehistory.png 304 684 76 76 0 0 -2.35977e-12
+F 122 assets/images/tiles/tileset_prehistory.png 380 684 76 76 0 0 -5.62883e-12
+F 123 assets/images/tiles/tileset_prehistory.png 456 684 76 76 0 0 -4.97518e-12
+F 124 assets/images/tiles/tileset_prehistory.png 532 684 76 76 0 0 -5.68568e-12
+F 125 assets/images/tiles/tileset_prehistory.png 608 684 76 76 0 0 -5.31619e-12
+F 126 assets/images/tiles/tileset_prehistory.png 684 684 76 76 0 0 -3.34031e-12
+F 127 assets/images/tiles/tileset_prehistory.png 760 684 76 76 0 0 -4.69096e-12
+F 128 assets/images/tiles/tileset_prehistory.png 836 684 76 76 0 0 -5.34467e-12
+F 129 assets/images/tiles/tileset_prehistory.png 912 684 76 76 0 0 -4.83307e-12
+F 130 assets/images/tiles/tileset_prehistory.png 0 760 76 76 0 0 -4.17936e-12
+F 131 assets/images/tiles/tileset_prehistory.png 76 760 76 76 0 0 -6.11201e-12
+F 132 assets/images/tiles/tileset_prehistory.png 152 760 76 76 0 0 -3.83829e-12
+F 133 assets/images/tiles/tileset_prehistory.png 228 760 76 76 0 0 -3.52497e-12
+F 134 assets/images/tiles/tileset_prehistory.png 304 760 76 76 0 0 -2.95661e-12
+F 135 assets/images/tiles/tileset_prehistory.png 380 760 76 76 0 0 -6.45308e-12
+F 136 assets/images/tiles/tileset_prehistory.png 456 760 76 76 0 0 -5.03202e-12
+F 137 assets/images/tiles/tileset_prehistory.png 532 760 76 76 0 0 -3.49663e-12
+F 138 assets/images/tiles/tileset_prehistory.png 608 760 76 76 0 0 -3.69619e-12
+F 139 assets/images/tiles/tileset_prehistory.png 684 760 76 76 0 0 -3.16978e-12
+F 140 assets/images/tiles/tileset_prehistory.png 760 760 76 76 0 0 -5.82779e-12
+F 141 assets/images/tiles/tileset_prehistory.png 836 760 76 76 0 0 -3.59611e-12
+F 142 assets/images/tiles/tileset_prehistory.png 912 760 76 76 0 0 -5.9699e-12
+F 143 assets/images/tiles/tileset_prehistory.png 0 836 76 76 0 0 -3.89514e-12
+F 144 assets/images/tiles/tileset_prehistory.png 76 836 76 76 0 0 -6.16885e-12
+F 145 assets/images/tiles/tileset_prehistory.png 152 836 76 76 0 0 -6.4815e-12
+F 146 assets/images/tiles/tileset_prehistory.png 228 836 76 76 0 0 -2.92819e-12
+F 147 assets/images/tiles/tileset_prehistory.png 304 836 76 76 0 0 -4.20778e-12
+F 148 assets/images/tiles/tileset_prehistory.png 380 836 76 76 0 0 -3.35452e-12
+F 149 assets/images/tiles/tileset_prehistory.png 456 836 76 76 0 0 -3.02767e-12
+F 150 assets/images/tiles/tileset_prehistory.png 532 836 76 76 0 0 -3.09872e-12
+F 151 assets/images/tiles/tileset_prehistory.png 608 836 76 76 0 0 -3.1982e-12
+F 152 assets/images/tiles/tileset_prehistory.png 684 836 76 76 0 0 -4.492e-12
+F 153 assets/images/tiles/tileset_prehistory.png 760 836 76 76 0 0 -4.54885e-12
+F 154 assets/images/tiles/tileset_prehistory.png 836 836 76 76 0 0 -7.24889e-12
+F 155 assets/images/tiles/tileset_prehistory.png 912 836 76 76 0 0 nan
+F 156 assets/images/tiles/tileset_prehistory.png 0 912 76 76 0 0 -6.76572e-12
+F 157 assets/images/tiles/tileset_prehistory.png 76 912 76 76 0 0 -6.96467e-12
+F 158 assets/images/tiles/tileset_prehistory.png 152 912 76 76 0 0 -6.82257e-12
+F 159 assets/images/tiles/tileset_prehistory.png 228 912 76 76 0 0 -4.18434e-12
+F 160 assets/images/tiles/tileset_prehistory.png 304 912 76 76 0 0 -3.34272e-12
+F 161 assets/images/tiles/tileset_prehistory.png 380 912 76 76 0 0 -4.55389e-12
+F 162 assets/images/tiles/tileset_prehistory.png 456 912 76 76 0 0 -4.49699e-12
+F 163 assets/images/tiles/tileset_prehistory.png 532 912 76 76 0 0 -6.1171e-12
+F 164 assets/images/tiles/tileset_prehistory.png 608 912 76 76 0 0 -3.0301e-12
+F 165 assets/images/tiles/tileset_prehistory.png 684 912 76 76 0 0 -6.45811e-12
+F 166 assets/images/tiles/tileset_prehistory.png 760 912 76 76 0 0 -4.21276e-12
+F 167 assets/images/tiles/tileset_prehistory.png 836 912 76 76 0 0 -3.52746e-12
+F 168 assets/images/tiles/tileset_prehistory.png 912 912 76 76 0 0 -4.69593e-12
+F 169 assets/images/tiles/tileset_prehistory.png 0 988 76 76 0 0 -4.98022e-12
+F 170 assets/images/tiles/tileset_prehistory.png 76 988 76 76 0 0 -5.03706e-12
+F 171 assets/images/tiles/tileset_prehistory.png 152 988 76 76 0 0 -3.20061e-12
+F 172 assets/images/tiles/tileset_prehistory.png 228 988 76 76 0 0 -3.59851e-12
+F 173 assets/images/tiles/tileset_prehistory.png 304 988 76 76 0 0 -5.3497e-12
+F 174 assets/images/tiles/tileset_prehistory.png 380 988 76 76 0 0 -2.93062e-12
+F 175 assets/images/tiles/tileset_prehistory.png 456 988 76 76 0 0 -6.48659e-12
+F 176 assets/images/tiles/tileset_prehistory.png 532 988 76 76 0 0 -3.17221e-12
+F 177 assets/images/tiles/tileset_prehistory.png 608 988 76 76 0 0 -5.69077e-12
+F 178 assets/images/tiles/tileset_prehistory.png 684 988 76 76 0 0 -3.10116e-12
+F 179 assets/images/tiles/tileset_prehistory.png 760 988 76 76 0 0 -2.95905e-12
+F 180 assets/images/tiles/tileset_prehistory.png 836 988 76 76 0 0 -3.35693e-12
+F 181 assets/images/tiles/tileset_prehistory.png 912 988 76 76 0 0 -3.70117e-12
+F 182 assets/images/tiles/tileset_prehistory.png 0 1064 76 76 0 0 -4.83811e-12
+F 183 assets/images/tiles/tileset_prehistory.png 76 1064 76 76 0 0 -3.49904e-12
+F 184 assets/images/tiles/tileset_prehistory.png 152 1064 76 76 0 0 -5.83288e-12
+F 185 assets/images/tiles/tileset_prehistory.png 228 1064 76 76 0 0 -3.84328e-12
+F 186 assets/images/tiles/tileset_prehistory.png 304 1064 76 76 0 0 -5.97499e-12
+F 187 assets/images/tiles/tileset_prehistory.png 380 1064 76 76 0 0 -6.17395e-12
+F 188 assets/images/tiles/tileset_prehistory.png 456 1064 76 76 0 0 -3.90012e-12
+F 189 assets/images/tiles/tileset_prehistory.png 532 1064 76 76 0 0 -5.32128e-12
+F 190 assets/images/tiles/tileset_prehistory.png 608 1064 76 76 0 0 -5.63393e-12
+F 191 assets/images/tiles/tileset_prehistory.png 684 1064 76 76 0 0 -6.77076e-12
+F 192 assets/images/tiles/tileset_prehistory.png 760 1064 76 76 0 0 -7.25393e-12
+F 193 assets/images/tiles/tileset_prehistory.png 836 1064 76 76 0 0 0
+F 194 assets/images/tiles/tileset_prehistory.png 912 1064 76 76 0 0 -6.96971e-12
+F 195 assets/images/tiles/tileset_prehistory.png 0 1140 76 76 0 0 -6.8276e-12
+F 196 assets/images/tiles/tileset_prehistory.png 76 1140 76 76 0 0 -1.33098e-11
+F 197 assets/images/tiles/tileset_prehistory.png 152 1140 76 76 0 0 -1.27414e-11
+F 198 assets/images/tiles/tileset_prehistory.png 228 1140 76 76 0 0 -9.78556e-12
+F 199 assets/images/tiles/tileset_prehistory.png 304 1140 76 76 0 0 -1.66152e-11
+F 200 assets/images/tiles/tileset_prehistory.png 380 1140 76 76 0 0 -1.26278e-11
+F 201 assets/images/tiles/tileset_prehistory.png 456 1140 76 76 0 0 -9.72873e-12
+F 202 assets/images/tiles/tileset_prehistory.png 532 1140 76 76 0 0 -1.74111e-11
+F 203 assets/images/tiles/tileset_prehistory.png 608 1140 76 76 0 0 -1.0354e-11
+F 204 assets/images/tiles/tileset_prehistory.png 684 1140 76 76 0 0 -9.04693e-12
+F 205 assets/images/tiles/tileset_prehistory.png 760 1140 76 76 0 0 -1.71837e-11
+F 206 assets/images/tiles/tileset_prehistory.png 836 1140 76 76 0 0 -8.76271e-12
+F 207 assets/images/tiles/tileset_prehistory.png 912 1140 76 76 0 0 -1.37077e-11
+F 208 assets/images/tiles/tileset_prehistory.png 0 1216 76 76 0 0 -1.4333e-11
+F 209 assets/images/tiles/tileset_prehistory.png 76 1216 76 76 0 0 -1.42762e-11
+F 210 assets/images/tiles/tileset_prehistory.png 152 1216 76 76 0 0 -1.30257e-11
+F 211 assets/images/tiles/tileset_prehistory.png 228 1216 76 76 0 0 -1.14341e-11
+F 212 assets/images/tiles/tileset_prehistory.png 304 1216 76 76 0 0 -1.04677e-11
+F 213 assets/images/tiles/tileset_prehistory.png 380 1216 76 76 0 0 -1.13204e-11
+F 214 assets/images/tiles/tileset_prehistory.png 456 1216 76 76 0 0 -1.07519e-11
+F 215 assets/images/tiles/tileset_prehistory.png 532 1216 76 76 0 0 -9.16029e-12
+F 216 assets/images/tiles/tileset_prehistory.png 608 1216 76 76 0 0 -1.5251e-11
+F 217 assets/images/tiles/tileset_prehistory.png 684 1216 76 76 0 0 -8.47847e-12
+F 218 assets/images/tiles/tileset_prehistory.png 760 1216 76 76 0 0 -1.10361e-11
+F 219 assets/images/tiles/tileset_prehistory.png 836 1216 76 76 0 0 -1.86616e-11
+F 220 assets/images/tiles/tileset_prehistory.png 912 1216 76 76 0 0 -1.85482e-11
+F 221 assets/images/tiles/tileset_prehistory.png 0 1292 76 76 0 0 -1.20593e-11
+F 222 assets/images/tiles/tileset_prehistory.png 76 1292 76 76 0 0 -1.3594e-11
+F 223 assets/images/tiles/tileset_prehistory.png 152 1292 76 76 0 0 -1.20025e-11
+F 224 assets/images/tiles/tileset_prehistory.png 228 1292 76 76 0 0 -8.08058e-12
+F 225 assets/images/tiles/tileset_prehistory.png 304 1292 76 76 0 0 -8.19427e-12
+F 226 assets/images/tiles/tileset_prehistory.png 380 1292 76 76 0 0 -1.60468e-11
+F 227 assets/images/tiles/tileset_prehistory.png 456 1292 76 76 0 0 -1.54784e-11
+F 228 assets/images/tiles/tileset_prehistory.png 532 1292 76 76 0 0 -2.32094e-11
+F 229 assets/images/tiles/tileset_prehistory.png 608 1292 76 76 0 0 -1.96324e-12
+F 230 assets/images/tiles/tileset_prehistory.png 684 1292 76 76 0 0 -2.78851e-12
+F 231 assets/images/tiles/tileset_prehistory.png 760 1292 76 76 0 0 -1.89219e-12
+F 232 assets/images/tiles/tileset_prehistory.png 836 1292 76 76 0 0 -2.53271e-12
+F 233 assets/images/tiles/tileset_prehistory.png 912 1292 76 76 0 0 -2.1163e-11
+F 234 assets/images/tiles/tileset_prehistory.png 0 1368 76 76 0 0 -2.51421e-11
+F 235 assets/images/tiles/tileset_prehistory.png 76 1368 76 76 0 0 -2.65062e-11
+F 236 assets/images/tiles/tileset_prehistory.png 152 1368 76 76 0 0 -2.46166e-12
+F 237 assets/images/tiles/tileset_prehistory.png 228 1368 76 76 0 0 -2.05945e-11
+F 238 assets/images/tiles/tileset_prehistory.png 304 1368 76 76 0 0 -2.00261e-11
+F 239 assets/images/tiles/tileset_prehistory.png 380 1368 76 76 0 0 -2.63219e-12
+F 240 assets/images/tiles/tileset_prehistory.png 456 1368 76 76 0 0 -2.3906e-12
+F 241 assets/images/tiles/tileset_prehistory.png 532 1368 76 76 0 0 -1.97987e-11
+F 242 assets/images/tiles/tileset_prehistory.png 608 1368 76 76 0 0 -2.06272e-12
+F 243 assets/images/tiles/tileset_prehistory.png 684 1368 76 76 0 0 -2.62788e-11
+F 244 assets/images/tiles/tileset_prehistory.png 760 1368 76 76 0 0 -2.43463e-11
+F 245 assets/images/tiles/tileset_prehistory.png 836 1368 76 76 0 0 -2.60377e-12
+F 246 assets/images/tiles/tileset_prehistory.png 912 1368 76 76 0 0 -2.7743e-12
+F 247 assets/images/tiles/tileset_prehistory.png 0 1444 76 76 0 0 -2.45737e-11
+F 248 assets/images/tiles/tileset_prehistory.png 76 1444 76 76 0 0 -2.57103e-11
+F 249 assets/images/tiles/tileset_prehistory.png 152 1444 76 76 0 0 -1.82113e-12
+F 250 assets/images/tiles/tileset_prehistory.png 228 1444 76 76 0 0 -2.17314e-11
+F 251 assets/images/tiles/tileset_prehistory.png 304 1444 76 76 0 0 -2.19588e-11
+F 252 assets/images/tiles/tileset_prehistory.png 380 1444 76 76 0 0 -2.30957e-11
+F 253 assets/images/tiles/tileset_prehistory.png 456 1444 76 76 0 0 -2.77567e-11
+F 254 assets/images/tiles/tileset_prehistory.png 532 1444 76 76 0 0 -2.7643e-11
+F 255 assets/images/tiles/tileset_prehistory.png 608 1444 76 76 0 0 -2.88936e-11
+F 256 assets/images/tiles/tileset_prehistory.png 684 1444 76 76 0 0 -2.0343e-12
+F 257 assets/images/tiles/tileset_prehistory.png 760 1444 76 76 0 0 -2.21904e-12
+F 258 assets/images/tiles/tileset_prehistory.png 836 1444 76 76 0 0 -2.20483e-12
+F 259 assets/images/tiles/tileset_prehistory.png 912 1444 76 76 0 0 -2.36218e-12
+F 260 assets/images/tiles/tileset_prehistory.png 0 1520 76 76 0 0 -1.29727e-11
+F 261 assets/images/tiles/tileset_prehistory.png 76 1520 76 76 0 0 -1.29159e-11
+F 262 assets/images/tiles/tileset_prehistory.png 152 1520 76 76 0 0 -1.23476e-11
+F 263 assets/images/tiles/tileset_prehistory.png 228 1520 76 76 0 0 -1.73054e-11
+F 264 assets/images/tiles/tileset_prehistory.png 304 1520 76 76 0 0 -8.36879e-12
+F 265 assets/images/tiles/tileset_prehistory.png 380 1520 76 76 0 0 -1.19496e-11
+F 266 assets/images/tiles/tileset_prehistory.png 456 1520 76 76 0 0 -9.67588e-12
+F 267 assets/images/tiles/tileset_prehistory.png 532 1520 76 76 0 0 -1.58274e-11
+F 268 assets/images/tiles/tileset_prehistory.png 608 1520 76 76 0 0 -1.35412e-11
+F 269 assets/images/tiles/tileset_prehistory.png 684 1520 76 76 0 0 -1.84425e-11
+F 270 assets/images/tiles/tileset_prehistory.png 760 1520 76 76 0 0 -1.22339e-11
+F 271 assets/images/tiles/tileset_prehistory.png 836 1520 76 76 0 0 -1.00738e-11
+F 272 assets/images/tiles/tileset_prehistory.png 912 1520 76 76 0 0 -9.39198e-12
+F 273 assets/images/tiles/tileset_prehistory.png 0 1596 76 76 0 0 -1.39391e-11
+F 274 assets/images/tiles/tileset_prehistory.png 76 1596 76 76 0 0 -1.7078e-11
+F 275 assets/images/tiles/tileset_prehistory.png 152 1596 76 76 0 0 -1.78738e-11
+F 276 assets/images/tiles/tileset_prehistory.png 228 1596 76 76 0 0 -1.90109e-11
+F 277 assets/images/tiles/tileset_prehistory.png 304 1596 76 76 0 0 -1.36549e-11
+F 278 assets/images/tiles/tileset_prehistory.png 380 1596 76 76 0 0 -1.45075e-11
+F 279 assets/images/tiles/tileset_prehistory.png 456 1596 76 76 0 0 -7.80035e-12
+F 280 assets/images/tiles/tileset_prehistory.png 532 1596 76 76 0 0 -8.99408e-12
+F 281 assets/images/tiles/tileset_prehistory.png 608 1596 76 76 0 0 -9.10744e-12
+F 282 assets/images/tiles/tileset_prehistory.png 684 1596 76 76 0 0 -8.42564e-12
+F 283 assets/images/tiles/tileset_prehistory.png 760 1596 76 76 0 0 -1.06991e-11
+F 284 assets/images/tiles/tileset_prehistory.png 836 1596 76 76 0 0 -9.9601e-12
+F 285 assets/images/tiles/tileset_prehistory.png 912 1596 76 76 0 0 -1.12675e-11
+F 286 assets/images/tiles/tileset_prehistory.png 0 1672 76 76 0 0 -1.42233e-11
+F 287 assets/images/tiles/tileset_prehistory.png 76 1672 76 76 0 0 -1.46905e-11
+F 288 assets/images/tiles/tileset_prehistory.png 152 1672 76 76 0 0 -1.06422e-11
+F 289 assets/images/tiles/tileset_prehistory.png 228 1672 76 76 0 0 -1.16654e-11
+F 290 assets/images/tiles/tileset_prehistory.png 304 1672 76 76 0 0 -1.13812e-11
+F 291 assets/images/tiles/tileset_prehistory.png 380 1672 76 76 0 0 -1.59411e-11
+F 292 assets/images/tiles/tileset_prehistory.png 456 1672 76 76 0 0 -1.92383e-11
+F 293 assets/images/tiles/tileset_prehistory.png 532 1672 76 76 0 0 -2.19162e-12
+F 294 assets/images/tiles/tileset_prehistory.png 608 1672 76 76 0 0 -2.35585e-11
+F 295 assets/images/tiles/tileset_prehistory.png 684 1672 76 76 0 0 -2.04889e-11
+F 296 assets/images/tiles/tileset_prehistory.png 760 1672 76 76 0 0 -2.24216e-11
+F 297 assets/images/tiles/tileset_prehistory.png 836 1672 76 76 0 0 -2.26268e-12
+F 298 assets/images/tiles/tileset_prehistory.png 912 1672 76 76 0 0 -2.03752e-11
+F 299 assets/images/tiles/tileset_prehistory.png 0 1748 76 76 0 0 -2.18531e-11
+F 300 assets/images/tiles/tileset_prehistory.png 76 1748 76 76 0 0 -2.64005e-11
+F 301 assets/images/tiles/tileset_prehistory.png 152 1748 76 76 0 0 -2.83332e-11
+F 302 assets/images/tiles/tileset_prehistory.png 228 1748 76 76 0 0 -2.29124e-12
+F 303 assets/images/tiles/tileset_prehistory.png 304 1748 76 76 0 0 -2.16257e-11
+F 304 assets/images/tiles/tileset_prehistory.png 380 1748 76 76 0 0 -2.37858e-11
+F 305 assets/images/tiles/tileset_prehistory.png 456 1748 76 76 0 0 -1.87898e-12
+F 306 assets/images/tiles/tileset_prehistory.png 532 1748 76 76 0 0 -2.61809e-12
+F 307 assets/images/tiles/tileset_prehistory.png 608 1748 76 76 0 0 -2.299e-11
+F 308 assets/images/tiles/tileset_prehistory.png 684 1748 76 76 0 0 -2.75373e-11
+F 309 assets/images/tiles/tileset_prehistory.png 760 1748 76 76 0 0 -2.50364e-11
+F 310 assets/images/tiles/tileset_prehistory.png 836 1748 76 76 0 0 -2.43335e-12
+F 311 assets/images/tiles/tileset_prehistory.png 912 1748 76 76 0 0 -2.02109e-12
+F 312 assets/images/tiles/tileset_prehistory.png 0 1824 76 76 0 0 -2.7602e-12
+F 313 assets/images/tiles/tileset_prehistory.png 76 1824 76 76 0 0 -2.81058e-11
+F 314 assets/images/tiles/tileset_prehistory.png 152 1824 76 76 0 0 -2.49227e-11
+F 315 assets/images/tiles/tileset_prehistory.png 228 1824 76 76 0 0 -2.61731e-11
+F 316 assets/images/tiles/tileset_prehistory.png 304 1824 76 76 0 0 -1.86477e-12
+F 317 assets/images/tiles/tileset_prehistory.png 380 1824 76 76 0 0 -2.58967e-12
+F 318 assets/images/tiles/tileset_prehistory.png 456 1824 76 76 0 0 -2.68914e-12
+F 319 assets/images/tiles/tileset_prehistory.png 532 1824 76 76 0 0 -2.83126e-12
+F 320 assets/images/tiles/tileset_prehistory.png 608 1824 76 76 0 0 -2.12056e-12
+F 321 assets/images/tiles/tileset_prehistory.png 684 1824 76 76 0 0 -2.04951e-12
+F 322 assets/images/tiles/tileset_prehistory.png 760 1824 76 76 0 0 -2.69689e-11
+F 323 assets/images/tiles/tileset_prehistory.png 836 1824 76 76 0 0 -2.44756e-12
+F 324 assets/images/tiles/tileset_prehistory.png 912 1824 76 76 0 0 -3.00179e-12
+F 325 assets/images/tiles/tileset_prehistory.png 0 1900 76 76 0 0 -6.42991e-12
+F 326 assets/images/tiles/tileset_prehistory.png 76 1900 76 76 0 0 -3.32862e-12
+F 327 assets/images/tiles/tileset_prehistory.png 152 1900 76 76 0 0 -2.85968e-12
+F 328 assets/images/tiles/tileset_prehistory.png 228 1900 76 76 0 0 -3.81507e-12
+F 329 assets/images/tiles/tileset_prehistory.png 304 1900 76 76 0 0 -5.29308e-12
+F 330 assets/images/tiles/tileset_prehistory.png 380 1900 76 76 0 0 -4.63937e-12
+F 331 assets/images/tiles/tileset_prehistory.png 456 1900 76 76 0 0 -6.28785e-12
+F 332 assets/images/tiles/tileset_prehistory.png 532 1900 76 76 0 0 -3.18651e-12
+F 333 assets/images/tiles/tileset_prehistory.png 608 1900 76 76 0 0 -3.25759e-12
+F 334 assets/images/tiles/tileset_prehistory.png 684 1900 76 76 0 0 -6.0889e-12
+F 335 assets/images/tiles/tileset_prehistory.png 760 1900 76 76 0 0 -3.016e-12
+F 336 assets/images/tiles/tileset_prehistory.png 836 1900 76 76 0 0 -5.49204e-12
+F 337 assets/images/tiles/tileset_prehistory.png 912 1900 76 76 0 0 -3.39967e-12
+IMAGEMAP YELLOW_DOOR_CASTLE 1
+F 0 assets/images/elements/tile_gates.png 160 0 80 304 40 512 -9.7878e-12
+IMAGEMAP YELLOW_DOOR_EGYPT 1
+F 0 assets/images/elements/tile_gates.png 800 0 80 304 40 512 -9.73096e-12
+IMAGEMAP YELLOW_DOOR_FUTURE 1
+F 0 assets/images/elements/tile_gates.png 480 304 80 304 40 512 -2.17359e-11
+IMAGEMAP YELLOW_DOOR_PIRATES 1
+F 0 assets/images/elements/tile_gates.png 480 0 80 304 40 512 -8.48071e-12
+IMAGEMAP YELLOW_DOOR_PREHISTORY 1
+F 0 assets/images/elements/tile_gates.png 160 304 80 304 40 512 -1.20616e-11
+### imagemaps 0df2af78
+IMAGEMAP ACID_IN 9
+F 0 assets/images/enemies/anim_lava_tile.png 0 304 76 152 38 152 -1.70678e-10
+F 1 assets/images/enemies/anim_lava_tile.png 76 304 76 152 38 152 -1.50665e-10
+F 2 assets/images/enemies/anim_lava_tile.png 152 304 76 152 38 152 -1.2338e-10
+F 3 assets/images/enemies/anim_lava_tile.png 228 304 76 152 38 152 -4.06829e-10
+F 4 assets/images/enemies/anim_lava_tile.png 304 304 76 152 38 152 -3.34074e-10
+F 5 assets/images/enemies/anim_lava_tile.png 380 304 76 152 38 152 -3.03152e-10
+F 6 assets/images/enemies/anim_lava_tile.png 456 304 76 152 38 152 -5.79026e-11
+F 7 assets/images/enemies/anim_lava_tile.png 532 304 76 152 38 152 -4.28656e-10
+F 8 assets/images/enemies/anim_lava_tile.png 608 304 76 152 38 152 -3.75907e-10
+IMAGEMAP ACID_OUT 9
+F 0 assets/images/enemies/anim_lava_tile.png 0 304 76 152 38 152 -4.30476e-10
+F 1 assets/images/enemies/anim_lava_tile.png 76 304 76 152 38 152 -5.31278e-11
+F 2 assets/images/enemies/anim_lava_tile.png 152 304 76 152 38 152 -4.10467e-10
+F 3 assets/images/enemies/anim_lava_tile.png 228 304 76 152 38 152 -5.56289e-11
+F 4 assets/images/enemies/anim_lava_tile.png 304 304 76 152 38 152 -5.15362e-11
+F 5 assets/images/enemies/anim_lava_tile.png 380 304 76 152 38 152 -3.97734e-10
+F 6 assets/images/enemies/anim_lava_tile.png 456 304 76 152 38 152 -3.8864e-10
+F 7 assets/images/enemies/anim_lava_tile.png 532 304 76 152 38 152 -3.37712e-10
+F 8 assets/images/enemies/anim_lava_tile.png 608 304 76 152 38 152 -2.43126e-10
+IMAGEMAP BIG_CANNONBALL 1
+F 0 assets/images/enemies/enemies_tile_2.png 900 760 60 60 30 49 -5.97428e-12
+IMAGEMAP BIG_ROBOT 3
+F 0 assets/images/enemies/enemies_tile_2.png 0 580 140 180 50 170 -6.7866e-11
+F 1 assets/images/enemies/enemies_tile_2.png 140 580 140 180 50 170 -7.24136e-11
+F 2 assets/images/enemies/enemies_tile_2.png 280 580 140 180 50 170 -6.55923e-11
+IMAGEMAP BIRD_BLACK 5
+F 0 assets/images/enemies/enemies_tile_2.png 0 260 110 130 55 100 -4.64259e-10
+F 1 assets/images/enemies/enemies_tile_2.png 110 260 110 130 55 100 -6.01353e-11
+F 2 assets/images/enemies/enemies_tile_2.png 220 260 110 130 55 100 -8.60571e-11
+F 3 assets/images/enemies/enemies_tile_2.png 330 260 110 130 55 100 -4.48471e-11
+F 4 assets/images/enemies/enemies_tile_2.png 440 260 110 130 55 100 -5.00768e-11
+IMAGEMAP BIRD_BROWN 5
+F 0 assets/images/enemies/enemies_tile_2.png 0 0 110 130 55 100 -3.42388e-10
+F 1 assets/images/enemies/enemies_tile_2.png 110 0 110 130 55 100 -3.73311e-10
+F 2 assets/images/enemies/enemies_tile_2.png 220 0 110 130 55 100 -2.91456e-10
+F 3 assets/images/enemies/enemies_tile_2.png 330 0 110 130 55 100 -3.22379e-10
+F 4 assets/images/enemies/enemies_tile_2.png 440 0 110 130 55 100 -3.40569e-10
+IMAGEMAP BIRD_ROBOT 3
+F 0 assets/images/enemies/enemies_tile_2.png 320 480 110 100 50 85 -5.23501e-11
+F 1 assets/images/enemies/enemies_tile_2.png 430 480 110 100 50 85 -5.96805e-11
+F 2 assets/images/enemies/enemies_tile_2.png 540 480 110 100 50 85 -4.32555e-11
+IMAGEMAP BIRD_YELLOW 5
+F 0 assets/images/enemies/enemies_tile_2.png 0 130 110 130 55 100 -3.64216e-10
+F 1 assets/images/enemies/enemies_tile_2.png 110 130 110 130 55 100 -4.13326e-10
+F 2 assets/images/enemies/enemies_tile_2.png 220 130 110 130 55 100 -4.46068e-10
+F 3 assets/images/enemies/enemies_tile_2.png 330 130 110 130 55 100 -3.68889e-11
+F 4 assets/images/enemies/enemies_tile_2.png 440 130 110 130 55 100 -4.36974e-10
+IMAGEMAP BLUE_SPLATTER 8
+F 0 assets/images/enemies/anim_lava_tile.png 0 152 76 152 38 152 -1.36774e-10
+F 1 assets/images/enemies/anim_lava_tile.png 76 152 76 152 38 152 -3.33583e-10
+F 2 assets/images/enemies/anim_lava_tile.png 152 152 76 152 38 152 -1.80434e-10
+F 3 assets/images/enemies/anim_lava_tile.png 228 152 76 152 38 152 -2.04081e-10
+F 4 assets/images/enemies/anim_lava_tile.png 304 152 76 152 38 152 -2.08623e-10
+F 5 assets/images/enemies/anim_lava_tile.png 380 152 76 152 38 152 -1.2495e-10
+F 6 assets/images/enemies/anim_lava_tile.png 456 152 76 152 38 152 1.46019e+25
+F 7 assets/images/enemies/anim_lava_tile.png 532 152 76 152 38 152 -1.74062e-10
+IMAGEMAP CANNONBALL_CASTLE 1
+F 0 assets/images/enemies/enemies_tile_2.png 180 760 60 60 30 46 -4.83745e-12
+IMAGEMAP CANNONBALL_EGYPT 1
+F 0 assets/images/enemies/enemies_tile_2.png 120 760 60 60 30 36 -3.34239e-12
+IMAGEMAP CANNONBALL_FUTURE 1
+F 0 assets/images/enemies/enemies_tile_2.png 60 760 60 60 30 40 -3.3566e-12
+IMAGEMAP CANNONBALL_PIRATES 1
+F 0 assets/images/enemies/enemies_tile_2.png 0 760 60 60 30 46 -4.69533e-12
+IMAGEMAP CANNONBALL_PREHISTORY 1
+F 0 assets/images/enemies/enemies_tile_2.png 600 760 60 60 30 46 -3.84262e-12
+IMAGEMAP CANNON_CASTLE 3
+F 0 assets/images/enemies/enemies_tile_2.png 240 390 80 90 40 88 -1.01064e-10
+F 1 assets/images/enemies/enemies_tile_2.png 320 390 80 90 40 88 -1.04247e-10
+F 2 assets/images/enemies/enemies_tile_2.png 400 390 80 90 40 88 -1.01973e-10
+IMAGEMAP CANNON_EGYPT 3
+F 0 assets/images/enemies/enemies_tile_2.png 0 390 80 90 40 88 -9.06047e-11
+F 1 assets/images/enemies/enemies_tile_2.png 80 390 80 90 40 88 -7.01398e-11
+F 2 assets/images/enemies/enemies_tile_2.png 160 390 80 90 40 88 -7.78716e-11
+IMAGEMAP CANNON_LASER 3
+F 0 assets/images/enemies/enemies_tile_2.png 420 580 80 90 40 88 -2.21974e-12
+F 1 assets/images/enemies/enemies_tile_2.png 500 580 80 90 40 88 -2.36185e-12
+F 2 assets/images/enemies/enemies_tile_2.png 580 580 80 90 40 88 -2.39027e-12
+IMAGEMAP CANNON_PIRATES 3
+F 0 assets/images/enemies/enemies_tile_2.png 720 390 80 90 40 88 0
+F 1 assets/images/enemies/enemies_tile_2.png 800 390 80 90 40 88 -2.06342e-12
+F 2 assets/images/enemies/enemies_tile_2.png 880 390 80 90 40 88 -2.46133e-12
+IMAGEMAP CANNON_PREHISTORY 3
+F 0 assets/images/enemies/enemies_tile_2.png 480 390 80 90 40 88 -4.15145e-10
+F 1 assets/images/enemies/enemies_tile_2.png 560 390 80 90 40 88 -1.0652e-10
+F 2 assets/images/enemies/enemies_tile_2.png 640 390 80 90 40 88 -1.09704e-10
+IMAGEMAP CAVE_TRAP 4
+F 0 assets/images/enemies/enemies_tile.png 660 660 80 304 40 304 -3.79544e-10
+F 1 assets/images/enemies/enemies_tile.png 740 660 80 304 40 304 -3.15885e-10
+F 2 assets/images/enemies/enemies_tile.png 820 660 80 304 40 304 -2.64954e-10
+F 3 assets/images/enemies/enemies_tile.png 900 660 80 304 40 304 -5.54015e-11
+IMAGEMAP COCONUT 1
+F 0 assets/images/enemies/enemies_tile_2.png 720 760 60 60 30 45 -4.55323e-12
+IMAGEMAP DINOSAUR_BIG 11
+F 0 assets/images/enemies/enemies_tile.png 0 230 130 140 65 136 -1.32089e-10
+F 1 assets/images/enemies/enemies_tile.png 130 230 130 140 65 136 -2.23942e-10
+F 2 assets/images/enemies/enemies_tile.png 260 230 130 140 65 136 -2.30308e-10
+F 3 assets/images/enemies/enemies_tile.png 390 230 130 140 65 136 -1.41184e-10
+F 4 assets/images/enemies/enemies_tile.png 520 230 130 140 65 136 -1.5755e-10
+F 5 assets/images/enemies/enemies_tile.png 650 230 130 140 65 136 -1.78468e-10
+F 6 assets/images/enemies/enemies_tile.png 780 230 130 140 65 136 -7.22573e-12
+F 7 assets/images/enemies/enemies_tile.png 0 370 130 140 65 136 -1.42093e-10
+F 8 assets/images/enemies/enemies_tile.png 130 370 130 140 65 136 -2.36882e-10
+F 9 assets/images/enemies/enemies_tile.png 260 370 130 140 65 136 -1.53002e-10
+F 10 assets/images/enemies/enemies_tile.png 390 370 130 140 65 136 -2.14847e-10
+IMAGEMAP DINOSAUR_SMALL 11
+F 0 assets/images/enemies/enemies_tile.png 0 510 90 90 45 82 -2.13937e-10
+F 1 assets/images/enemies/enemies_tile.png 90 510 90 90 45 82 -1.87563e-10
+F 2 assets/images/enemies/enemies_tile.png 180 510 90 90 45 82 -6.62887e-12
+F 3 assets/images/enemies/enemies_tile.png 270 510 90 90 45 82 -1.62097e-10
+F 4 assets/images/enemies/enemies_tile.png 360 510 90 90 45 82 -1.68464e-10
+F 5 assets/images/enemies/enemies_tile.png 450 510 90 90 45 82 -1.98478e-10
+F 6 assets/images/enemies/enemies_tile.png 540 510 90 90 45 82 -2.04842e-10
+F 7 assets/images/enemies/enemies_tile.png 630 510 90 90 45 82 -6.91309e-12
+F 8 assets/images/enemies/enemies_tile.png 720 510 90 90 45 82 -3.57498e-11
+F 9 assets/images/enemies/enemies_tile.png 810 510 90 90 45 82 -3.1657e-11
+F 10 assets/images/enemies/enemies_tile.png 900 510 90 90 45 82 -4.33335e-10
+IMAGEMAP ENEMY_DEATH 4
+F 0 assets/images/enemies/enemies_tile_2.png 360 820 160 150 75 75 -5.00886e-12
+F 1 assets/images/enemies/enemies_tile_2.png 520 820 160 150 75 75 -5.43519e-12
+F 2 assets/images/enemies/enemies_tile_2.png 680 820 160 150 75 75 -5.77626e-12
+F 3 assets/images/enemies/enemies_tile_2.png 840 820 160 150 75 75 -1.21175e-10
+IMAGEMAP ESCORPION_R 7
+F 0 assets/images/enemies/enemies_tile.png 0 140 100 90 50 82 -4.01403e-12
+F 1 assets/images/enemies/enemies_tile.png 100 140 100 90 50 82 -3.4281e-12
+F 2 assets/images/enemies/enemies_tile.png 200 140 100 90 50 82 -3.87192e-12
+F 3 assets/images/enemies/enemies_tile.png 300 140 100 90 50 82 -5.80468e-12
+F 4 assets/images/enemies/enemies_tile.png 400 140 100 90 50 82 -3.58442e-12
+F 5 assets/images/enemies/enemies_tile.png 500 140 100 90 50 82 -6.14575e-12
+F 6 assets/images/enemies/enemies_tile.png 600 140 100 90 50 82 -4.29825e-12
+IMAGEMAP FIRE 4
+F 0 assets/images/enemies/enemies_tile.png 550 0 80 80 40 75 -3.24979e-10
+F 1 assets/images/enemies/enemies_tile.png 630 0 80 80 40 75 -4.92625e-11
+F 2 assets/images/enemies/enemies_tile.png 710 0 80 80 40 75 -5.03994e-11
+F 3 assets/images/enemies/enemies_tile.png 790 0 80 80 40 75 -2.83143e-10
+IMAGEMAP FIRE_G 2
+F 0 assets/images/enemies/enemies_tile_2.png 480 760 60 60 30 55 -4.2121e-12
+F 1 assets/images/enemies/enemies_tile_2.png 540 760 60 60 30 55 -6.11639e-12
+IMAGEMAP FIRE_R 2
+F 0 assets/images/enemies/enemies_tile_2.png 360 760 60 60 30 55 -3.17185e-12
+F 1 assets/images/enemies/enemies_tile_2.png 420 760 60 60 30 55 -4.97956e-12
+IMAGEMAP FIRE_Y 2
+F 0 assets/images/enemies/enemies_tile_2.png 240 760 60 60 30 55 -5.69011e-12
+F 1 assets/images/enemies/enemies_tile_2.png 300 760 60 60 30 55 -3.49871e-12
+IMAGEMAP GREEN_SPLATTER 9
+F 0 assets/images/enemies/anim_lava_tile.png 0 304 76 152 38 152 -1.55212e-10
+F 1 assets/images/enemies/anim_lava_tile.png 76 304 76 152 38 152 -1.5976e-10
+F 2 assets/images/enemies/anim_lava_tile.png 152 304 76 152 38 152 -4.52306e-10
+F 3 assets/images/enemies/anim_lava_tile.png 228 304 76 152 38 152 -3.68527e-12
+F 4 assets/images/enemies/anim_lava_tile.png 304 304 76 152 38 152 -2.32523e-10
+F 5 assets/images/enemies/anim_lava_tile.png 380 304 76 152 38 152 -3.96948e-12
+F 6 assets/images/enemies/anim_lava_tile.png 456 304 76 152 38 152 -1.96144e-10
+F 7 assets/images/enemies/anim_lava_tile.png 532 304 76 152 38 152 -2.18881e-10
+F 8 assets/images/enemies/anim_lava_tile.png 608 304 76 152 38 152 -1.71583e-10
+IMAGEMAP GUILLOTINE 1
+F 0 assets/images/enemies/enemies_tile_2.png 790 0 80 310 40 305 -5.63327e-12
+IMAGEMAP HEDGEHOG 2
+F 0 assets/images/enemies/enemies_tile_2.png 550 330 80 60 40 55 -2.77397e-12
+F 1 assets/images/enemies/enemies_tile_2.png 630 330 80 60 40 55 -3.52713e-12
+IMAGEMAP LAVA_IN 8
+F 0 assets/images/enemies/anim_lava_tile.png 0 0 76 152 38 152 -2.31361e-10
+F 1 assets/images/enemies/anim_lava_tile.png 76 0 76 152 38 152 -2.97206e-10
+F 2 assets/images/enemies/anim_lava_tile.png 152 0 76 152 38 152 -3.24487e-10
+F 3 assets/images/enemies/anim_lava_tile.png 228 0 76 152 38 152 -2.21356e-10
+F 4 assets/images/enemies/anim_lava_tile.png 304 0 76 152 38 152 -1.56783e-10
+F 5 assets/images/enemies/anim_lava_tile.png 380 0 76 152 38 152 -1.55873e-10
+F 6 assets/images/enemies/anim_lava_tile.png 456 0 76 152 38 152 -2.62644e-10
+F 7 assets/images/enemies/anim_lava_tile.png 532 0 76 152 38 152 -1.23131e-10
+IMAGEMAP LAVA_OUT 8
+F 0 assets/images/enemies/anim_lava_tile.png 0 0 76 152 38 152 -1.18584e-10
+F 1 assets/images/enemies/anim_lava_tile.png 76 0 76 152 38 152 -1.82253e-10
+F 2 assets/images/enemies/anim_lava_tile.png 152 0 76 152 38 152 -1.38593e-10
+F 3 assets/images/enemies/anim_lava_tile.png 228 0 76 152 38 152 -1.4314e-10
+F 4 assets/images/enemies/anim_lava_tile.png 304 0 76 152 38 152 -2.89929e-10
+F 5 assets/images/enemies/anim_lava_tile.png 380 0 76 152 38 152 -2.13176e-10
+F 6 assets/images/enemies/anim_lava_tile.png 456 0 76 152 38 152 -2.22266e-10
+F 7 assets/images/enemies/anim_lava_tile.png 532 0 76 152 38 152 -1.868e-10
+IMAGEMAP METEORITE 1
+F 0 assets/images/enemies/enemies_tile_2.png 780 760 60 60 30 52 -5.32062e-12
+IMAGEMAP MINE 1
+F 0 assets/images/enemies/enemies_tile_2.png 540 670 80 50 40 50 -2.03486e-12
+IMAGEMAP MOUSE_ROBOT 3
+F 0 assets/images/enemies/enemies_tile_2.png 650 530 80 50 40 45 -4.37103e-11
+F 1 assets/images/enemies/enemies_tile_2.png 730 530 80 50 40 45 -4.71209e-11
+F 2 assets/images/enemies/enemies_tile_2.png 810 530 80 50 40 45 -5.28049e-11
+IMAGEMAP MUMMY 6
+F 0 assets/images/enemies/enemies_tile.png 0 840 110 170 40 153 -3.80258e-11
+F 1 assets/images/enemies/enemies_tile.png 110 840 110 170 40 153 -3.00547e-10
+F 2 assets/images/enemies/enemies_tile.png 220 840 110 170 40 153 -3.09646e-10
+F 3 assets/images/enemies/enemies_tile.png 330 840 110 170 40 153 -3.60578e-10
+F 4 assets/images/enemies/enemies_tile.png 440 840 110 170 40 153 -4.55164e-10
+F 5 assets/images/enemies/enemies_tile.png 550 840 110 170 40 153 -3.18741e-10
+IMAGEMAP PIRANHA_G 4
+F 0 assets/images/enemies/enemies_tile_2.png 660 660 80 80 40 80 -2.00306e-11
+F 1 assets/images/enemies/enemies_tile_2.png 740 660 80 80 40 80 -2.65106e-11
+F 2 assets/images/enemies/enemies_tile_2.png 820 660 80 80 40 80 -2.76475e-11
+F 3 assets/images/enemies/enemies_tile_2.png 900 660 80 80 40 80 -2.88981e-11
+IMAGEMAP PIRANHA_R 4
+F 0 assets/images/enemies/enemies_tile_2.png 660 580 80 80 40 75 -2.57148e-11
+F 1 assets/images/enemies/enemies_tile_2.png 740 580 80 80 40 75 -2.43505e-11
+F 2 assets/images/enemies/enemies_tile_2.png 820 580 80 80 40 75 -2.53238e-12
+F 3 assets/images/enemies/enemies_tile_2.png 900 580 80 80 40 75 -2.51463e-11
+IMAGEMAP PIRATE 3
+F 0 assets/images/enemies/enemies_tile.png 360 660 100 180 50 170 -2.25761e-10
+F 1 assets/images/enemies/enemies_tile.png 460 660 100 180 50 170 -3.41582e-11
+F 2 assets/images/enemies/enemies_tile.png 560 660 100 180 50 170 -2.69624e-10
+IMAGEMAP PIXEL 1
+F 0 assets/images/enemies/pixel.png 0 0 1 1 0.5 0.5 -5.15097e-12
+IMAGEMAP POWER 36
+F 0 assets/images/enemies/coinEffect.png 0 0 104 162 52 129 -3.57717e-10
+F 1 assets/images/enemies/coinEffect.png 104 0 104 162 52 129 -2.52221e-10
+F 2 assets/images/enemies/coinEffect.png 208 0 104 162 52 129 -2.34031e-10
+F 3 assets/images/enemies/coinEffect.png 312 0 104 162 52 129 -4.48666e-10
+F 4 assets/images/enemies/coinEffect.png 416 0 104 162 52 129 -1.04441e-10
+F 5 assets/images/enemies/coinEffect.png 520 0 104 162 52 129 -1.08989e-10
+F 6 assets/images/enemies/coinEffect.png 624 0 104 162 52 129 -4.01699e-11
+F 7 assets/images/enemies/coinEffect.png 728 0 104 162 52 129 -4.88078e-11
+F 8 assets/images/enemies/coinEffect.png 832 0 104 162 52 129 -3.2212e-11
+F 9 assets/images/enemies/coinEffect.png 0 162 104 162 52 129 -4.13068e-11
+F 10 assets/images/enemies/coinEffect.png 104 162 104 162 52 129 -1.149e-10
+F 11 assets/images/enemies/coinEffect.png 208 162 104 162 52 129 -3.06204e-11
+F 12 assets/images/enemies/coinEffect.png 312 162 104 162 52 129 -9.17083e-11
+F 13 assets/images/enemies/coinEffect.png 416 162 104 162 52 129 -4.63067e-11
+F 14 assets/images/enemies/coinEffect.png 520 162 104 162 52 129 -8.62524e-11
+F 15 assets/images/enemies/coinEffect.png 624 162 104 162 52 129 -3.10751e-11
+F 16 assets/images/enemies/coinEffect.png 728 162 104 162 52 129 -3.74415e-11
+F 17 assets/images/enemies/coinEffect.png 832 162 104 162 52 129 -1.14446e-10
+F 18 assets/images/enemies/coinEffect.png 0 324 104 162 52 129 -1.09898e-10
+F 19 assets/images/enemies/coinEffect.png 104 324 104 162 52 129 -1.02167e-10
+F 20 assets/images/enemies/coinEffect.png 208 324 104 162 52 129 -4.35805e-11
+F 21 assets/images/enemies/coinEffect.png 312 324 104 162 52 129 -3.72141e-11
+F 22 assets/images/enemies/coinEffect.png 416 324 104 162 52 129 -1.01258e-10
+F 23 assets/images/enemies/coinEffect.png 520 324 104 162 52 129 -4.65341e-11
+F 24 assets/images/enemies/coinEffect.png 624 324 104 162 52 129 -8.39777e-11
+F 25 assets/images/enemies/coinEffect.png 728 324 104 162 52 129 -4.4033e-11
+F 26 assets/images/enemies/coinEffect.png 832 324 104 162 52 129 -9.67105e-11
+F 27 assets/images/enemies/coinEffect.png 0 486 104 162 52 129 -4.24414e-11
+F 28 assets/images/enemies/coinEffect.png 104 486 104 162 52 129 -3.97152e-11
+F 29 assets/images/enemies/coinEffect.png 208 486 104 162 52 129 -3.49404e-11
+F 30 assets/images/enemies/coinEffect.png 312 486 104 162 52 129 -3.33488e-11
+F 31 assets/images/enemies/coinEffect.png 416 486 104 162 52 129 -1.06715e-10
+F 32 assets/images/enemies/coinEffect.png 520 486 104 162 52 129 -3.44857e-11
+F 33 assets/images/enemies/coinEffect.png 624 486 104 162 52 129 -9.62557e-11
+F 34 assets/images/enemies/coinEffect.png 728 486 104 162 52 129 -8.85251e-11
+F 35 assets/images/enemies/coinEffect.png 832 486 104 162 52 129 -9.07989e-11
+IMAGEMAP PTERODACTILE 5
+F 0 assets/images/enemies/enemies_tile.png 0 0 110 140 55 90 -1.3027e-10
+F 1 assets/images/enemies/enemies_tile.png 110 0 110 140 55 90 -2.03025e-10
+F 2 assets/images/enemies/enemies_tile.png 220 0 110 140 55 90 -1.25722e-10
+F 3 assets/images/enemies/enemies_tile.png 330 0 110 140 55 90 -1.89383e-10
+F 4 assets/images/enemies/enemies_tile.png 440 0 110 140 55 90 -2.45977e-10
+IMAGEMAP RAT 3
+F 0 assets/images/enemies/enemies_tile_2.png 0 820 120 100 65 86 -3.1008e-12
+F 1 assets/images/enemies/enemies_tile_2.png 120 820 120 100 65 86 -6.7701e-12
+F 2 assets/images/enemies/enemies_tile_2.png 240 820 120 100 65 86 4.49898e-29
+IMAGEMAP RED_SPLATTER 8
+F 0 assets/images/enemies/anim_lava_tile.png 0 0 76 152 38 152 -9.47583e-11
+F 1 assets/images/enemies/anim_lava_tile.png 76 0 76 152 38 152 -8.15713e-11
+F 2 assets/images/enemies/anim_lava_tile.png 152 0 76 152 38 152 -9.70321e-11
+F 3 assets/images/enemies/anim_lava_tile.png 228 0 76 152 38 152 -6.20176e-11
+F 4 assets/images/enemies/anim_lava_tile.png 304 0 76 152 38 152 -6.11083e-11
+F 5 assets/images/enemies/anim_lava_tile.png 380 0 76 152 38 152 -7.97531e-11
+F 6 assets/images/enemies/anim_lava_tile.png 456 0 76 152 38 152 -2.35359e-10
+F 7 assets/images/enemies/anim_lava_tile.png 532 0 76 152 38 152 -2.00443e-10
+IMAGEMAP ROCK 1
+F 0 assets/images/enemies/enemies_tile_2.png 840 760 60 60 30 50 -2.95869e-12
+IMAGEMAP SKATE 1
+F 0 assets/images/enemies/enemies_tile_2.png 550 100 120 80 60 70 -2.61316e-10
+IMAGEMAP SNAKE 4
+F 0 assets/images/enemies/enemies_tile_2.png 550 0 60 100 30 94 -3.15811e-12
+F 1 assets/images/enemies/enemies_tile_2.png 610 0 60 100 30 94 -4.15614e-12
+F 2 assets/images/enemies/enemies_tile_2.png 670 0 60 100 30 94 -4.3551e-12
+F 3 assets/images/enemies/enemies_tile_2.png 730 0 60 100 30 94 -4.95202e-12
+IMAGEMAP SNAKE_ROBOT 4
+F 0 assets/images/enemies/enemies_tile_2.png 0 480 80 100 40 94 -8.37834e-11
+F 1 assets/images/enemies/enemies_tile_2.png 80 480 80 100 40 94 -4.07544e-11
+F 2 assets/images/enemies/enemies_tile_2.png 160 480 80 100 40 94 -5.50787e-11
+F 3 assets/images/enemies/enemies_tile_2.png 240 480 80 100 40 94 -4.75757e-11
+IMAGEMAP STALACTITE 1
+F 0 assets/images/enemies/enemies_tile_2.png 660 760 60 60 30 60 -5.34904e-12
+IMAGEMAP STATIC_SNAKE 2
+F 0 assets/images/enemies/enemies_tile_2.png 420 670 60 80 30 77 -5.83222e-12
+F 1 assets/images/enemies/enemies_tile_2.png 480 670 60 80 30 77 -4.49638e-12
+IMAGEMAP TEMPLARY 3
+F 0 assets/images/enemies/enemies_tile.png 0 600 120 240 60 224 -3.9514e-10
+F 1 assets/images/enemies/enemies_tile.png 120 600 120 240 60 224 -2.93833e-11
+F 2 assets/images/enemies/enemies_tile.png 240 600 120 240 60 224 -2.87814e-10
+IMAGEMAP WATER_IN 8
+F 0 assets/images/enemies/anim_lava_tile.png 0 152 76 152 38 152 -1.14706e-10
+F 1 assets/images/enemies/anim_lava_tile.png 76 152 76 152 38 152 -2.24319e-11
+F 2 assets/images/enemies/anim_lava_tile.png 152 152 76 152 38 152 -1.20741e-11
+F 3 assets/images/enemies/anim_lava_tile.png 228 152 76 152 38 152 -1.61579e-10
+F 4 assets/images/enemies/anim_lava_tile.png 304 152 76 152 38 152 -3.99791e-12
+F 5 assets/images/enemies/anim_lava_tile.png 380 152 76 152 38 152 -1.97963e-10
+F 6 assets/images/enemies/anim_lava_tile.png 456 152 76 152 38 152 -2.17062e-10
+F 7 assets/images/enemies/anim_lava_tile.png 532 152 76 152 38 152 -1.35204e-10
+IMAGEMAP WATER_OUT 8
+F 0 assets/images/enemies/anim_lava_tile.png 0 152 76 152 38 152 -2.07058e-10
+F 1 assets/images/enemies/anim_lava_tile.png 76 152 76 152 38 152 -2.27978e-10
+F 2 assets/images/enemies/anim_lava_tile.png 152 152 76 152 38 152 -1.44298e-10
+F 3 assets/images/enemies/anim_lava_tile.png 228 152 76 152 38 152 -1.46117e-10
+F 4 assets/images/enemies/anim_lava_tile.png 304 152 76 152 38 152 -1.25199e-10
+F 5 assets/images/enemies/anim_lava_tile.png 380 152 76 152 38 152 -4.28212e-12
+F 6 assets/images/enemies/anim_lava_tile.png 456 152 76 152 38 152 -1.82502e-10
+F 7 assets/images/enemies/anim_lava_tile.png 532 152 76 152 38 152 -2.07967e-10
+### anims 0dfce008
+ANIM BEGIN_CLIMB 60 00000000 4 24
+K VASCOLET 20 6 0 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 19 6 6 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 18 6 12 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 17 6 18 | 0 0 0 0 0 0 1 1 0
+ANIM CLIMB 60 00000001 4 40
+K VASCOLET 21 10 0 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 22 10 10 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 21 10 20 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 23 10 30 | 0 0 0 0 0 0 1 1 0
+ANIM D_HURT 60 00000000 4 50
+K VASCOLET 14 10 0 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 15 10 10 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 16 10 20 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 16 20 30 | 0 0 0 0 0 0 1 1 0
+ANIM D_JUMP 60 00000000 3 39
+K D_VASCOLET 15 10 0 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 15 25 10 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 15 4 35 | 0 0 0 0 0 0 1 1 0
+ANIM D_WALK 60 00000001 11 66
+K D_VASCOLET 8 6 0 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 9 6 6 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 10 6 12 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 11 6 18 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 1 6 24 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 2 6 30 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 3 6 36 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 4 6 42 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 5 6 48 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 6 6 54 | 0 0 0 0 0 0 1 1 0
+K D_VASCOLET 7 6 60 | 0 0 0 0 0 0 1 1 0
+ANIM END_CLIMB 60 00000000 4 20
+K VASCOLET 17 5 0 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 18 5 5 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 19 5 10 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 20 5 15 | 0 0 0 0 0 0 1 1 0
+ANIM GET_UP 60 00000000 2 10
+K VASCOLET 20 5 0 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 0 5 5 | 0 0 0 0 0 0 1 1 0
+ANIM HIT_GROUND 12 00000000 1 10
+K VASCOLET 13 10 0 | 0 0 0 0 0 0 1 1 0
+ANIM HURT 60 00000000 4 50
+K VASCOLET 14 10 0 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 15 10 10 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 16 10 20 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 16 20 30 | 0 0 0 0 0 0 1 1 0
+ANIM JUMP 60 00000000 4 42
+K VASCOLET 9 30 0 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 10 4 30 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 11 4 34 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 12 4 38 | 0 0 0 0 0 0 1 1 0
+ANIM P_JUMP 60 00000001 3 18
+K P_VASCOLET 3 6 0 | 0 0 0 0 0 0 1 1 0
+K P_VASCOLET 3 6 6 | 0 0 0 0 0 0 1 1 0
+K P_VASCOLET 3 6 12 | 0 0 0 0 0 0 1 1 0
+ANIM P_WALK 60 00000001 2 12
+K P_VASCOLET 1 6 0 | 0 0 0 0 0 0 1 1 0
+K P_VASCOLET 2 6 6 | 0 0 0 0 0 0 1 1 0
+ANIM WALK 60 00000001 8 32
+K VASCOLET 1 4 0 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 2 4 4 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 3 4 8 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 4 4 12 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 5 4 16 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 6 4 20 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 7 4 24 | 0 0 0 0 0 0 1 1 0
+K VASCOLET 8 4 28 | 0 0 0 0 0 0 1 1 0
+### anims 0e01bab8
+ANIM ACID_IN 60 00000000 4 28
+K GREEN_SPLATTER 7 7 0 | 0 0 0 0 0 0 1 1 0
+K GREEN_SPLATTER 3 7 7 | 0 0 0 0 0 0 1 1 0
+K GREEN_SPLATTER 4 7 14 | 0 0 0 0 0 0 1 1 0
+K GREEN_SPLATTER 5 7 21 | 0 0 0 0 0 0 1 1 0
+ANIM ACID_OUT 60 00000000 6 42
+K GREEN_SPLATTER 0 7 0 | 0 0 0 0 0 0 1 1 0
+K GREEN_SPLATTER 1 7 7 | 0 0 0 0 0 0 1 1 0
+K GREEN_SPLATTER 2 7 14 | 0 0 0 0 0 0 1 1 0
+K GREEN_SPLATTER 3 7 21 | 0 0 0 0 0 0 1 1 0
+K GREEN_SPLATTER 4 7 28 | 0 0 0 0 0 0 1 1 0
+K GREEN_SPLATTER 5 7 35 | 0 0 0 0 0 0 1 1 0
+ANIM BIG_ROBOT 60 00000001 4 60
+K BIG_ROBOT 0 15 0 | 0 0 0 0 0 0 1 1 0
+K BIG_ROBOT 1 15 15 | 0 0 0 0 0 0 1 1 0
+K BIG_ROBOT 0 15 30 | 0 0 0 0 0 0 1 1 0
+K BIG_ROBOT 2 15 45 | 0 0 0 0 0 0 1 1 0
+ANIM BIRD_BLACK 60 00000001 5 30
+K BIRD_BLACK 0 6 0 | 0 0 0 0 0 0 1 1 0
+K BIRD_BLACK 1 6 6 | 0 0 0 0 0 0 1 1 0
+K BIRD_BLACK 2 6 12 | 0 0 0 0 0 0 1 1 0
+K BIRD_BLACK 3 6 18 | 0 0 0 0 0 0 1 1 0
+K BIRD_BLACK 4 6 24 | 0 0 0 0 0 0 1 1 0
+ANIM BIRD_BROWN 60 00000001 5 30
+K BIRD_BROWN 0 6 0 | 0 0 0 0 0 0 1 1 0
+K BIRD_BROWN 1 6 6 | 0 0 0 0 0 0 1 1 0
+K BIRD_BROWN 2 6 12 | 0 0 0 0 0 0 1 1 0
+K BIRD_BROWN 3 6 18 | 0 0 0 0 0 0 1 1 0
+K BIRD_BROWN 4 6 24 | 0 0 0 0 0 0 1 1 0
+ANIM BIRD_ROBOT 60 00000001 4 48
+K BIRD_ROBOT 0 12 0 | 0 0 0 0 0 0 1 1 0
+K BIRD_ROBOT 1 12 12 | 0 0 0 0 0 0 1 1 0
+K BIRD_ROBOT 2 12 24 | 0 0 0 0 0 0 1 1 0
+K BIRD_ROBOT 1 12 36 | 0 0 0 0 0 0 1 1 0
+ANIM BIRD_YELLOW 60 00000001 5 30
+K BIRD_YELLOW 0 6 0 | 0 0 0 0 0 0 1 1 0
+K BIRD_YELLOW 1 6 6 | 0 0 0 0 0 0 1 1 0
+K BIRD_YELLOW 2 6 12 | 0 0 0 0 0 0 1 1 0
+K BIRD_YELLOW 3 6 18 | 0 0 0 0 0 0 1 1 0
+K BIRD_YELLOW 4 6 24 | 0 0 0 0 0 0 1 1 0
+ANIM CANNON_CASTLE 60 00000000 5 150
+K CANNON_CASTLE 0 10 0 | 0 0 0 0 0 0 1 1 0
+K CANNON_CASTLE 1 70 10 | 0 0 0 0 0 0 1 1 0
+K CANNON_CASTLE 2 50 80 | 0 0 0 0 0 0 1 1 0
+K CANNON_CASTLE 1 10 130 | 0 0 0 0 0 0 1 1 0
+K CANNON_CASTLE 0 10 140 | 0 0 0 0 0 0 1 1 0
+ANIM CANNON_EGYPT 60 00000000 5 150
+K CANNON_EGYPT 0 10 0 | 0 0 0 0 0 0 1 1 0
+K CANNON_EGYPT 1 70 10 | 0 0 0 0 0 0 1 1 0
+K CANNON_EGYPT 2 50 80 | 0 0 0 0 0 0 1 1 0
+K CANNON_EGYPT 1 10 130 | 0 0 0 0 0 0 1 1 0
+K CANNON_EGYPT 0 10 140 | 0 0 0 0 0 0 1 1 0
+ANIM CANNON_LASER 60 00000000 5 125
+K CANNON_LASER 0 10 0 | 0 0 0 0 0 0 1 1 0
+K CANNON_LASER 1 70 10 | 0 0 0 0 0 0 1 1 0
+K CANNON_LASER 2 10 80 | 0 0 0 0 0 0 1 1 0
+K CANNON_LASER 1 25 90 | 0 0 0 0 0 0 1 1 0
+K CANNON_LASER 0 10 115 | 0 0 0 0 0 0 1 1 0
+ANIM CANNON_PIRATES 60 00000000 5 147
+K CANNON_PIRATES 0 10 0 | 0 0 0 0 0 0 1 1 0
+K CANNON_PIRATES 1 70 10 | 0 0 0 0 0 0 1 1 0
+K CANNON_PIRATES 2 7 80 | 0 0 0 0 0 0 1 1 0
+K CANNON_PIRATES 1 50 87 | 0 0 0 0 0 0 1 1 0
+K CANNON_PIRATES 0 10 137 | 0 0 0 0 0 0 1 1 0
+ANIM CANNON_PREHISTORY 60 00000000 4 140
+K CANNON_PREHISTORY 0 10 0 | 0 0 0 0 0 0 1 1 0
+K CANNON_PREHISTORY 1 70 10 | 0 0 0 0 0 0 1 1 0
+K CANNON_PREHISTORY 2 50 80 | 0 0 0 0 0 0 1 1 0
+K CANNON_PREHISTORY 0 10 130 | 0 0 0 0 0 0 1 1 0
+ANIM CAVE_TRAP 60 00000000 8 56
+K CAVE_TRAP 0 7 0 | 0 0 0 0 0 0 1 1 0
+K CAVE_TRAP 1 7 7 | 0 0 0 0 0 0 1 1 0
+K CAVE_TRAP 2 7 14 | 0 0 0 0 0 0 1 1 0
+K CAVE_TRAP 3 7 21 | 0 0 0 0 0 0 1 1 0
+K CAVE_TRAP 3 7 28 | 0 0 0 0 0 0 1 1 0
+K CAVE_TRAP 2 7 35 | 0 0 0 0 0 0 1 1 0
+K CAVE_TRAP 1 7 42 | 0 0 0 0 0 0 1 1 0
+K CAVE_TRAP 0 7 49 | 0 0 0 0 0 0 1 1 0
+ANIM DINOSAUR_BIG 60 ffffff01 11 44
+K DINOSAUR_BIG 0 4 0 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_BIG 1 4 4 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_BIG 2 4 8 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_BIG 3 4 12 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_BIG 4 4 16 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_BIG 5 4 20 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_BIG 6 4 24 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_BIG 7 4 28 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_BIG 8 4 32 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_BIG 9 4 36 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_BIG 10 4 40 | 0 0 0 0 0 0 1 1 0
+ANIM DINOSAUR_SMALL 60 ffffff01 11 44
+K DINOSAUR_SMALL 0 4 0 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_SMALL 1 4 4 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_SMALL 2 4 8 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_SMALL 3 4 12 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_SMALL 4 4 16 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_SMALL 5 4 20 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_SMALL 6 4 24 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_SMALL 7 4 28 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_SMALL 8 4 32 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_SMALL 9 4 36 | 0 0 0 0 0 0 1 1 0
+K DINOSAUR_SMALL 10 4 40 | 0 0 0 0 0 0 1 1 0
+ANIM ENEMY_DEATH 60 00000000 4 32
+K ENEMY_DEATH 0 8 0 | 0 0 0 0 0 0 1 1 0
+K ENEMY_DEATH 1 8 8 | 0 0 0 0 0 0 1 1 0
+K ENEMY_DEATH 2 8 16 | 0 0 0 0 0 0 1 1 0
+K ENEMY_DEATH 3 8 24 | 0 0 0 0 0 0 1 1 0
+ANIM ESCORPION_R 60 ffffff01 7 42
+K ESCORPION_R 0 6 0 | 0 0 0 0 0 0 1 1 0
+K ESCORPION_R 1 6 6 | 0 0 0 0 0 0 1 1 0
+K ESCORPION_R 2 6 12 | 0 0 0 0 0 0 1 1 0
+K ESCORPION_R 3 6 18 | 0 0 0 0 0 0 1 1 0
+K ESCORPION_R 4 6 24 | 0 0 0 0 0 0 1 1 0
+K ESCORPION_R 5 6 30 | 0 0 0 0 0 0 1 1 0
+K ESCORPION_R 6 6 36 | 0 0 0 0 0 0 1 1 0
+ANIM FIRE 60 00000001 4 48
+K FIRE 0 12 0 | 0 0 0 0 0 0 1 1 0
+K FIRE 1 12 12 | 0 0 0 0 0 0 1 1 0
+K FIRE 2 12 24 | 0 0 0 0 0 0 1 1 0
+K FIRE 3 12 36 | 0 0 0 0 0 0 1 1 0
+ANIM FIRE_G_DOWN 60 00000001 1 7
+K FIRE_G 1 7 0 | 0 0 0 0 0 0 1 1 0
+ANIM FIRE_G_UP 60 00000001 1 7
+K FIRE_G 0 7 0 | 0 0 0 0 0 0 1 1 0
+ANIM FIRE_R_DOWN 60 00000001 1 7
+K FIRE_R 1 7 0 | 0 0 0 0 0 0 1 1 0
+ANIM FIRE_R_UP 60 00000001 1 7
+K FIRE_R 0 7 0 | 0 0 0 0 0 0 1 1 0
+ANIM FIRE_Y_DOWN 60 00000001 1 7
+K FIRE_Y 1 7 0 | 0 0 0 0 0 0 1 1 0
+ANIM FIRE_Y_UP 60 00000001 1 7
+K FIRE_Y 0 7 0 | 0 0 0 0 0 0 1 1 0
+ANIM HEDGEHOG 60 00000001 2 45
+K HEDGEHOG 0 40 0 | 0 0 0 0 0 0 1 1 0
+K HEDGEHOG 1 5 40 | 0 0 0 0 0 0 1 1 0
+ANIM LAVA_IN 60 00000000 4 28
+K RED_SPLATTER 7 7 0 | 0 0 0 0 0 0 1 1 0
+K RED_SPLATTER 3 7 7 | 0 0 0 0 0 0 1 1 0
+K RED_SPLATTER 4 7 14 | 0 0 0 0 0 0 1 1 0
+K RED_SPLATTER 5 7 21 | 0 0 0 0 0 0 1 1 0
+ANIM LAVA_OUT 60 00000000 6 42
+K RED_SPLATTER 0 7 0 | 0 0 0 0 0 0 1 1 0
+K RED_SPLATTER 1 7 7 | 0 0 0 0 0 0 1 1 0
+K RED_SPLATTER 2 7 14 | 0 0 0 0 0 0 1 1 0
+K RED_SPLATTER 3 7 21 | 0 0 0 0 0 0 1 1 0
+K RED_SPLATTER 4 7 28 | 0 0 0 0 0 0 1 1 0
+K RED_SPLATTER 5 7 35 | 0 0 0 0 0 0 1 1 0
+ANIM MOUSE_ROBOT 60 00000001 4 48
+K MOUSE_ROBOT 0 12 0 | 0 0 0 0 0 0 1 1 0
+K MOUSE_ROBOT 1 12 12 | 0 0 0 0 0 0 1 1 0
+K MOUSE_ROBOT 2 12 24 | 0 0 0 0 0 0 1 1 0
+K MOUSE_ROBOT 1 12 36 | 0 0 0 0 0 0 1 1 0
+ANIM MUMMY 60 00000001 6 96
+K MUMMY 0 16 0 | 0 0 0 0 0 0 1 1 0
+K MUMMY 1 16 16 | 0 0 0 0 0 0 1 1 0
+K MUMMY 2 16 32 | 0 0 0 0 0 0 1 1 0
+K MUMMY 3 16 48 | 0 0 0 0 0 0 1 1 0
+K MUMMY 4 16 64 | 0 0 0 0 0 0 1 1 0
+K MUMMY 5 16 80 | 0 0 0 0 0 0 1 1 0
+ANIM PIRANHA_G_DOWN 60 00000001 2 14
+K PIRANHA_G 2 7 0 | 0 0 0 0 0 0 1 1 0
+K PIRANHA_G 3 7 7 | 0 0 0 0 0 0 1 1 0
+ANIM PIRANHA_G_UP 60 00000001 2 14
+K PIRANHA_G 0 7 0 | 0 0 0 0 0 0 1 1 0
+K PIRANHA_G 1 7 7 | 0 0 0 0 0 0 1 1 0
+ANIM PIRANHA_R_DOWN 60 00000001 2 14
+K PIRANHA_R 2 7 0 | 0 0 0 0 0 0 1 1 0
+K PIRANHA_R 3 7 7 | 0 0 0 0 0 0 1 1 0
+ANIM PIRANHA_R_UP 60 00000001 2 14
+K PIRANHA_R 0 7 0 | 0 0 0 0 0 0 1 1 0
+K PIRANHA_R 1 7 7 | 0 0 0 0 0 0 1 1 0
+ANIM PIRATE 60 00000001 4 64
+K PIRATE 0 16 0 | 0 0 0 0 0 0 1 1 0
+K PIRATE 1 16 16 | 0 0 0 0 0 0 1 1 0
+K PIRATE 0 16 32 | 0 0 0 0 0 0 1 1 0
+K PIRATE 2 16 48 | 0 0 0 0 0 0 1 1 0
+ANIM POWER 30 00000000 30 30
+K POWER 0 1 0 | 0 0 0 0 0 0 1 1 0
+K POWER 1 1 1 | 0 0 0 0 0 0 1 1 0
+K POWER 2 1 2 | 0 0 0 0 0 0 1 1 0
+K POWER 3 1 3 | 0 0 0 0 0 0 1 1 0
+K POWER 4 1 4 | 0 0 0 0 0 0 1 1 0
+K POWER 5 1 5 | 0 0 0 0 0 0 1 1 0
+K POWER 6 1 6 | 0 0 0 0 0 0 1 1 0
+K POWER 7 1 7 | 0 0 0 0 0 0 1 1 0
+K POWER 8 1 8 | 0 0 0 0 0 0 1 1 0
+K POWER 9 1 9 | 0 0 0 0 0 0 1 1 0
+K POWER 10 1 10 | 0 0 0 0 0 0 1 1 0
+K POWER 11 1 11 | 0 0 0 0 0 0 1 1 0
+K POWER 12 1 12 | 0 0 0 0 0 0 1 1 0
+K POWER 13 1 13 | 0 0 0 0 0 0 1 1 0
+K POWER 14 1 14 | 0 0 0 0 0 0 1 1 0
+K POWER 15 1 15 | 0 0 0 0 0 0 1 1 0
+K POWER 16 1 16 | 0 0 0 0 0 0 1 1 0
+K POWER 17 1 17 | 0 0 0 0 0 0 1 1 0
+K POWER 18 1 18 | 0 0 0 0 0 0 1 1 0
+K POWER 19 1 19 | 0 0 0 0 0 0 1 1 0
+K POWER 20 1 20 | 0 0 0 0 0 0 1 1 0
+K POWER 21 1 21 | 0 0 0 0 0 0 1 1 0
+K POWER 22 1 22 | 0 0 0 0 0 0 1 1 0
+K POWER 23 1 23 | 0 0 0 0 0 0 1 1 0
+K POWER 24 1 24 | 0 0 0 0 0 0 1 1 0
+K POWER 25 1 25 | 0 0 0 0 0 0 1 1 0
+K POWER 26 1 26 | 0 0 0 0 0 0 1 1 0
+K POWER 27 1 27 | 0 0 0 0 0 0 1 1 0
+K POWER 28 1 28 | 0 0 0 0 0 0 1 1 0
+K POWER 29 1 29 | 0 0 0 0 0 0 1 1 0
+ANIM PTERODACTILE 60 ffffff01 5 30
+K PTERODACTILE 0 6 0 | 0 0 0 0 0 0 1 1 0
+K PTERODACTILE 1 6 6 | 0 0 0 0 0 0 1 1 0
+K PTERODACTILE 2 6 12 | 0 0 0 0 0 0 1 1 0
+K PTERODACTILE 3 6 18 | 0 0 0 0 0 0 1 1 0
+K PTERODACTILE 4 6 24 | 0 0 0 0 0 0 1 1 0
+ANIM RAT 60 00000001 3 30
+K RAT 0 10 0 | 0 0 0 0 0 0 1 1 0
+K RAT 1 10 10 | 0 0 0 0 0 0 1 1 0
+K RAT 2 10 20 | 0 0 0 0 0 0 1 1 0
+ANIM SKATE 60 00000000 1 7
+K SKATE 0 7 0 | 0 0 0 0 0 0 1 1 0
+ANIM SNAKE 60 ffffff00 4 72
+K SNAKE 0 4 0 | 0 0 0 0 0 0 1 1 0
+K SNAKE 1 4 4 | 0 0 0 0 0 0 1 1 0
+K SNAKE 2 60 8 | 0 0 0 0 0 0 1 1 0
+K SNAKE 3 4 68 | 0 0 0 0 0 0 1 1 0
+ANIM SNAKE_ROBOT 60 ffffff00 4 72
+K SNAKE_ROBOT 0 4 0 | 0 0 0 0 0 0 1 1 0
+K SNAKE_ROBOT 1 4 4 | 0 0 0 0 0 0 1 1 0
+K SNAKE_ROBOT 2 60 8 | 0 0 0 0 0 0 1 1 0
+K SNAKE_ROBOT 3 4 68 | 0 0 0 0 0 0 1 1 0
+ANIM STATIC_SNAKE 60 00000001 2 45
+K STATIC_SNAKE 0 40 0 | 0 0 0 0 0 0 1 1 0
+K STATIC_SNAKE 1 5 40 | 0 0 0 0 0 0 1 1 0
+ANIM TEMPLARY 60 00000001 4 64
+K TEMPLARY 0 16 0 | 0 0 0 0 0 0 1 1 0
+K TEMPLARY 1 16 16 | 0 0 0 0 0 0 1 1 0
+K TEMPLARY 0 16 32 | 0 0 0 0 0 0 1 1 0
+K TEMPLARY 2 16 48 | 0 0 0 0 0 0 1 1 0
+ANIM WATER_IN 60 00000000 4 28
+K BLUE_SPLATTER 7 7 0 | 0 0 0 0 0 0 1 1 0
+K BLUE_SPLATTER 3 7 7 | 0 0 0 0 0 0 1 1 0
+K BLUE_SPLATTER 4 7 14 | 0 0 0 0 0 0 1 1 0
+K BLUE_SPLATTER 5 7 21 | 0 0 0 0 0 0 1 1 0
+ANIM WATER_OUT 60 00000000 6 42
+K BLUE_SPLATTER 0 7 0 | 0 0 0 0 0 0 1 1 0
+K BLUE_SPLATTER 1 7 7 | 0 0 0 0 0 0 1 1 0
+K BLUE_SPLATTER 2 7 14 | 0 0 0 0 0 0 1 1 0
+K BLUE_SPLATTER 3 7 21 | 0 0 0 0 0 0 1 1 0
+K BLUE_SPLATTER 4 7 28 | 0 0 0 0 0 0 1 1 0
+K BLUE_SPLATTER 5 7 35 | 0 0 0 0 0 0 1 1 0

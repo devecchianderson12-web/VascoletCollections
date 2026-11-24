@@ -81,11 +81,11 @@ void rays(float cx, float cy, float dim = 0) {
         v.push_back({ { cx + std::cos(a0) * R, cy + std::sin(a0) * R }, e, { 0, 0 } });
         v.push_back({ { cx + std::cos(a1) * R, cy + std::sin(a1) * R }, e, { 0, 0 } });
     }
-    // Brillo naranja/amarillo en el centro.
-    const int M = 40;
+    // Brillo suave en el centro.
+    const int M = 72;
     for (int i = 0; i < M; i++) {
-        const float a0 = i * 6.2831853f / M, a1 = (i + 1) * 6.2831853f / M, rr = H() * 0.85f;
-        v.push_back({ { cx, cy }, { 255, 170, 40, 210 }, { 0, 0 } });
+        const float a0 = i * 6.2831853f / M, a1 = (i + 1) * 6.2831853f / M, rr = H() * 0.62f;
+        v.push_back({ { cx, cy }, { 255, 150, 40, 120 }, { 0, 0 } });
         v.push_back({ { cx + std::cos(a0) * rr, cy + std::sin(a0) * rr }, { 255, 90, 20, 0 }, { 0, 0 } });
         v.push_back({ { cx + std::cos(a1) * rr, cy + std::sin(a1) * rr }, { 255, 90, 20, 0 }, { 0, 0 } });
     }
@@ -112,8 +112,8 @@ void button(const std::string& s, float cx, float cy, float w, float h, bool hot
 void panel(float x, float y, float w, float h) {
     plat::Image* p = img("v1/assets/lang/images/menu/banner.png");
     if (!p) { plat::fillRoundRect({ x, y, w, h }, 18, { 190, 20, 20, 240 }); return; }
-    const SDL_Rect s = { 16, 304, 368, 132 };
-    const int c = 26;
+    const SDL_Rect s = { 16, 608, 368, 263 };   // panel rojo de banner.png (512x1024)
+    const int c = 34;
     const float xs[4] = { x, x + c, x + w - c, x + w }, ys[4] = { y, y + c, y + h - c, y + h };
     const int sx[4] = { s.x, s.x + c, s.x + s.w - c, s.x + s.w }, sy[4] = { s.y, s.y + c, s.y + s.h - c, s.y + s.h };
     for (int j = 0; j < 3; j++)
@@ -313,8 +313,13 @@ void Launcher::drawList() {
         const float y = y0 + i * ROW_H;
         if (sel == i) button("", x + w * 0.5f, y + ROW_H * 0.5f, w, ROW_H + 2, true);
         text(rows[i].label, x + 16, y + (ROW_H - th) * 0.5f, sc, WHITE);
-        const std::string v = rows[i].value ? rows[i].value() : std::string(">");
-        text(v, x + w - 16 - font().width(v, sc), y + (ROW_H - th) * 0.5f, sc, YELLOW);
+        if (rows[i].value) {
+            const std::string v = rows[i].value();
+            text(v, x + w - 16 - font().width(v, sc), y + (ROW_H - th) * 0.5f, sc, YELLOW);
+        } else {   // submenú: flecha
+            const float ax = x + w - 22, ay = y + ROW_H * 0.5f;
+            plat::fillTriangle({ ax - 6, ay - 8 }, { ax + 6, ay }, { ax - 6, ay + 8 }, YELLOW);
+        }
     }
     const float by = y0 + n * ROW_H + 30;
     button("Volver", W() * 0.5f, by, 160, 36, sel == n, g_ptr.pressIn(W() * 0.5f - 80, by - 18, 160, 36));

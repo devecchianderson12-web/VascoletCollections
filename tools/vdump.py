@@ -73,7 +73,7 @@ tex_name, frame_owner = {}, {}
 
 def textures(obj):
     for k, v in map_entries(obj):
-        tex_name[u32(v)] = k
+        tex_name[u32(v)] = k; tex_name[v] = k
         print('TEX', k)
 
 def imagemaps(obj):
@@ -84,7 +84,7 @@ def imagemaps(obj):
         for i in range(n):
             fr = u32(arr + i * 4)
             frame_owner[fr] = (k, i)
-            v = struct.unpack('<7f', rd(fr + 4, 28) or b'\0' * 28)
+            v = struct.unpack('<7f', rd(fr + 8, 28) or b'\0' * 28)
             print('F %d %s %s' % (i, tex_name.get(u32(fr), '?'), ' '.join('%g' % x for x in v)))
 
 def anims(obj):

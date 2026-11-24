@@ -1,0 +1,8 @@
+textures 02de72a8
+imagemaps 02de8e38
+imagemaps 0df2aec8
+imagemaps 0eb70008
+imagemaps 0df2afd0
+imagemaps 0df2af78
+anims 0dfce008
+anims 0e01bab8

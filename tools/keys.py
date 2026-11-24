@@ -31,7 +31,15 @@ print('al frente:', bool(found) and u32.GetForegroundWindow() == found[0])
 print('window', found[:1])
 for a in sys.argv[2:]:
     k, _, w = a.partition(':')
+    if k == 'click': pass
     # Solo si el juego es la ventana activa: nunca escribir en otra ventana.
     if not found or u32.GetForegroundWindow() != found[0]: print('el juego no está al frente, se cancela'); sys.exit(1)
+    if k == 'click':
+        # click:x,y (relativo a la ventana) con el mouse real
+        x, y = map(int, w.split(',')); w = '900'
+        r = W.RECT(); u32.GetWindowRect(found[0], ctypes.byref(r))
+        u32.SetCursorPos(r.left + x, r.top + y); time.sleep(0.15)
+        u32.mouse_event(0x0002, 0, 0, 0, 0); time.sleep(0.08); u32.mouse_event(0x0004, 0, 0, 0, 0)
+        time.sleep(int(w) / 1000); continue
     sc = SC[k]; key(sc, False); time.sleep(0.08); key(sc, True)
     time.sleep(int(w or 600) / 1000)
