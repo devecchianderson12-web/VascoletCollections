@@ -1,0 +1,12 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="damage00" sourceImage="head" axis="17,44" sourceRect="38,62,36,52" />
+    <SpriteData keyName="damage01" sourceImage="head" axis="17,44" sourceRect="1,62,36,52" />
+    <SpriteData keyName="normal" sourceImage="head" axis="17,45" sourceRect="149,1,36,50" />
+    <SpriteData keyName="normalL" sourceImage="head" axis="17,45" sourceRect="112,1,36,50" />
+    <SpriteData keyName="normalR" sourceImage="head" axis="17,45" sourceRect="75,62,36,50" />
+    <SpriteData keyName="openMouth" sourceImage="head" axis="17,45" sourceRect="75,1,36,60" />
+    <SpriteData keyName="openMouthL" sourceImage="head" axis="17,45" sourceRect="38,1,36,60" />
+    <SpriteData keyName="openMouthR" sourceImage="head" axis="17,45" sourceRect="1,1,36,60" />
+  </data>
+</LibraryInfo>

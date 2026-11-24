@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<data>
+	<texts>
+
+		<node key="game_name" 		text="Vascolet 2" />
+		<node key="any_key_start" 	text="¡Presiona ENTER para comenzar!" />
+		
+		<node key="st1-hello"					text="Estás en el Bosque Encantado...\nUsa las flechas para moverte."/>
+		<node key="st1-tipHowToJump"			text="Salta presionando las teclas [Z] o [S].\nIntenta subirte ahí arriba..."/>
+		<node key="st1-tipHowToJump2"			text="Presiona más tiempo la tecla de salto para saltar más alto."/>
+		<node key="st1-tipFall"					text="¿Qué habrá al fondo de este pozo?\nTe puedes tirar..."/>
+		<node key="st1-tipJumpEnemies"			text="Salta sobre los enemigos para librarte de ellos."/>
+		<node key="st1-tipSecretWalls"			text="¡Detrás de algunas paredes se esconden grandes secretos!"/>
+		<node key="st1-tipRunNeeded"			text="No podrás alcanzar lugares lejanos si no corres antes de saltar."/>
+		<node key="st1-tipVascoletItem"			text="¡Una Zapatilla! ¡Si la usas podrás correr muy rápido!"/>
+		<node key="st1-tipHowToRun"				text="Para correr tienes que presionar dos veces la flecha."/>
+		<node key="st1-tipDontJumpOverHedehog"	text="Algunos enemigos son invencibles.\n¡Cuidado con este puercoespín!"/>
+		<node key="st1-tipBoomerangUse"			text="Lanza boomerangs presionando\nlas teclas [A] o [X]."/>
+		<node key="st1-tipSecretPlaces"			text="Cuando veas cosas extrañas puede significar que hay un pasaje secreto muy cerca..."/>
+		<node key="st1-secretFound"				text="¡Encontraste un pasaje secreto!"/>
+		<node key="st1-tipEnergy"				text="¡Los vascolets y los cereales te dan energía!"/>
+		<node key="st1-tipLives"				text="¡Hay una vida extra arriba del árbol!"/>
+		<node key="st1-tipDoubleJump"			text="¡Un resorte! Si lo tienes podrás dar saltos dobles."/>
+		<node key="st1-tipDoubleJump2"			text="Salta y luego en el aire vuelve a saltar para llegar a lugares altos."/>
+		<node key="st1-tipInpresiveSecrets"		text="A veces lo que parece el fin del camino, no es más que el comienzo del mismo..."/>
+		<node key="st1-tipBlueKeyNeeded"		text="Necesitas una llave azul para abrir esta puerta."/>
+		<node key="st1-tipHowToBeatTheBoss"		text="Para vencer al Ogro, písalo cuando no pueda atacarte."/>
+		<node key="st1-tipKeyAndDoor"			text="Necesitas una llave verde, para poder seguir adelante."/>
+		<node key="st1-tipRedKeyRequired"		text="Necesitas una llave roja para seguir... ¿Has leido todos los carteles?"/>
+		<node key="st1-save"					text="Si tocas el salvado luego puedes continuar desde este punto."/>
+		<node key="st1-findVascolet"			text="No puedes correr sin las zapatillas adecuadas. ¡Búscalas!"/>
+		<node key="st1-runAndJump"				text=" "/>
+		<node key="st1-platforms"				text="Utiliza las plataformas para llegar a otras zonas."/>
+		<node key="st1-ogro1"					text="El mago Malmark transformó las criaturas de este bosque en seres malvados."/>
+		<node key="st1-ogro2"					text="Dos llaves necesitarás para poder seguir adelante..."/>
+		<node key="st1-coins"					text="Cuidado... Malmark se acerca..."/>
+		
+		<node key="st2-monster"			text="En este lago vivía un peligroso Monstruo."/>
+		<node key="st2-swim"			text="Usa la tecla de saltar para\nimpulsarte en el agua."/>
+		<node key="st2-SaltoDoble"		text="Toma el resorte que lo\nnecesitarás más adelante!"/>
+		<node key="st2-explorer"		text="¿Como llegaste aquí?"/>
+		<node key="st2-out"				text="Puedes salir a la superficie saltando en el borde del agua."/>
+		<node key="st2-secrets"			text="Se esconden varios secretos en las profundidades de este lago."/>
+		<node key="st2-UsarSaltoDoble"	text="Necesitarás tu salto doble\npara cruzar esta zona..."/>
+		<node key="st2-CuidadoJefe"		text="¡El Monstruo odia la electricidad!"/>
+		<node key="st2-story1"			text="Antiguamente había una civilización, hasta que llegó Malmark..."/>
+		<node key="st2-story2"			text="Dinero recaudado para el hospital de peces."/>
+
+		<node key="st3-HowToShot"		text="Utiliza [S] o [Z] para volar\ny [A] o [X] para atacar."/>
+
+		<node key="st4-bossTip1"		text="¡Hay un Golem muy peligroso aquí!"/>
+		<node key="st4-bossTip2"		text="Debes averiguar su debilidad..."/>
+		<node key="st4-bossTip3"		text="Piensa... Usa la cabeza..."/>
+		
+		
+		<node key="st5-SomeWallsAreIlussion"	text="Algunas paredes son simplemente ilusiones..."/>
+		<node key="st5-EndOfWaySorry"			text="Fin del camino..."/>
+		<node key="st5-ThisNot"					text="Pero esta no..."/>
+		<node key="st5-Secreto3Armaduras"		text="Hay un secreto más allá de las tres armaduras..."/>
+		<node key="st5-EnMedioDeLas2Armaduras"	text="¡Cuidado, el piso es falso en medio de las dos armaduras!"/>
+		<node key="st5-CuidadoAlBajar"			text="Cuidado abajo..."/>
+		<node key="st5-lastBossTip"				text="Para alcanzar al mago... rebota sobre sus bolas de fuego..."/>
+				
+		<node key="cs1-msg001" 	text="Capítulo I: Una nueva aventura..." />
+		<node key="cs1-msg002" 	text="¿Dónde estará Alejandro?" />
+		<node key="cs1-msg003" 	text="¿Habrá vuelto de su aventura en el tiempo?" />
+		<node key="cs1-msg004" 	text="¡Alejandro!" />
+		<node key="cs1-msg005" 	text="¡Hola chicos!" />
+		<node key="cs1-msg006" 	text="¿Cómo han estado?" />
+		<node key="cs1-msg007" 	text="¡Muy bien! ¿Y vos?" />
+		<node key="cs1-msg008" 	text="¡Bien! ¡No saben cuánto me divertí!" />
+		<node key="cs1-msg009" 	text="¿Que fue eso?" />
+		<node key="cs1-msg010" 	text="¡Mira Alejandro! ¡El portal...!" />
+		<node key="cs1-msg011" 	text="¡Allá voy!" />
+		<node key="cs1-msg012" 	text="Soy el poderoso MALMARK." />
+		<node key="cs1-msg013" 	text="Dame tu libro de la fórmula secreta." />
+		<node key="cs1-msg014" 	text="¡Ahora es mío!" />
+		<node key="cs1-msg015" 	text="¡Jajajaja!" />
+		
+		<node key="cs2-msg001" 	text="Capítulo II: El Lago del Monstruo" />
+		<node key="cs2-msg002" 	text="¿Y ésto?\n¿Un esnórquel?" />
+		<node key="cs2-msg003" 	text="Este lago parece muy profundo..." />
+		<node key="cs2-msg004" 	text="¡Me viene ideal para nadar aquí!" />
+		
+		<node key="cs3-msg001" 	text="Capítulo III: El Mundo de los Dragones" />
+		<node key="cs3-msg002" 	text="¿¡Un pequeño dragón!?" />
+		<node key="cs3-msg003" 	text="¡Me pareció haberlo visto antes!" />
+		<node key="cs3-msg004" 	text="¡Parece cansado!..." />
+		<node key="cs3-msg005" 	text="¡Hola! ¿Cómo te llamás?" />
+		<node key="cs3-msg006" 	text="Yo... soy WILLY..." />
+		<node key="cs3-msg007" 	text="Esos carteles del cielo... y el esnórquel... ¿Eras tú?" />
+		<node key="cs3-msg008" 	text="Asi es..." />
+		<node key="cs3-msg009" 	text="¿Qué te sucede?" />
+		<node key="cs3-msg010" 	text="Estoy muy cansado... Malmark... me ha hechizado..." />
+		<node key="cs3-msg011" 	text="¡Te daré algo que te ayudará!" />
+		<node key="cs3-msg012" 	text="¡Muchas gracias!" />
+		<node key="cs3-msg013" 	text="¡Ya me siento con mucha energía!" />
+		<node key="cs3-msg014" 	text="Debemos apresurarnos... ¡Hay que detener a Malmark!" />
+		<node key="cs3-msg015" 	text="¡Vamos volando! ¡Sube que te llevo!" />
+		
+		<node key="cs4-msg001" 	text="Capítulo IV: La Montaña del Mal" />
+		<node key="cs4-msg002" 	text="¡Llegamos a la Montaña del Mal!" />
+		<node key="cs4-msg003" 	text="Los dragones no podemos acercarnos...\n¡No podré acompañarte!" />
+		<node key="cs4-msg004" 	text="No importa...\n¡Muchas gracias por haberme traído!" />
+		<node key="cs4-msg005" 	text="¿Qué harás ahora?" />
+		<node key="cs4-msg006" 	text="Debo volver a mi mundo.\n¡Ten cuidado con Malmark!" />
+		<node key="cs4-msg007" 	text="¡Adiós Willy!\n¡Te voy a extrañar!" />
+		<node key="cs4-msg008" 	text="¡Y yo a tí! ¡Ten cuidado!" />
+		
+		<node key="cs5-msg001" 	text="Capitulo V: El Castillo de Malmark" />
+		<node key="cs5-msg002" 	text="¡Esta parece la puerta del Castillo!" />
+		<node key="cs5-msg003" 	text="¡Debo tener mucho cuidado!" />
+		<node key="cs5-msg004" 	text="¡Malmark no debe saber que estoy aquí!" />
+		<node key="cs5-msg005" 	text="¿A dónde crees que vas?" />
+		<node key="cs5-msg006" 	text="¡Es increíble que hayas llegado tan lejos!" />
+		<node key="cs5-msg007" 	text="¿Porque insistes?\n¡No te devolveré la fórmula secreta!" />
+		<node key="cs5-msg008" 	text="Te estaré esperando...\n si logras econtrarme... ¡Jajajaja!" />
+		
+		<node key="cs6-msg001" 	text="De nuevo en la Escuela..." />
+		<node key="cs6-msg002" 	text="El castillo... ¿se derrumbó?...\nRecuerdo que alguien me salvó..." />
+		<node key="cs6-msg003" 	text="¡Alejandro! ¿Que pasó?" />
+		<node key="cs6-msg004" 	text="¡Uy! ¡No! ¡El libro...!" />
+		<node key="cs6-msg005" 	text="¡Se quedó en el Castillo...!" />
+		<node key="cs6-msg006" 	text="¡Era el libro de la fórmula secreta!" />
+		<node key="cs6-msg007" 	text="¡Lo he perdido para siempre!" />
+		<node key="cs6-msg008" 	text="¡Willy!" />
+		<node key="cs6-msg009" 	text="¡Hola Alejandro! ¡Te traje el libro!" />
+		<node key="cs6-msg010" 	text="Ahora lo recuerdo... ¡Fuiste tú quien me salvó! ¡Gracias!" />
+		<node key="cs6-msg011" 	text="¡Si!... Escucha... ¡He leído el libro!" />
+		<node key="cs6-msg012" 	text="¡Tiene la fórmula perfecta para preparar Vascolet!" />
+		<node key="cs6-msg013" 	text="¡Gracias por salvar mi mundo Alejandro! ¡Te extrañaré!" />
+		<node key="cs6-msg014" 	text="¡Willy espera! ¿Nos volverémos a ver?" />
+		<node key="cs6-msg015" 	text="... ¡Seguramente...!" />
+		
+	</texts>
+</data>

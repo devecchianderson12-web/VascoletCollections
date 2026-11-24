@@ -1,0 +1,6 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="micro00" sourceImage="micro" axis="81,125" sourceRect="164,1,162,134" />
+    <SpriteData keyName="micro01" sourceImage="micro" axis="81,124" sourceRect="1,1,162,134" />
+  </data>
+</LibraryInfo>

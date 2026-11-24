@@ -1,0 +1,6 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="roca00" sourceImage="rocas" axis="6,15" sourceRect="38,1,16,16" />
+    <SpriteData keyName="roca01" sourceImage="rocas" axis="17,73" sourceRect="1,1,36,74" />
+  </data>
+</LibraryInfo>

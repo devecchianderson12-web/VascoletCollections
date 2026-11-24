@@ -1,0 +1,11 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="damage" sourceImage="pterodactilo-verde" axis="36,66" sourceRect="157,1,80,68" />
+    <SpriteData keyName="damage00" sourceImage="pterodactilo-verde" axis="36,66" sourceRect="76,1,80,68" />
+    <SpriteData keyName="fly00" sourceImage="pterodactilo-verde" axis="36,66" sourceRect="76,70,74,68" />
+    <SpriteData keyName="fly01" sourceImage="pterodactilo-verde" axis="36,66" sourceRect="1,84,74,68" />
+    <SpriteData keyName="fly02" sourceImage="pterodactilo-verde" axis="46,44" sourceRect="1,153,84,58" />
+    <SpriteData keyName="fly03" sourceImage="pterodactilo-verde" axis="36,44" sourceRect="1,1,74,82" />
+    <SpriteData keyName="fly04" sourceImage="pterodactilo-verde" axis="36,44" sourceRect="151,70,74,58" />
+  </data>
+</LibraryInfo>

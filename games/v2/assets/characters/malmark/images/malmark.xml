@@ -1,0 +1,14 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="damage" sourceImage="malmark" axis="74,135" sourceRect="64,307,128,136" />
+    <SpriteData keyName="fly00" sourceImage="malmark" axis="32,143" sourceRect="159,154,60,152" />
+    <SpriteData keyName="fly00a" sourceImage="malmark" axis="32,143" sourceRect="1,154,94,152" />
+    <SpriteData keyName="fly00b" sourceImage="malmark" axis="32,143" sourceRect="211,1,104,152" />
+    <SpriteData keyName="fly01" sourceImage="malmark" axis="32,143" sourceRect="1,307,62,152" />
+    <SpriteData keyName="fly01a" sourceImage="malmark" axis="32,143" sourceRect="411,1,94,152" />
+    <SpriteData keyName="fly01b" sourceImage="malmark" axis="32,143" sourceRect="106,1,104,152" />
+    <SpriteData keyName="fly02" sourceImage="malmark" axis="32,143" sourceRect="96,154,62,152" />
+    <SpriteData keyName="fly02a" sourceImage="malmark" axis="32,143" sourceRect="316,1,94,152" />
+    <SpriteData keyName="fly02b" sourceImage="malmark" axis="32,143" sourceRect="1,1,104,152" />
+  </data>
+</LibraryInfo>

@@ -1,0 +1,61 @@
+apply plugin: 'com.android.application'
+
+def gamesDir = rootProject.file('../games')
+def stagedAssets = layout.buildDirectory.dir('vc-assets')
+
+// Copia al APK: v1/assets (Vascolet 1), v2/assets (Vascolet 2) y data (interfaz de la colección).
+def stageGameAssets = tasks.register('stageGameAssets', Sync) {
+    if (!new File(gamesDir, 'v1/assets/data/castle.tmx').exists() || !new File(gamesDir, 'v2/assets/data/texts.xml').exists())
+        doFirst { throw new GradleException("Faltan los juegos en ${gamesDir} (v1/assets y v2/assets)") }
+    from(new File(gamesDir, 'v1/assets')) { into 'v1/assets' }
+    from(new File(gamesDir, 'v2/assets')) { into 'v2/assets' }
+    from(rootProject.file('../data')) { into 'data' }
+    eachFile { it.path = it.path.toLowerCase() }
+    includeEmptyDirs = false
+    into stagedAssets
+}
+
+android {
+    namespace 'com.vascolet.collections'
+    compileSdk 34
+    ndkVersion '27.2.12479018'
+    defaultConfig {
+        applicationId 'com.vascolet.collections'
+        minSdk 21
+        targetSdk 34
+        versionCode((project.findProperty('vcVersionCode') ?: '1') as int)
+        versionName(project.findProperty('vcVersionName') ?: '1.0')
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=c++_static'
+                abiFilters 'arm64-v8a', 'armeabi-v7a'
+            }
+        }
+    }
+    // Firma fija para que cada APK publicado se instale encima del anterior.
+    signingConfigs {
+        openxa {
+            storeFile file('openxa.keystore')
+            storePassword 'openxa123'
+            keyAlias 'openxa'
+            keyPassword 'openxa123'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.openxa
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path 'jni/CMakeLists.txt'
+            version '3.22.1'
+        }
+    }
+    sourceSets.main.assets.srcDirs += stagedAssets
+    androidResources { noCompress += ['ogg', 'jpg', 'png', 'wav'] }
+    lint { abortOnError false }
+}
+
+tasks.named('preBuild') { dependsOn stageGameAssets }

@@ -1,0 +1,10 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="amiga-a" sourceImage="amigos" axis="20,76" sourceRect="44,1,42,88" />
+    <SpriteData keyName="amiga-b" sourceImage="amigos" axis="20,75" sourceRect="1,1,42,88" />
+    <SpriteData keyName="amigo1-a" sourceImage="amigos" axis="29,52" sourceRect="1,90,62,78" />
+    <SpriteData keyName="amigo1-b" sourceImage="amigos" axis="29,52" sourceRect="189,1,62,78" />
+    <SpriteData keyName="amigo2-a" sourceImage="amigos" axis="25,71" sourceRect="138,1,50,84" />
+    <SpriteData keyName="amigo2-b" sourceImage="amigos" axis="25,71" sourceRect="87,1,50,84" />
+  </data>
+</LibraryInfo>

@@ -1,0 +1,21 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="level1Over" sourceImage="level" axis="47,117" sourceRect="383,236,94,234" />
+    <SpriteData keyName="level1Title" sourceImage="level" axis="39,24" sourceRect="575,56,78,48" />
+    <SpriteData keyName="level1Up" sourceImage="level" axis="47,117" sourceRect="1,236,96,234" />
+    <SpriteData keyName="level2Over" sourceImage="level" axis="47,117" sourceRect="389,1,96,234" />
+    <SpriteData keyName="level2Title" sourceImage="level" axis="43,28" sourceRect="585,1,80,52" />
+    <SpriteData keyName="level2Up" sourceImage="level" axis="47,117" sourceRect="292,1,96,234" />
+    <SpriteData keyName="level3Over" sourceImage="level" axis="47,117" sourceRect="288,236,94,234" />
+    <SpriteData keyName="level3Title" sourceImage="level" axis="48,28" sourceRect="486,1,98,54" />
+    <SpriteData keyName="level3Up" sourceImage="level" axis="47,117" sourceRect="195,1,96,234" />
+    <SpriteData keyName="level4Over" sourceImage="level" axis="47,117" sourceRect="193,236,94,234" />
+    <SpriteData keyName="level4Title" sourceImage="level" axis="45,27" sourceRect="486,109,86,50" />
+    <SpriteData keyName="level4Up" sourceImage="level" axis="47,117" sourceRect="98,1,96,234" />
+    <SpriteData keyName="level5Over" sourceImage="level" axis="47,117" sourceRect="98,236,94,234" />
+    <SpriteData keyName="level5Title" sourceImage="level" axis="42,25" sourceRect="486,56,88,52" />
+    <SpriteData keyName="level5Up" sourceImage="level" axis="47,117" sourceRect="1,1,96,234" />
+    <SpriteData keyName="volverOver" sourceImage="level" axis="57,15" sourceRect="116,471,114,30" />
+    <SpriteData keyName="volverUp" sourceImage="level" axis="57,15" sourceRect="1,471,114,30" />
+  </data>
+</LibraryInfo>

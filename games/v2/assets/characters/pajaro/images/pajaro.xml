@@ -1,0 +1,10 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="dead" sourceImage="pajaro" axis="43,52" sourceRect="131,1,88,62" />
+    <SpriteData keyName="flight00" sourceImage="pajaro" axis="35,64" sourceRect="66,1,64,64" />
+    <SpriteData keyName="flight01" sourceImage="pajaro" axis="34,67" sourceRect="1,1,64,68" />
+    <SpriteData keyName="flight02" sourceImage="pajaro" axis="37,35" sourceRect="147,64,66,48" />
+    <SpriteData keyName="flight03" sourceImage="pajaro" axis="36,49" sourceRect="80,66,66,50" />
+    <SpriteData keyName="kicked" sourceImage="pajaro" axis="38,56" sourceRect="1,70,78,54" />
+  </data>
+</LibraryInfo>

@@ -1,0 +1,18 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="explosion1-00" sourceImage="explosion" axis="9,10" sourceRect="166,78,20,20" />
+    <SpriteData keyName="explosion1-01" sourceImage="explosion" axis="18,16" sourceRect="338,1,36,36" />
+    <SpriteData keyName="explosion1-02" sourceImage="explosion" axis="26,24" sourceRect="243,66,52,50" />
+    <SpriteData keyName="explosion1-03" sourceImage="explosion" axis="30,24" sourceRect="1,197,60,54" />
+    <SpriteData keyName="explosion1-04" sourceImage="explosion" axis="47,32" sourceRect="243,1,94,64" />
+    <SpriteData keyName="explosion1-05" sourceImage="explosion" axis="56,33" sourceRect="142,179,110,66" />
+    <SpriteData keyName="explosion1-06" sourceImage="explosion" axis="69,4" sourceRect="338,38,134,14" />
+    <SpriteData keyName="explosion2-00" sourceImage="explosion" axis="11,14" sourceRect="235,117,30,30" />
+    <SpriteData keyName="explosion2-01" sourceImage="explosion" axis="22,24" sourceRect="62,197,52,54" />
+    <SpriteData keyName="explosion2-02" sourceImage="explosion" axis="35,37" sourceRect="166,1,76,76" />
+    <SpriteData keyName="explosion2-03" sourceImage="explosion" axis="42,35" sourceRect="142,100,92,78" />
+    <SpriteData keyName="explosion2-04" sourceImage="explosion" axis="67,47" sourceRect="1,100,140,96" />
+    <SpriteData keyName="explosion2-05" sourceImage="explosion" axis="81,49" sourceRect="1,1,164,98" />
+    <SpriteData keyName="explosion2-06" sourceImage="explosion" axis="99,8" sourceRect="296,66,200,26" />
+  </data>
+</LibraryInfo>

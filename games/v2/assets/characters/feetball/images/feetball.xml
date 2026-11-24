@@ -1,0 +1,16 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="run00" sourceImage="feetball" axis="26,58" sourceRect="76,149,62,66" />
+    <SpriteData keyName="run01" sourceImage="feetball" axis="25,61" sourceRect="54,78,52,70" />
+    <SpriteData keyName="run02" sourceImage="feetball" axis="25,64" sourceRect="174,1,52,74" />
+    <SpriteData keyName="run03" sourceImage="feetball" axis="26,67" sourceRect="1,1,60,76" />
+    <SpriteData keyName="run04" sourceImage="feetball" axis="44,70" sourceRect="227,1,82,56" />
+    <SpriteData keyName="run05" sourceImage="feetball" axis="34,64" sourceRect="107,78,74,66" />
+    <SpriteData keyName="run06" sourceImage="feetball" axis="26,58" sourceRect="182,76,60,66" />
+    <SpriteData keyName="run07" sourceImage="feetball" axis="25,61" sourceRect="1,78,52,70" />
+    <SpriteData keyName="run08" sourceImage="feetball" axis="25,64" sourceRect="121,1,52,74" />
+    <SpriteData keyName="run09" sourceImage="feetball" axis="26,67" sourceRect="62,1,58,76" />
+    <SpriteData keyName="run10" sourceImage="feetball" axis="44,70" sourceRect="139,145,82,56" />
+    <SpriteData keyName="run11" sourceImage="feetball" axis="34,64" sourceRect="1,149,74,66" />
+  </data>
+</LibraryInfo>

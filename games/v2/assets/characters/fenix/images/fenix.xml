@@ -1,0 +1,8 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="fenix00" sourceImage="fenix" axis="74,108" sourceRect="1,1,138,112" />
+    <SpriteData keyName="fenix01" sourceImage="fenix" axis="70,106" sourceRect="1,114,134,110" />
+    <SpriteData keyName="fenix02" sourceImage="fenix" axis="70,29" sourceRect="140,1,134,104" />
+    <SpriteData keyName="fenix03" sourceImage="fenix" axis="78,48" sourceRect="140,106,142,62" />
+  </data>
+</LibraryInfo>

@@ -1,0 +1,25 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="angry00" sourceImage="Iguana" axis="69,137" sourceRect="138,210,136,202" />
+    <SpriteData keyName="angry01" sourceImage="Iguana" axis="70,137" sourceRect="632,204,134,194" />
+    <SpriteData keyName="angry02" sourceImage="Iguana" axis="69,137" sourceRect="1,210,136,202" />
+    <SpriteData keyName="angry03" sourceImage="Iguana" axis="70,137" sourceRect="791,1,134,194" />
+    <SpriteData keyName="angry04" sourceImage="Iguana" axis="69,137" sourceRect="297,1,136,202" />
+    <SpriteData keyName="angry05" sourceImage="Iguana" axis="70,136" sourceRect="1,608,134,192" />
+    <SpriteData keyName="angry06" sourceImage="Iguana" axis="69,137" sourceRect="160,1,136,202" />
+    <SpriteData keyName="angry07" sourceImage="Iguana" axis="70,137" sourceRect="497,204,134,194" />
+    <SpriteData keyName="damage00" sourceImage="Iguana" axis="70,137" sourceRect="656,1,134,194" />
+    <SpriteData keyName="damage01" sourceImage="Iguana" axis="81,152" sourceRect="1,1,158,208" />
+    <SpriteData keyName="normal00" sourceImage="Iguana" axis="58,137" sourceRect="545,1,110,202" />
+    <SpriteData keyName="normal01" sourceImage="Iguana" axis="55,137" sourceRect="110,413,108,194" />
+    <SpriteData keyName="normal02" sourceImage="Iguana" axis="58,137" sourceRect="434,1,110,202" />
+    <SpriteData keyName="normal03" sourceImage="Iguana" axis="55,137" sourceRect="1,413,108,194" />
+    <SpriteData keyName="normal04" sourceImage="Iguana" axis="58,137" sourceRect="386,204,110,202" />
+    <SpriteData keyName="normal05" sourceImage="Iguana" axis="55,137" sourceRect="876,196,108,194" />
+    <SpriteData keyName="normal06" sourceImage="Iguana" axis="58,137" sourceRect="275,204,110,202" />
+    <SpriteData keyName="normal07" sourceImage="Iguana" axis="55,137" sourceRect="767,196,108,194" />
+    <SpriteData keyName="swiming00" sourceImage="Iguana" axis="31,21" sourceRect="219,471,62,22" />
+    <SpriteData keyName="swiming01" sourceImage="Iguana" axis="29,21" sourceRect="219,413,60,30" />
+    <SpriteData keyName="swiming02" sourceImage="Iguana" axis="25,24" sourceRect="219,444,56,26" />
+  </data>
+</LibraryInfo>

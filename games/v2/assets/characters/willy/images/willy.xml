@@ -1,0 +1,17 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="awake" sourceImage="willy" axis="51,51" sourceRect="185,187,110,64" />
+    <SpriteData keyName="awakeTalk" sourceImage="willy" axis="51,51" sourceRect="347,1,110,64" />
+    <SpriteData keyName="Fly00" sourceImage="willy" axis="46,91" sourceRect="92,1,88,104" />
+    <SpriteData keyName="Fly01" sourceImage="willy" axis="30,90" sourceRect="1,106,72,102" />
+    <SpriteData keyName="Fly02" sourceImage="willy" axis="46,52" sourceRect="163,106,88,80" />
+    <SpriteData keyName="Fly02b" sourceImage="willy" axis="46,52" sourceRect="74,106,88,80" />
+    <SpriteData keyName="Fly03" sourceImage="willy" axis="46,52" sourceRect="347,131,88,64" />
+    <SpriteData keyName="FlyAttack00" sourceImage="willy" axis="46,91" sourceRect="1,1,90,104" />
+    <SpriteData keyName="FlyAttack01" sourceImage="willy" axis="30,90" sourceRect="181,1,74,102" />
+    <SpriteData keyName="FlyAttack02" sourceImage="willy" axis="46,48" sourceRect="256,78,90,76" />
+    <SpriteData keyName="FlyAttack02b" sourceImage="willy" axis="46,48" sourceRect="256,1,90,76" />
+    <SpriteData keyName="FlyAttack03" sourceImage="willy" axis="46,52" sourceRect="347,66,90,64" />
+    <SpriteData keyName="sleep" sourceImage="willy" axis="51,51" sourceRect="74,187,110,64" />
+  </data>
+</LibraryInfo>

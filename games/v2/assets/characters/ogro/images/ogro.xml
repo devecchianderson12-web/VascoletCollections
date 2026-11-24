@@ -1,0 +1,17 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="dead" sourceImage="ogro" axis="85,165" sourceRect="727,186,184,176" />
+    <SpriteData keyName="deadStatue" sourceImage="ogro" axis="86,165" sourceRect="540,192,186,176" />
+    <SpriteData keyName="kicked" sourceImage="ogro" axis="99,133" sourceRect="1,578,190,144" />
+    <SpriteData keyName="ogroattack00" sourceImage="ogro" axis="115,214" sourceRect="1,1,182,220" />
+    <SpriteData keyName="ogroattack01" sourceImage="ogro" axis="119,205" sourceRect="184,1,174,216" />
+    <SpriteData keyName="ogroattack02" sourceImage="ogro" axis="75,189" sourceRect="190,218,174,200" />
+    <SpriteData keyName="ogrofail00" sourceImage="ogro" axis="75,133" sourceRect="176,423,174,144" />
+    <SpriteData keyName="ogrofail01" sourceImage="ogro" axis="70,144" sourceRect="1,423,174,154" />
+    <SpriteData keyName="ogrofail03" sourceImage="ogro" axis="101,192" sourceRect="1,222,188,200" />
+    <SpriteData keyName="ogroStatue" sourceImage="ogro" axis="102,183" sourceRect="359,1,176,190" />
+    <SpriteData keyName="ogrowalk00" sourceImage="ogro" axis="101,182" sourceRect="536,1,174,190" />
+    <SpriteData keyName="ogrowalk01" sourceImage="ogro" axis="101,181" sourceRect="365,192,174,188" />
+    <SpriteData keyName="ogrowalk02" sourceImage="ogro" axis="101,177" sourceRect="711,1,174,184" />
+  </data>
+</LibraryInfo>

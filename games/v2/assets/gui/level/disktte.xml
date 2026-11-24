@@ -1,0 +1,6 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="diskette00" sourceImage="disktte" axis="25,26" sourceRect="1,1,50,52" />
+    <SpriteData keyName="diskette01" sourceImage="disktte" axis="22,23" sourceRect="52,1,46,46" />
+  </data>
+</LibraryInfo>

@@ -1,0 +1,24 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="portal00" sourceImage="portal" axis="65,131" sourceRect="255,391,126,194" />
+    <SpriteData keyName="portal01" sourceImage="portal" axis="65,131" sourceRect="1,586,126,194" />
+    <SpriteData keyName="portal02" sourceImage="portal" axis="65,131" sourceRect="128,391,126,194" />
+    <SpriteData keyName="portal03" sourceImage="portal" axis="65,131" sourceRect="1,391,126,194" />
+    <SpriteData keyName="portal04" sourceImage="portal" axis="65,131" sourceRect="890,196,126,194" />
+    <SpriteData keyName="portal05" sourceImage="portal" axis="65,131" sourceRect="763,196,126,194" />
+    <SpriteData keyName="portal06" sourceImage="portal" axis="65,131" sourceRect="890,1,126,194" />
+    <SpriteData keyName="portal07" sourceImage="portal" axis="65,131" sourceRect="636,196,126,194" />
+    <SpriteData keyName="portal08" sourceImage="portal" axis="65,131" sourceRect="763,1,126,194" />
+    <SpriteData keyName="portal09" sourceImage="portal" axis="65,131" sourceRect="509,196,126,194" />
+    <SpriteData keyName="portal10" sourceImage="portal" axis="65,131" sourceRect="636,1,126,194" />
+    <SpriteData keyName="portal11" sourceImage="portal" axis="65,131" sourceRect="509,1,126,194" />
+    <SpriteData keyName="portal12" sourceImage="portal" axis="65,131" sourceRect="382,196,126,194" />
+    <SpriteData keyName="portal13" sourceImage="portal" axis="65,131" sourceRect="255,196,126,194" />
+    <SpriteData keyName="portal14" sourceImage="portal" axis="65,131" sourceRect="128,196,126,194" />
+    <SpriteData keyName="portal15" sourceImage="portal" axis="65,131" sourceRect="1,196,126,194" />
+    <SpriteData keyName="portal16" sourceImage="portal" axis="65,131" sourceRect="382,1,126,194" />
+    <SpriteData keyName="portal17" sourceImage="portal" axis="65,131" sourceRect="255,1,126,194" />
+    <SpriteData keyName="portal18" sourceImage="portal" axis="65,131" sourceRect="128,1,126,194" />
+    <SpriteData keyName="portal19" sourceImage="portal" axis="65,131" sourceRect="1,1,126,194" />
+  </data>
+</LibraryInfo>

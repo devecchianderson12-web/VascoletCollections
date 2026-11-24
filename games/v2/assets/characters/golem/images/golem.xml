@@ -1,0 +1,10 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="beforeGolem" sourceImage="golem" axis="88,93" sourceRect="296,1,176,104" />
+    <SpriteData keyName="damage" sourceImage="golem" axis="27,25" sourceRect="1,196,54,52" />
+    <SpriteData keyName="fist" sourceImage="golem" axis="45,94" sourceRect="296,106,92,100" />
+    <SpriteData keyName="normal" sourceImage="golem" axis="28,31" sourceRect="56,196,50,52" />
+    <SpriteData keyName="openMouth" sourceImage="golem" axis="28,31" sourceRect="389,106,50,76" />
+    <SpriteData keyName="torso" sourceImage="golem" axis="147,189" sourceRect="1,1,294,194" />
+  </data>
+</LibraryInfo>

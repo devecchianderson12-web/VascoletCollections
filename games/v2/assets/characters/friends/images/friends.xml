@@ -1,0 +1,22 @@
+﻿<LibraryInfo>
+  <data>
+    <SpriteData keyName="friend01-00" sourceImage="friends" axis="24,44" sourceRect="364,1,62,72" />
+    <SpriteData keyName="friend01-01" sourceImage="friends" axis="26,44" sourceRect="242,80,64,72" />
+    <SpriteData keyName="friend01-02" sourceImage="friends" axis="22,49" sourceRect="240,1,60,78" />
+    <SpriteData keyName="friend01-03" sourceImage="friends" axis="35,50" sourceRect="111,167,74,78" />
+    <SpriteData keyName="friend01-04" sourceImage="friends" axis="23,46" sourceRect="301,1,62,74" />
+    <SpriteData keyName="friend01-stand" sourceImage="friends" axis="22,49" sourceRect="186,167,60,78" />
+    <SpriteData keyName="friend02-00" sourceImage="friends" axis="30,72" sourceRect="103,1,48,84" />
+    <SpriteData keyName="friend02-01" sourceImage="friends" axis="35,68" sourceRect="146,86,54,80" />
+    <SpriteData keyName="friend02-02" sourceImage="friends" axis="35,68" sourceRect="56,171,54,80" />
+    <SpriteData keyName="friend02-03" sourceImage="friends" axis="35,67" sourceRect="75,86,70,80" />
+    <SpriteData keyName="friend02-04" sourceImage="friends" axis="35,68" sourceRect="1,171,54,80" />
+    <SpriteData keyName="friend02-stand" sourceImage="friends" axis="22,66" sourceRect="201,86,40,78" />
+    <SpriteData keyName="friend03-00" sourceImage="friends" axis="17,76" sourceRect="152,1,44,84" />
+    <SpriteData keyName="friend03-01" sourceImage="friends" axis="20,78" sourceRect="1,1,52,86" />
+    <SpriteData keyName="friend03-02" sourceImage="friends" axis="14,75" sourceRect="42,88,32,82" />
+    <SpriteData keyName="friend03-03" sourceImage="friends" axis="14,76" sourceRect="197,1,42,84" />
+    <SpriteData keyName="friend03-04" sourceImage="friends" axis="21,76" sourceRect="54,1,48,84" />
+    <SpriteData keyName="friend03-stand" sourceImage="friends" axis="14,75" sourceRect="1,88,40,82" />
+  </data>
+</LibraryInfo>
