@@ -10,6 +10,12 @@ static unsigned nextCp(const std::string& s, size_t& i) {
     int extra = (c & 0xE0) == 0xC0 ? 1 : (c & 0xF0) == 0xE0 ? 2 : (c & 0xF8) == 0xF0 ? 3 : 0;
     unsigned cp = c & (0x3F >> extra);
     for (int k = 0; k < extra && i < s.size(); k++) cp = (cp << 6) | ((unsigned char)s[i++] & 0x3F);
+    switch (cp) {   // comillas y signos tipográficos: se usa el equivalente simple
+        case 0x2018: case 0x2019: return '\'';
+        case 0x201C: case 0x201D: case 0x201E: return '"';
+        case 0x2013: case 0x2014: return '-';
+        case 0x2026: return '.';
+    }
     return cp < 256 ? cp : '?';
 }
 

@@ -12,6 +12,8 @@ void assetsDataDir(const std::string& dir);
 
 std::vector<uint8_t> assetRead(const std::string& name);
 bool assetExists(const std::string& name);
+// Prefijo para los nombres que empiezan con "assets/" (ej. "v1/" mientras se juega Vascolet 1).
+void setAssetPrefix(const std::string& prefix);
 
 struct ModInfo {
     std::string folder, name, author, description, version;

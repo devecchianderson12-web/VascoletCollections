@@ -1,6 +1,7 @@
 #include "launcher.h"
 #include "font.h"
 #include "settings.h"
+#include "../v1/game.h"
 #include "../platform.h"
 #include <algorithm>
 #include <cmath>
@@ -133,6 +134,7 @@ private:
     Page back = HOME;
     std::vector<Row> rows;
     bool quit = false;
+    bool startV1 = false;   // se arranca fuera de update(), en el bucle principal
     bool hasNext = false; Page nextPage = HOME; int nextSel = 0;
 
     void go(Page p, int s = 0) { hasNext = true; nextPage = p; nextSel = s; }
@@ -246,7 +248,8 @@ void Launcher::updateHome() {
     }
     if (act) {
         click();
-        if (sel < 2) { gameSel = sel; go(GAME); }
+        if (sel == 0) startV1 = true;
+        else if (sel == 1) { gameSel = sel; go(GAME); }
         else if (sel == 2) go(OPTIONS);
         else quit = true;
     }
@@ -397,6 +400,15 @@ void Launcher::run() {
         const uint32_t now = plat::ticksMs();
         acc = std::min(0.25f, acc + (now - last) / 1000.0f); last = now;
         while (acc >= STEP && !quit) { acc -= STEP; plat::inputPoll(); update(); }
+        if (startV1) {
+            startV1 = false;
+            plat::stopMusic();
+            v1::run();
+            plat::setTouchOverlay(false);
+            plat::playMusic("v1/assets/audio/music/andy.ogg");
+            acc = 0; last = plat::ticksMs();
+            continue;
+        }
         plat::beginFrame();
         draw();
         plat::endFrame();

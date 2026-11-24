@@ -8,8 +8,10 @@
 #include <map>
 #include <algorithm>
 #include <new>
+#ifndef _MSC_VER
 #include <fcntl.h>
 #include <unistd.h>
+#endif
 #include <set>
 #include <cmath>
 #include <sstream>
@@ -26,6 +28,7 @@
 #endif
 
 namespace plat {
+void audioDiagnostics();
 static bool g_quit = false;
 static bool g_smooth = false;
 void setSmooth(bool on) { g_smooth = on; }
@@ -96,7 +99,11 @@ static SDL_RWops* rwOpen(const std::string& path) {
 #endif
 }
 
-static SDL_RWops* openBase(const std::string& name) {
+// Cada juego de la colección pide sus archivos como "assets/..."; el prefijo elige la carpeta (v1/ o v2/).
+static std::string g_assetPrefix;
+void setAssetPrefix(const std::string& p) { g_assetPrefix = p; }
+static SDL_RWops* openBase(const std::string& name0) {
+    const std::string name = name0.compare(0, 7, "assets/") == 0 ? g_assetPrefix + name0 : name0;
     if (name.compare(0, 5, "data/") == 0) {
         for (auto& d : g_dataDirs) if (SDL_RWops* f = rwOpen(d + name)) return f;
         return nullptr;
@@ -267,6 +274,7 @@ std::vector<std::vector<uint8_t>> assetReadLayers(const std::string& name) {
 }
 #include <windows.h>
 namespace plat {
+void audioDiagnostics();
 static HANDLE g_dPipe = INVALID_HANDLE_VALUE;
 static std::string g_dClient, g_dImage = "xa", g_dImageText = "OpenXa";
 static std::string g_dDetails, g_dState, g_dSent;
@@ -1450,12 +1458,14 @@ static SDL_FPoint g_mapGrab;
 
 static void touchLayout(TouchBtn* b) {
     const float W = (float)SCREEN_W, H = (float)SCREEN_H;
-    const float sr = 60 * g_stickScale;
-    b[TB_DPAD]   = { std::max(80.0f, sr + 18), H - std::max(84.0f, sr + 20), sr };
-    b[TB_JUMP]   = { W - 60, H - 72, 36 };
-    b[TB_SHOOT]  = { W - 142, H - 52, 31 };
-    b[TB_PAUSE]  = { W - 26, 76, 18 };
-    b[TB_BACK]   = { 26, 96, 18 };
+    // Los tamaños están pensados para 384 de alto: con otra resolución lógica se escalan igual en pantalla.
+    const float k = H / 384.0f;
+    const float sr = 60 * g_stickScale * k;
+    b[TB_DPAD]   = { std::max(80.0f * k, sr + 18 * k), H - std::max(84.0f * k, sr + 20 * k), sr };
+    b[TB_JUMP]   = { W - 60 * k, H - 72 * k, 36 * k };
+    b[TB_SHOOT]  = { W - 142 * k, H - 52 * k, 31 * k };
+    b[TB_PAUSE]  = { W - 26 * k, 76 * k, 18 * k };
+    b[TB_BACK]   = { 26 * k, 96 * k, 18 * k };
     for (int i = 0; i < TB_COUNT; i++) {
         if (!g_custom[i]) continue;
         const float r = std::min(b[i].r, std::min(W, H) * 0.5f);
@@ -2046,7 +2056,6 @@ void endFrame() {
     static uint32_t lastDiag = 0;
     if (ticksMs() - lastDiag >= 2000) {
         lastDiag = ticksMs();
-        void audioDiagnostics();
         audioDiagnostics();
     }
     g_frame++;
@@ -2598,6 +2607,7 @@ std::vector<uint8_t> saveRead() {
 }
 
 namespace plat {
+void audioDiagnostics();
 
 static void (*g_lowMemCb)() = nullptr;
 static void newHandler() {
@@ -2623,6 +2633,7 @@ void setLowMemoryHandler(void (*cb)()) {
 }
 
 namespace plat {
+void audioDiagnostics();
 
 int localHour() {
     time_t t = time(nullptr);

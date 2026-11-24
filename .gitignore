@@ -4,3 +4,4 @@ android/app/.cxx/
 android/build/
 android/local.properties
 build/
+pc/build/

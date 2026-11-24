@@ -41,5 +41,8 @@ for a in sys.argv[2:]:
         u32.SetCursorPos(r.left + x, r.top + y); time.sleep(0.15)
         u32.mouse_event(0x0002, 0, 0, 0, 0); time.sleep(0.08); u32.mouse_event(0x0004, 0, 0, 0, 0)
         time.sleep(int(w) / 1000); continue
+    if k.startswith('hold-'):
+        # hold-<tecla>:ms mantiene la tecla apretada ese tiempo
+        sc = SC[k[5:]]; key(sc, False); time.sleep(int(w or 500) / 1000); key(sc, True); continue
     sc = SC[k]; key(sc, False); time.sleep(0.08); key(sc, True)
     time.sleep(int(w or 600) / 1000)
