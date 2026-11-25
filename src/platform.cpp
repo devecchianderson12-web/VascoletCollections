@@ -1881,12 +1881,12 @@ static void drawTouchOverlay() {
             if (i != TB_SHOOT || g_touchShoot) geoCircle(b[i].x, b[i].y, b[i].r + 3.0f, b[i].r + (g_mapDrag == i ? 7.0f : 5.0f), Ca(g_mapDrag == i ? th.hot : th.ring, g_mapDrag == i ? 230 : 120));
     auto pressedVis = [](int i) { return g_tbDown[i] || g_mapDrag == i; };
 
-    // Gráficos de la colección (si están): se respetan tamaño, mapeo, 2D/3D y opacidad.
-    if (touchSprite(TS_BASE) && touchSprite(TS_KNOB) && touchSprite(TS_TRI) && touchSprite(TS_PAUSE) && touchSprite(TS_BACK)) {
+    // Estilo 3D: gráficos de la colección (si están). Se respetan tamaño, mapeo y opacidad.
+    // (El estilo 2D sigue con el dibujo anterior hasta tener sus gráficos.)
+    if (g_btn3d && touchSprite(TS_BASE) && touchSprite(TS_KNOB) && touchSprite(TS_TRI) && touchSprite(TS_PAUSE) && touchSprite(TS_BACK)) {
         auto art = [&](int s, float cx, float cy, float size, bool down) {
             const float sz = size * (down ? 0.92f : 1.0f);
-            const float push = g_btn3d && down ? sz * 0.05f : 0.0f;
-            if (g_btn3d) spriteAt(s, cx + sz * 0.04f, cy + sz * 0.08f, sz, 0, AS(120), false, { 0, 0, 0, 255 }); // sombra 3D
+            const float push = down ? sz * 0.04f : 0.0f;
             spriteAt(s, cx, cy + push, sz, 0, down ? HOT : AS(235), false, down ? SDL_Color{ 255, 250, 225, 255 } : SDL_Color{ 255, 255, 255, 255 });
         };
         TouchBtn j = b[TB_DPAD];
@@ -1900,7 +1900,7 @@ static void drawTouchOverlay() {
             kx += ox; ky += oy;
         }
         art(TS_KNOB, kx, ky, j.r * 0.95f, g_stickActive);
-        art(TS_TRI, b[TB_JUMP].x, b[TB_JUMP].y, b[TB_JUMP].r * 2.2f, pressedVis(TB_JUMP));
+        art(TS_TRI, b[TB_JUMP].x, b[TB_JUMP].y, b[TB_JUMP].r * 2.4f, pressedVis(TB_JUMP));
         if (g_touchShoot) art(TS_SHOOT, b[TB_SHOOT].x, b[TB_SHOOT].y, b[TB_SHOOT].r * 2.0f, pressedVis(TB_SHOOT));
         art(TS_PAUSE, b[TB_PAUSE].x, b[TB_PAUSE].y, b[TB_PAUSE].r * 2.5f, pressedVis(TB_PAUSE));
         art(TS_BACK, b[TB_BACK].x, b[TB_BACK].y, b[TB_BACK].r * 2.5f, pressedVis(TB_BACK));
