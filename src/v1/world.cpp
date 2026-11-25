@@ -359,13 +359,10 @@ void World::moveBox(Box& b, float& vx, float& vy, float dt, bool solidPlatforms,
 // ---------------- Jugador ----------------
 void World::hurtHero(float fromX) {
     if (hero.invuln > 0 || powerT > 0 || hero.state == HS_DEAD || hero.state == HS_WIN) return;
-    // En el original un golpe cuesta una vida.
-    killHero(); return;
-    hero.invuln = 1.6f;
-    hero.state = HS_HURT; hero.hurtT = 0.45f;
-    hero.vx = hero.cx() < fromX ? -260.0f : 260.0f;
-    hero.vy = -520;
-    hero.anim.play(heroAnim("HURT"), true);
+    // En el original un golpe cuesta una vida (estado 9); las animaciones HURT/HIT_GROUND/GET_UP
+    // existen en los archivos pero el exe nunca las usa.
+    (void)fromX;
+    killHero();
 }
 
 void World::killHero() {
