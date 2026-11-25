@@ -27,6 +27,7 @@ struct Hero {
     Box box{};
     float vx = 0, vy = 0;
     bool left = false, onGround = false, doubleJumped = false;
+    float animLockT = 0;      // animación que no se cambia todavía (terminar de subir la escalera)
     bool stillJump = false;   // saltó sin dirección: en el aire acelera la mitad (original)
     HeroState state = HS_AIR;
     float invuln = 0, hurtT = 0, deadT = 0;
@@ -43,6 +44,7 @@ struct Enemy {
     Box box{};
     float x0 = 0, y0 = 0, h0 = 0, vx = 0, vy = 0, ay = 0, jumpVy = 0;
     float savedVx = 0, landT = 0; bool landed = false;   // serpiente saltarina
+    float fireT = 0;          // cañón: tiempo hasta que sale la bala
     float dx = 0, dy = 0, duration = 1, t = 0, wait = 0, minT = 1, maxT = 2, timer = 0;
     float offX = 0, offY = 0, bulletVx = 0;
     bool collidesFloor = false, collidesH = false, collidesV = false, left = true, dead = false, stompable = true;

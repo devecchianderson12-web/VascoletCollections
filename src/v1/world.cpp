@@ -176,6 +176,7 @@ bool World::load(int level, const Counters& carry) {
     powerAnim.play(EA("POWER"));
 #ifdef HOST
     // Pruebas en la PC: V1_POS=x,y pone al jugador en ese punto del mapa.
+    if (getenv("V1_KEYS")) for (int& k : cnt.keys) k = 9;   // pruebas: todas las llaves
     if (const char* p = getenv("V1_POS")) { float x, y; if (sscanf(p, "%f,%f", &x, &y) == 2) { hero.box.x = x; hero.box.y = y - hero.box.h; } }
 #endif
     refitCamera();
@@ -444,13 +445,16 @@ void World::updateHero(float dt) {
         ((U && ladderAt(midX, h.box.y + h.box.h * 0.6f)) || (D && h.onGround && ladderAt(midX, h.bottom() + 4)))) {
         h.state = HS_CLIMB; h.vx = 0; h.vy = 0;
         h.box.x = std::floor(midX / map.tileW) * map.tileW + (map.tileW - h.box.w) * 0.5f;
-        if (D && h.onGround) h.box.y += 8;
-        h.anim.play(HA("CLIMB"));
+        const bool fromTop = D && h.onGround;
+        if (fromTop) h.box.y += 8;
+        // Animaciones del original: BEGIN_CLIMB al bajar desde arriba, END_CLIMB al terminar de subir.
+        h.anim.play(HA(fromTop ? "BEGIN_CLIMB" : "CLIMB"), true);
     }
     if (h.state == HS_CLIMB) {
         h.vy = U ? -CLIMB : D ? CLIMB : 0;
         if (U || D) { stepT -= dt; if (stepT <= 0) { stepT = 0.32f; stepAlt = !stepAlt; playSfx(stepAlt ? "stair_1.ogg" : "stair_2.ogg"); } }
-        if (!U && !D) h.anim.time -= dt;   // quieto en la escalera
+        if (h.anim.a == HA("BEGIN_CLIMB") && h.anim.finished()) h.anim.play(HA("CLIMB"), true);
+        if (!U && !D && h.anim.a == HA("CLIMB")) h.anim.time -= dt;   // quieto en la escalera
         const float prevBottom = h.bottom();
         h.box.y += h.vy * dt;
         // Arriba de todo: si los pies pasan el borde superior de la escalera, queda parado arriba.
@@ -458,7 +462,7 @@ void World::updateHero(float dt) {
             const float top = std::floor((prevBottom - 1) / map.tileH) * map.tileH;
             h.box.y = top - h.box.h;
             h.state = HS_GROUND; h.onGround = true; h.vy = 0;
-            h.anim.play(HA("WALK"), true); h.anim.time = 0;
+            h.anim.play(HA("END_CLIMB"), true); h.animLockT = 20.0f / 60.0f;
             return;
         }
         // Se suelta solo si ya no tiene escalera ni en el cuerpo ni bajo los pies (antes se soltaba
@@ -546,7 +550,8 @@ void World::updateHero(float dt) {
     } else if (ground) stepT = 0;
 
     // Animación
-    if (h.state == HS_GROUND) {
+    if (h.animLockT > 0) { h.animLockT -= dt; if (h.vx != 0) h.animLockT = 0; }
+    if (h.state == HS_GROUND && h.animLockT <= 0) {
         const Anim* walk = heroAnim("WALK");
         if (h.anim.a != walk) h.anim.play(walk);
         if (h.vx == 0) h.anim.time = 0;     // parado: primer cuadro
@@ -623,10 +628,18 @@ void World::updateEnemies(float dt) {
             }
             case EK_STATIC: break;
             case EK_THROWER: {
+                // EnemyThrower (0x440440): pasado el tiempo al azar (pMinTime..pMaxTime) arranca la animación
+                // y la bala sale en el cuadro 2 (a los 80 ticks); el tiempo vuelve a contar al terminarla.
                 e.timer -= dt;
-                if (e.timer <= 0 && std::fabs(hb.x - e.box.x) < LOGICAL_W) {
-                    e.timer = frand(e.minT, e.maxT);
-                    if (const Anim* a = EA(e.animName)) e.anim.play(a, true);
+                if (e.timer <= 0) {
+                    const Anim* a = EA(e.animName);
+                    if (a) e.anim.play(a, true);
+                    const float animLen = a && a->fps > 0 ? a->totalTicks / (float)a->fps : 0;
+                    e.timer = frand(e.minT, e.maxT) + animLen;
+                    e.fireT = a && a->fps > 0 ? 80.0f / a->fps : 0.001f;
+                }
+                if (e.fireT > 0 && (e.fireT -= dt) <= 0) {
+                    e.fireT = 0;
                     // Como EnemyThrower (0x440580): la bala sale en (centro + pxOffset, pie + pyOffset),
                     // corrida su ancho si dispara a la izquierda; ese punto es su esquina superior izquierda.
                     Shot s; s.img = EM(e.bullet);
@@ -668,7 +681,8 @@ void World::updateEnemies(float dt) {
                 const float cycle = e.duration * 2 + e.wait * 2, p = std::fmod(e.t, cycle);
                 float k;
                 if (p < e.wait) k = 0;
-                else if (p < e.wait + e.duration) k = (p - e.wait) / e.duration;
+                // Baja acelerando (curva 1 - cos(t·π/2), 0x44bbd0) y sube en línea recta (0x44bbc0).
+                else if (p < e.wait + e.duration) k = 1.0f - std::cos((p - e.wait) / e.duration * 1.5707963f);
                 else if (p < e.wait * 2 + e.duration) k = 1;
                 else k = 1 - (p - e.wait * 2 - e.duration) / e.duration;
                 const float prevK = e.vy; e.vy = k;
