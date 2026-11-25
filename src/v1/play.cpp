@@ -20,6 +20,7 @@ namespace {
 const SDL_Rect FULL = { 0, 0, 1200, 900 };
 const char* const INTRO_IMG[LEVELS] = { "intro_prehistoria", "intro_egipto", "intro_castillo", "intro_pirata", "intro_futuro" };
 
+const float INTRO_LOADING = 0.6f;   // segundos con "Cargando..." antes de poder seguir
 enum Scene { MENU, HELP, CREDITS, SELECT, STORY, INTRO, PLAY, END_WIN, END_LOSE };
 // Menú del juego original (sobre menu.jpg, en píxeles de la imagen de 1200x900).
 const char* const MENU_LBL[5] = { "Jugar", "Opciones", "Ayuda", "Creditos", "Salir" };
@@ -47,11 +48,25 @@ plat::Image* img(const std::string& name) {
     return i;
 }
 
-// Dibuja una imagen 4:3 entera, centrada, con bordes rojos a los costados. Devuelve dónde quedó.
+// Dónde van las pantallas de 1200x900 (menú, selección, historia...): estiradas a toda la pantalla
+// (opción "Estirar pantalla", por defecto) o enteras en 4:3 con bordes rojos a los costados.
+struct ContentFrame {
+    float x = 0, y = 0, sx = 1, sy = 1;
+    float X(float v) const { return x + v * sx; }
+    float Y(float v) const { return y + v * sy; }
+};
+ContentFrame contentFrame() {
+    ContentFrame f;
+    if (vc::settings().stretch) { f.sx = LOGICAL_W / 1200.0f; f.sy = LOGICAL_H / 900.0f; return f; }
+    const float s = std::min(LOGICAL_W / 1200.0f, LOGICAL_H / 900.0f);
+    f.sx = f.sy = s; f.x = (LOGICAL_W - 1200 * s) * 0.5f; f.y = (LOGICAL_H - 900 * s) * 0.5f;
+    return f;
+}
+
 SDL_FRect drawFull(const std::string& name) {
     plat::fillScreen({ 150, 10, 12, 255 });
-    const float s = std::min(LOGICAL_W / (float)FULL.w, LOGICAL_H / (float)FULL.h);
-    const SDL_FRect d = { (LOGICAL_W - FULL.w * s) * 0.5f, (LOGICAL_H - FULL.h * s) * 0.5f, FULL.w * s, FULL.h * s };
+    const ContentFrame f = contentFrame();
+    const SDL_FRect d = { f.x, f.y, 1200 * f.sx, 900 * f.sy };
     if (plat::Image* i = img(name)) plat::drawImage(i, FULL, d);
     return d;
 }
@@ -99,6 +114,8 @@ void run() {
     int sel = 0, storyPage = 1, level = 0;
     bool quit = false, paused = false;
     int pauseSel = 0;
+    float introT = 0;   // tiempo en la intro de la época ("Cargando..." y después "Pulsa cualquier tecla")
+    Scene prevScene = scene;
     Counters carry;
     World* world = nullptr;
     plat::playMusic("assets/audio/music/andy.ogg");
@@ -115,14 +132,15 @@ void run() {
             g_tap.poll();
             plat::setTouchOverlay(scene == PLAY && !paused);
             const bool accept = plat::pressed(plat::BTN_ACCEPT) || plat::pressed(plat::BTN_START);
+            if (scene != prevScene) { prevScene = scene; introT = 0; }
             switch (scene) {
                 case MENU: {
                     if (plat::pressed(plat::BTN_DOWN)) menuSel = (menuSel + 1) % 5;
                     if (plat::pressed(plat::BTN_UP)) menuSel = (menuSel + 4) % 5;
-                    const float s = std::min(LOGICAL_W / 1200.0f, LOGICAL_H / 900.0f), ox = (LOGICAL_W - 1200 * s) * 0.5f, oy = (LOGICAL_H - 900 * s) * 0.5f;
+                    const ContentFrame f = contentFrame();
                     bool go = accept;
                     for (int i = 0; i < 5; i++)
-                        if (g_tap.in(ox + (MENU_X - 115) * s, oy + (MENU_Y0 + i * MENU_DY - 32) * s, 230 * s, 64 * s)) { menuSel = i; go = true; }
+                        if (g_tap.in(f.X(MENU_X - 115), f.Y(MENU_Y0 + i * MENU_DY - 32), 230 * f.sx, 64 * f.sy)) { menuSel = i; go = true; }
                     if (plat::pressed(plat::BTN_BACK)) { quit = true; break; }
                     if (!go) break;
                     playSfx("item.ogg");
@@ -152,14 +170,14 @@ void run() {
                     if (sel >= open) sel = open - 1;
                     if (plat::pressed(plat::BTN_RIGHT)) sel = (sel + 1) % open;
                     if (plat::pressed(plat::BTN_LEFT)) sel = (sel + open - 1) % open;
-                    const float s = std::min(LOGICAL_W / 1200.0f, LOGICAL_H / 900.0f), ox = (LOGICAL_W - 1200 * s) * 0.5f, oy = (LOGICAL_H - 900 * s) * 0.5f;
+                    const ContentFrame f = contentFrame();
                     bool go = accept;
                     for (int i = 0; i < LEVELS; i++)
-                        if (g_tap.in(ox + EPOCH[i].x * s, oy + EPOCH[i].y * s, EPOCH[i].w * s, EPOCH[i].h * s)) {
+                        if (g_tap.in(f.X(EPOCH[i].x), f.Y(EPOCH[i].y), EPOCH[i].w * f.sx, EPOCH[i].h * f.sy)) {
                             if (i < open) { sel = i; go = true; }
                         }
-                    { float hx, hy; backHot = plat::pointerHover(&hx, &hy) && hx >= ox + 534 * s && hx < ox + 666 * s && hy >= oy + 835 * s && hy < oy + 889 * s; }
-                    if (g_tap.in(ox + 534 * s, oy + 835 * s, 132 * s, 54 * s) || plat::pressed(plat::BTN_BACK)) { scene = MENU; break; }
+                    { float hx, hy; backHot = plat::pointerHover(&hx, &hy) && hx >= f.X(534) && hx < f.X(666) && hy >= f.Y(835) && hy < f.Y(889); }
+                    if (g_tap.in(f.X(534), f.Y(835), 132 * f.sx, 54 * f.sy) || plat::pressed(plat::BTN_BACK)) { scene = MENU; break; }
                     if (go) { level = sel; carry = Counters(); scene = level == 0 ? STORY : INTRO; storyPage = 1; playSfx("item.ogg"); }
                     break;
                 }
@@ -168,7 +186,8 @@ void run() {
                     if (plat::pressed(plat::BTN_BACK)) scene = SELECT;
                     break;
                 case INTRO:
-                    if (accept || g_tap.tapped || plat::pressed(plat::BTN_JUMP)) {
+                    introT += STEP;
+                    if (introT > INTRO_LOADING && (accept || g_tap.tapped || plat::pressed(plat::BTN_JUMP))) {
                         delete world; world = new World;
                         if (!world->load(level, carry)) { delete world; world = nullptr; scene = SELECT; break; }
                         scene = PLAY; paused = false; acc = 0; last = plat::ticksMs();
@@ -223,11 +242,12 @@ void run() {
         plat::setView43(false, LOGICAL_W);
         switch (scene) {
             case MENU: {
-                const SDL_FRect d = drawFull("assets/images/menuelements/menu.jpg");
-                const float s = d.w / 1200.0f;
+                drawFull("assets/images/menuelements/menu.jpg");
+                const ContentFrame f = contentFrame();
+                const float s = f.sy;
                 const ImageMap* sb = imageMap("SMALL_BUTTON", "AssetsGeneral");
                 for (int i = 0; i < 5; i++) {
-                    const float bx = d.x + MENU_X * s, by = d.y + (MENU_Y0 + i * MENU_DY) * s;
+                    const float bx = f.X(MENU_X), by = f.Y(MENU_Y0 + i * MENU_DY);
                     if (sb && sb->frames.size() >= 2) drawFrameScaled(sb->frames[menuSel == i ? 1 : 0], bx, by, s * 1.65f);
                     text(MENU_LBL[i], bx, by - vc::uiFont().height(0.5f) * 0.5f, 0.5f);
                 }
@@ -236,8 +256,9 @@ void run() {
             case HELP: drawFull("assets/lang/images/help/ayuda.jpg"); break;
             case CREDITS: drawFull("assets/lang/images/credits/creditos.jpg"); break;
             case SELECT: {
-                const SDL_FRect d = drawFull("assets/lang/images/seleccionar_nivel/fondo_seleccionar_nivel.jpg");
-                const float s = d.w / 1200.0f;
+                drawFull("assets/lang/images/seleccionar_nivel/fondo_seleccionar_nivel.jpg");
+                const ContentFrame f = contentFrame();
+                const float s = f.sy;
                 // Épocas habilitadas: panel de color con su personaje (boton_*.png); las bloqueadas quedan
                 // como en el fondo (oscuras). La elegida usa el panel resaltado.
                 static const char* const BTN[LEVELS] = { "prehistoria", "egipto", "castillo", "piratas", "futuro" };
@@ -246,10 +267,10 @@ void run() {
                 for (int i = 0; i < open; i++) {
                     plat::Image* b = img(std::string("assets/lang/images/seleccionar_nivel/boton_") + BTN[i] + ".png");
                     if (!b) continue;
-                    const SDL_FRect r = { d.x + EPOCH[i].x * s, d.y + EPOCH[i].y * s, EPOCH[i].w * s, EPOCH[i].h * s };
+                    const SDL_FRect r = { f.X(EPOCH[i].x), f.Y(EPOCH[i].y), EPOCH[i].w * f.sx, EPOCH[i].h * f.sy };
                     plat::drawImage(b, i == sel ? SDL_Rect{ 224, 4, 212, 534 } : SDL_Rect{ 4, 4, 212, 534 }, r);
                     const SDL_Rect& c = CHAR[i];
-                    const float k = r.w / 212.0f, cw = c.w * k, ch = c.h * k;
+                    const float cw = c.w * r.w / 212.0f, ch = c.h * r.h / 534.0f;
                     plat::drawImage(b, c, SDL_FRect{ r.x + r.w * 0.5f - cw * 0.5f, r.y + r.h - ch, cw, ch });
                 }
                 // Monedas juntadas en cada época habilitada ("N / 100") y el botón "Atrás", como en el original.
@@ -258,17 +279,25 @@ void run() {
                 const ImageMap* coin = imageMap("COIN", "AssetsItems");
                 for (int i = 0; i < open; i++) {
                     char cb[16]; snprintf(cb, sizeof cb, "%d / 100", st.v1Coins[i]);
-                    const float cx = d.x + (EPOCH[i].x + EPOCH[i].w * 0.5f - 10) * s, tw = vc::uiFont().width(cb, ts);
-                    text(cb, cx, d.y + 807 * s - vc::uiFont().height(ts) * 0.5f, ts);
-                    if (coin && !coin->frames.empty()) drawFrameScaled(coin->frames[0], cx + tw * 0.5f + 20 * s, d.y + 822 * s, s * 0.36f);
+                    const float cx = f.X(EPOCH[i].x + EPOCH[i].w * 0.5f - 10), tw = vc::uiFont().width(cb, ts);
+                    text(cb, cx, f.Y(807) - vc::uiFont().height(ts) * 0.5f, ts);
+                    if (coin && !coin->frames.empty()) drawFrameScaled(coin->frames[0], cx + tw * 0.5f + 20 * s, f.Y(822), s * 0.36f);
                 }
                 if (const ImageMap* sb = imageMap("SMALL_BUTTON", "AssetsGeneral"); sb && sb->frames.size() >= 2)
-                    drawFrameScaled(sb->frames[backHot ? 1 : 0], d.x + 600 * s, d.y + 862 * s, s * 0.95f);
-                text("Atrás", d.x + 600 * s, d.y + 862 * s - vc::uiFont().height(ts) * 0.5f, ts);
+                    drawFrameScaled(sb->frames[backHot ? 1 : 0], f.X(600), f.Y(862), s * 0.95f);
+                text("Atrás", f.X(600), f.Y(862) - vc::uiFont().height(ts) * 0.5f, ts);
                 break;
             }
             case STORY: drawFull("assets/lang/images/intros/intro_page" + std::to_string(storyPage) + ".jpg"); break;
-            case INTRO: drawFull(std::string("assets/lang/images/intros/") + INTRO_IMG[level] + ".jpg"); break;
+            case INTRO: {
+                const SDL_FRect d = drawFull(std::string("assets/lang/images/intros/") + INTRO_IMG[level] + ".jpg");
+                if (introT > INTRO_LOADING) if (plat::Image* pk = img("assets/lang/images/menu/press_any_key.png")) {
+                    // Tapa el "Cargando..." de la imagen.
+                    const float sx = d.w / 1200.0f, sy = d.h / 900.0f;
+                    plat::drawImage(pk, SDL_Rect{ 0, 0, pk->w, pk->h }, SDL_FRect{ d.x + 80 * sx, d.y + 773 * sy, pk->w * sx, pk->h * sy });
+                }
+                break;
+            }
             case PLAY:
                 if (world) { world->setInterp(plat::highFps() && !paused ? acc / STEP : 1.0f); world->draw(); }
                 if (paused) {

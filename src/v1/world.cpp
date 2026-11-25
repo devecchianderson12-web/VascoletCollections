@@ -344,7 +344,8 @@ void World::award(const Item& it) {
     else if (c == "GREEN_KEY") { cnt.keys[2]++; playSfx("item.ogg"); }
     else if (c == "BLUE_KEY") { cnt.keys[3]++; playSfx("item.ogg"); }
     else if (c == "MICROWAVE") {
-        hero.state = HS_WIN; hero.vx = 0; winT = 0;
+        hero.state = HS_WIN; hero.vx = 0; hero.vy = 0; winT = 0;
+        spawnEffect("POWER", hero.cx(), hero.box.y + hero.box.h * 0.5f);   // como en el original: desaparece en un destello
         plat::stopMusic(); playSfx("microwave.ogg");
     } else { cnt.points += 10; playSfx("item.ogg"); }
 }
@@ -384,6 +385,7 @@ void World::updateHero(float dt) {
     }
     if (h.state == HS_CLIMB) {
         h.vy = U ? -CLIMB : D ? CLIMB : 0;
+        if (U || D) { stepT -= dt; if (stepT <= 0) { stepT = 0.32f; stepAlt = !stepAlt; playSfx(stepAlt ? "stair_1.ogg" : "stair_2.ogg"); } }
         if (!U && !D) h.anim.time -= dt;   // quieto en la escalera
         const float prevBottom = h.bottom();
         h.box.y += h.vy * dt;
@@ -460,6 +462,15 @@ void World::updateHero(float dt) {
     if (ground) h.doubleJumped = false;
     if (ground && !wasGround && h.state == HS_AIR) h.state = HS_GROUND;
     if (!ground && h.state == HS_GROUND) h.state = HS_AIR;
+    // Pasos: alternados a pie o con el dinosaurio; la patineta tiene su zumbido.
+    if (ground && h.vx != 0 && h.state == HS_GROUND) {
+        stepT -= dt;
+        if (stepT <= 0) {
+            stepAlt = !stepAlt;
+            if ((*mount == 'P')) { stepT = 0.6f; playSfx("skate.ogg"); }
+            else { stepT = riding ? 0.42f : 0.3f; playSfx(riding ? (stepAlt ? "footstep_dino_1.ogg" : "footstep_dino_2.ogg") : (stepAlt ? "footstep_1.ogg" : "footstep_2.ogg")); }
+        }
+    } else if (ground) stepT = 0;
 
     // Animación
     if (h.state == HS_GROUND) {
@@ -609,6 +620,7 @@ void World::update(float dt) {
     updateEnemies(dt);
 
     if (messageT > 0) messageT -= dt;
+    if (savedT > 0) savedT -= dt;
     for (auto& ef : effects) ef.anim.update(dt);
     effects.erase(std::remove_if(effects.begin(), effects.end(), [](const Effect& e) { return e.anim.finished(); }), effects.end());
 
@@ -629,7 +641,7 @@ void World::update(float dt) {
             if (!s.active && overlap(hero.box, s.box)) {
                 for (auto& o : saves) o.active = false;
                 s.active = true; spawnX = s.box.x; spawnY = s.box.y + s.box.h - hero.box.h;
-                showMessage("Juego Salvado", 2.5f);
+                savedT = 2.5f;
                 playSfx("powerup.ogg");
             }
         activeSign = nullptr;
@@ -727,7 +739,7 @@ void World::drawFrameContents() {
         hdAddLight(hero.cx(), hero.box.y + 20, 360, 1.0f, 0.9f, 0.74f, 0.34f, 0.08f, true);
         if (hf) { hdContactShadow(hero.cx(), hero.bottom(), hero.onGround, 34, cx, cy); hdSpriteShadow(*hf, hero.cx() - cx, hero.bottom() - cy, hero.left); }
     }
-    if (hf && !blink) drawFrame(*hf, hero.cx() - cx, hero.bottom() - cy, hero.left);
+    if (hf && !blink && hero.state != HS_WIN) drawFrame(*hf, hero.cx() - cx, hero.bottom() - cy, hero.left);
     if (powerT > 0) if (const Frame* pf = powerAnim.current()) drawFrame(*pf, hero.cx() - cx, hero.box.y + hero.box.h * 0.5f - cy, false, (Uint8)(powerT < 2 ? 120 : 200));
 
     for (auto& ef : effects) if (const Frame* f = ef.anim.current()) drawFrame(*f, ef.x - cx, ef.y - cy);
@@ -742,6 +754,13 @@ void World::drawHud() {
     char b[32];
     // El HUD se midió sobre 800x600; la vista es de 900 de alto (como el original, 1200x900): se escala.
     const float u = LOGICAL_H / 600.0f;
+    {
+        SDL_Renderer* r = plat::renderer();
+        SDL_SetRenderDrawBlendMode(r, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(r, 0, 0, 0, 128);
+        const SDL_FRect hb = { 0, 0, (float)LOGICAL_W, 92 * LOGICAL_H / 900.0f };
+        SDL_RenderFillRectF(r, &hb);
+    }
     // Posiciones y tamaños medidos sobre el video del juego original (pantalla de 800x600).
     if (const ImageMap* h = imageMap("HUD_HERO", "AssetsGeneral")) drawFrameScaled(h->frames[0], 52 * u, 28 * u, 0.6f * u);
     snprintf(b, sizeof b, "%d", cnt.lives); f.draw(b, 70 * u, 34 * u, 0.5f * u, white);
@@ -764,20 +783,22 @@ void World::drawHud() {
         f.draw(d, 10, (float)LOGICAL_H - 40, 0.45f, white);
     }
 #endif
-    if (messageT > 0 && !message.empty()) {
-        // Como en el original: franja negra debajo del HUD con el texto centrado en blanco.
+    // Franjas negras con texto blanco centrado, medidas en el video (vista de 900 de alto):
+    // la de los carteles empieza en 152 y la de "Juego Salvado" en 257; cada renglón mide 30.
+    const float v = LOGICAL_H / 900.0f, lh = 30 * v, sc = lh / f.height(1.0f);
+    auto band = [&](const std::string& msg, float top) {
         std::vector<std::string> lines; std::string cur;
-        for (char c : message) { if (c == '\n') { lines.push_back(cur); cur.clear(); } else cur += c; }
+        for (char c : msg) { if (c == '\n') { lines.push_back(cur); cur.clear(); } else cur += c; }
         lines.push_back(cur);
-        const float u = LOGICAL_H / 600.0f, sc = 0.45f * u, lh = f.height(sc), top = 92 * u;
-        const float bh = lines.size() * lh + 10 * u;
         SDL_Renderer* r = plat::renderer();
         SDL_SetRenderDrawBlendMode(r, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
-        const SDL_FRect band = { 0, top, (float)LOGICAL_W, bh };
-        SDL_RenderFillRectF(r, &band);
-        for (size_t i = 0; i < lines.size(); i++) f.drawCentered(lines[i], LOGICAL_W * 0.5f, top + 5 * u + i * lh, sc, white);
-    }
+        const SDL_FRect rc = { 0, top, (float)LOGICAL_W, lines.size() * lh + 16 * v };
+        SDL_RenderFillRectF(r, &rc);
+        for (size_t i = 0; i < lines.size(); i++) f.drawCentered(lines[i], LOGICAL_W * 0.5f, top + 8 * v + i * lh, sc, white);
+    };
+    if (messageT > 0 && !message.empty()) band(message, 152 * v);
+    if (savedT > 0) band("Juego Salvado", 257 * v);
 }
 
 }

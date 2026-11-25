@@ -196,6 +196,7 @@ void Launcher::buildRows() {
 #endif
             static const char* SHARP[3] = { "No", "Media", "Alta" };
             rows.push_back({ "Diseño gráfico", [] { return std::string(settings().modernArt ? "Moderno" : "Clásico"); }, toggle(&Settings::modernArt) });
+            rows.push_back({ "Estirar pantalla", [] { return std::string(onOff(settings().stretch)); }, toggle(&Settings::stretch) });
             rows.push_back({ "Suavizado", [] { return std::string(onOff(settings().smooth)); }, toggle(&Settings::smooth) });
             rows.push_back({ "Nitidez", [] { return std::string(SHARP[settings().sharpness % 3]); }, cycle(&Settings::sharpness, 3) });
             rows.push_back({ "Calidad HD", [] { return std::string(onOff(settings().hd)); }, toggle(&Settings::hd) });

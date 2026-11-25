@@ -69,7 +69,7 @@ public:
     bool load(int level, const Counters& carry);
     void update(float dt);
     void draw();
-    bool won() const { return winT > 2.0f; }
+    bool won() const { return winT > 2.4f; }
     bool gameOver() const { return outOfLives; }
     const Counters& counters() const { return cnt; }
     int level() const { return levelNo; }
@@ -121,10 +121,12 @@ private:
     const Sign* lastSign = nullptr;
     std::string message;        // franja negra con texto debajo del HUD (carteles, "Juego Salvado")
     float messageT = 0;
+    float savedT = 0;           // franja de "Juego Salvado" (debajo de la de los carteles)
     void showMessage(const std::string& m, float secs) { message = m; messageT = secs; }
     Counters cnt;
     bool outOfLives = false;
     float winT = 0;
+    float stepT = 0; bool stepAlt = false;   // sonido de pasos y escaleras
     float powerT = 0;            // cereales: invencible un rato
     AnimPlayer powerAnim;
     GameCamera cam;
