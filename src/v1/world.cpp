@@ -238,7 +238,7 @@ void World::screenCamera(bool snap) {
     screenX = sx; screenY = sy;
     if (cut) resetScreenEnemies();
     auto axis = [](float cell0, float cellSize, float view, float focus, float cur, bool jump, float dt) {
-        if (view >= cellSize) return cell0 + (cellSize - view) * 0.5f;
+        if (view >= cellSize - 16) return view >= cellSize ? cell0 + (cellSize - view) * 0.5f : cell0;   // original: anclada a la esquina
         const float target = std::max(cell0, std::min(cell0 + cellSize - view, focus - view * 0.5f));
         if (jump) return target;
         const float k = std::min(1.0f, dt * 8.0f);     // seguimiento suave dentro de la pantalla
@@ -372,7 +372,7 @@ void World::killHero() {
     if (hero.state == HS_DEAD) return;
     hero.state = HS_DEAD; hero.deadT = 0;
     hero.vx = 0; hero.vy = -800;
-    playSfx(rand() & 1 ? "death_1.ogg" : "death_2.ogg");   // DEATH_1 / DEATH_2 del original
+    playSfx("death_1.ogg");   // DEATH_1 al recibir el golpe
 }
 
 void World::respawn() {
@@ -427,10 +427,14 @@ void World::updateHero(float dt) {
     if (powerT > 0) { powerT -= dt; powerAnim.update(dt); }
 
     if (h.state == HS_DEAD) {
+        // Queda quieto 1 s (0x294 = 1.0) y después salta y cae, con el sonido DEATH_2.
+        const float before = h.deadT;
         h.deadT += dt;
+        if (h.deadT < 1.0f) return;
+        if (before < 1.0f) playSfx("death_2.ogg");
         h.vy = std::min(h.vy + GRAVITY * dt, MAX_FALL);
         h.box.y += h.vy * dt;
-        if (h.box.y > (screenY + 1) * 12.0f * map.tileH + 500 || h.deadT > 4.0f) respawn();
+        if (h.box.y > (screenY + 1) * 12.0f * map.tileH + 500 || h.deadT > 5.0f) respawn();
         return;
     }
     if (h.state == HS_WIN) { winT += dt; return; }
@@ -650,7 +654,7 @@ void World::updateEnemies(float dt) {
                     s.x = tlx + px; s.y = tly + py; s.cy = py - (bf ? bf->h * 0.5f : 30);
                     s.vx = e.bulletVx; s.vy = 0;
                     shots.push_back(s);
-                    playSfx(e.asset == "CANNON_LASER" ? "laser.ogg" : "cannon.ogg");
+                    playSfx(e.asset == "CANNON_LASER" ? "laser.ogg" : e.asset == "CANNON_PIRATES" ? "cannon.ogg" : "statue_shot.ogg");
                 }
                 break;
             }
@@ -700,8 +704,8 @@ void World::updateEnemies(float dt) {
                     while (y < map.height * map.tileH && !solidAt(e.box.x + e.box.w * 0.5f, y)) y += map.tileH;
                     e.dy = y - e.box.y;
                 }
-                if (!e.falling && std::fabs(hero.cx() - (e.box.x + e.box.w * 0.5f)) < std::max(60.0f, e.offX) &&
-                    hb.y + hb.h > e.box.y && hb.y < e.box.y + e.dy) e.falling = true;
+                if (!e.falling && std::fabs(hero.cx() - (e.box.x + e.box.w * 0.5f)) <= e.offX &&
+                    hero.bottom() - e.box.y > 0 && hero.bottom() - e.box.y <= e.dy) e.falling = true;
                 if (e.falling) {
                     e.vy += e.ay * dt; e.box.y += e.vy * dt;
                     if (solidAt(e.box.x + e.box.w * 0.5f, e.box.y + e.box.h)) { e.dead = true; spawnEffect("ENEMY_DEATH", e.box.x + e.box.w * 0.5f, e.box.y + e.box.h * 0.5f); }
@@ -790,7 +794,7 @@ void World::update(float dt) {
             const Box near = { d.box.x - 10, d.box.y, d.box.w + 20, d.box.h };
             if (!overlap(hero.box, near)) continue;
             int* k = d.key == "YELLOW_KEY" ? &cnt.keys[0] : d.key == "RED_KEY" ? &cnt.keys[1] : d.key == "GREEN_KEY" ? &cnt.keys[2] : d.key == "BLUE_KEY" ? &cnt.keys[3] : nullptr;
-            if (k && *k > 0) { (*k)--; d.opening = true; playSfx("door.ogg"); }
+            if (k && *k > 0) { (*k)--; d.opening = true; playSfx("explosion.ogg"); }
         }
         // SavePoint (0x442cc0): cada vez que se lo toca (después de haberse alejado) guarda el lugar y
         // muestra "Juego Salvado".
@@ -800,7 +804,7 @@ void World::update(float dt) {
                 for (auto& o : saves) o.active = false;
                 spawnX = s.box.x; spawnY = s.box.y + s.box.h - hero.box.h;
                 savedT = 2.5f;
-                playSfx("item.ogg");
+                playSfx("powerup.ogg");
             }
             s.active = touching;
         }
@@ -924,7 +928,7 @@ void World::drawHud() {
     const SDL_Color white = { 255, 255, 255, 255 };
     char b[32];
     // El HUD se midió sobre 800x600; la vista es de 900 de alto (como el original, 1200x900): se escala.
-    const float u = 912.0f / 600.0f;   // el HUD va en unidades del mundo, como en el original
+    const float u = 900.0f / 600.0f;   // el HUD va en unidades del mundo, como en el original
     {
         SDL_Renderer* r = plat::renderer();
         SDL_SetRenderDrawBlendMode(r, SDL_BLENDMODE_BLEND);

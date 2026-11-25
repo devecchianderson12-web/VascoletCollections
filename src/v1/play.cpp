@@ -12,8 +12,8 @@
 
 namespace v1 {
 
-int LOGICAL_W = 1216, LOGICAL_H = 912;
-int UI_W = 1216;   // ancho de la interfaz (HUD, pausa, menús) en la resolución sin deformar
+int LOGICAL_W = 1200, LOGICAL_H = 900;
+int UI_W = 1200;   // ancho de la interfaz (HUD, pausa, menús) en la resolución sin deformar
 
 namespace {
 
@@ -111,8 +111,10 @@ void run() {
     // Igual que el original: se ve siempre una pantalla entera del juego (16x12 bloques = 1216x912) y
     // la cámara salta de pantalla en pantalla. En el celular se estira a toda la pantalla ("Estirar
     // pantalla", por defecto) o se muestra en 4:3.
-    LOGICAL_W = 1216; LOGICAL_H = 912;
-    UI_W = std::max(1216, (int)std::lround(912.0f * oldW / std::max(1, oldH)));
+    // Como el Scenario del original (0x4276b0): la vista mide 1200x900 y arranca en la esquina de la
+    // pantalla de 16x12 bloques (1216x912); quedan sin verse 16 px a la derecha y 12 abajo, igual que en el video.
+    LOGICAL_W = 1200; LOGICAL_H = 900;
+    UI_W = std::max(1200, (int)std::lround(900.0f * oldW / std::max(1, oldH)));
     // Por defecto se trabaja en la resolución de la interfaz (sin deformar); solo el mundo se dibuja
     // en la pantalla 4:3 del original, estirada a lo ancho si está activado "Estirar pantalla".
     auto uiSpace = [&] { plat::setStretch(false); plat::setLogicalSize(st.stretch ? UI_W : LOGICAL_W, LOGICAL_H); };
