@@ -225,8 +225,15 @@ void run() {
                         for (int i = 0; i < 3; i++) if (g_tap.in(cx - 110 * k, cy + (PAUSE_BTN_Y[i] - 30) * k, 220 * k, 60 * k)) { pauseSel = i; act = true; }
                         if (plat::pressed(plat::BTN_START) && !plat::pressed(plat::BTN_ACCEPT)) { pauseSel = 0; act = true; }
                         if (act && pauseSel == 1) {
+                            // Foto del juego (sin el cartel de pausa) para verlo detrás de las opciones.
+                            if (world) {
+                                plat::beginFrame();
+                                worldSpace(); world->draw(); uiSpace(); world->drawHud();
+                                plat::captureBackdrop();
+                            }
                             plat::setStretch(false); plat::setLogicalSize(oldW, oldH);
                             vc::runOptionsMenu();
+                            plat::clearBackdrop();
                             uiSpace();
                             g_hdOff = (uint8_t)st.hdOff;
                             g_cameraFixed = false;

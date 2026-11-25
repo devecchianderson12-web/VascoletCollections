@@ -697,11 +697,11 @@ void World::updateMeteorites(float dt) {
         if (meteorT < 0) {
             meteorT = frand(3.0f, 4.0f);
             Meteor m;
-            const bool right = frand(0, 1) >= 0.5f;
-            const float a = frand(0.25f, 1.1f);
-            m.x = screenX * SW + (right ? frand(900, 1300) : frand(-100, 300));
+            // En el video caen siempre de arriba hacia abajo y a la derecha.
+            const float a = frand(0.6f, 1.2f);
+            m.x = screenX * SW + frand(-150, 700);
             m.y = screenY * SH - 65;
-            m.vx = (right ? -1.0f : 1.0f) * 250 * std::cos(a);
+            m.vx = 250 * std::cos(a);
             m.vy = 250 * std::sin(a);
             m.ay = 400;
             meteors.push_back(m);
@@ -840,7 +840,7 @@ void World::drawFrameContents() {
         drawFrame(*f, x, y, flip);
     }
     if (meteorImg && !meteorImg->frames.empty())
-        for (auto& m : meteors) drawFrame(meteorImg->frames[0], m.x - cx, m.y + 20 - cy, m.vx < 0);
+        for (auto& m : meteors) drawFrame(meteorImg->frames[0], m.x - cx, m.y + 20 - cy, false);
     for (auto& s : shots) if (s.img && !s.img->frames.empty()) {
         if (hd) hdAddLight(s.x, s.y, 90, 1.0f, 0.75f, 0.4f, 0.4f, 0.4f, true);
         drawFrame(s.img->frames[0], s.x - cx, s.y - cy, s.vx < 0);

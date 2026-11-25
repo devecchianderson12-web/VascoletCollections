@@ -68,7 +68,21 @@ void text(const std::string& s, float x, float y, float sc = TXT, SDL_Color c = 
 void textC(const std::string& s, float cx, float y, float sc = TXT, SDL_Color c = WHITE) { font().drawCentered(s, cx, y, sc, c); }
 
 // Fondo de rayos rojos que giran despacio, con brillo naranja en el centro (como el menú original).
-void rays(float cx, float cy, float dim = 0) {
+void rays(float cx, float cy, float dim = 0);
+// Fondo de las páginas de opciones: el juego (si se abrieron desde la pausa) o el arte del inicio,
+// quietos y oscurecidos para que resalte el menú.
+void optionsBackdrop() {
+    if (!plat::drawBackdrop()) {
+        plat::fillScreen({ 120, 8, 10, 255 });
+        if (plat::Image* e = img("v1/assets/images/menuelements/menu.jpg")) {
+            const float ah = H(), aw = ah * 4.0f / 3.0f;
+            plat::drawImage(e, SDL_Rect{ 0, 0, 1200, 900 }, SDL_FRect{ (W() - aw) * 0.5f, 0, aw, ah });
+        }
+    }
+    plat::dimScreen(0.62f);
+}
+
+void rays(float cx, float cy, float dim) {
     SDL_Renderer* r = plat::renderer();
     SDL_SetRenderDrawBlendMode(r, SDL_BLENDMODE_BLEND);
     plat::fillScreen({ 178, 12, 14, 255 });
@@ -343,7 +357,7 @@ void Launcher::updateList() {
 }
 
 void Launcher::drawList() {
-    rays(W() * 0.5f, H() * 0.45f, 0.25f);
+    optionsBackdrop();
     const int n = (int)rows.size();
     const float RH = rowH(n);
     const float x = listX(), w = listW(), y0 = listY0(n);
@@ -377,7 +391,7 @@ void Launcher::updateMapping() {
 }
 
 void Launcher::drawMapping() {
-    rays(W() * 0.5f, H() * 0.45f, 0.45f);
+    optionsBackdrop();
     const float cy = H() * 0.5f;
     textC("Arrastrá cada botón a donde quieras", W() * 0.5f, cy - 70, 0.6f, YELLOW);
     button("Restablecer", W() * 0.5f - 85, cy, 150, 40, false);

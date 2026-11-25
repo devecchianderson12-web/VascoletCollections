@@ -51,6 +51,10 @@ void dimMargins(Uint8 alpha);
 void fillScreen(SDL_Color c);
 SDL_Color imagePixel(const std::string& name, int x, int y);
 void setStretch(bool on);
+// Foto de la pantalla actual (antes de mostrarla) para usar de fondo en las opciones de un juego.
+void captureBackdrop();
+void clearBackdrop();
+bool drawBackdrop();   // dibuja la foto a pantalla completa; false si no hay
 void setSmooth(bool on);
 void setTvEffect(bool on);
 void setTouchOpacity(int percent);

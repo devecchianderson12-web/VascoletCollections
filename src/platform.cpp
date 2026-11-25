@@ -636,6 +636,31 @@ static void fullScreenRect(SDL_Color c, SDL_BlendMode mode) {
     if (stretched) setView43(true, vp.w);
     else if (vp.w != SCREEN_W || vp.x != 0) SDL_RenderSetViewport(g_ren, &vp);
 }
+// Fondo de las opciones abiertas desde un juego: una foto de la pantalla del juego.
+static SDL_Texture* g_backdrop = nullptr;
+void captureBackdrop() {
+    if (!g_ren) return;
+    clearBackdrop();
+    int w = 0, h = 0;
+    if (SDL_GetRendererOutputSize(g_ren, &w, &h) != 0 || w <= 0 || h <= 0) return;
+    SDL_Surface* s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
+    if (!s) return;
+    if (SDL_RenderReadPixels(g_ren, nullptr, SDL_PIXELFORMAT_ARGB8888, s->pixels, s->pitch) == 0)
+        g_backdrop = SDL_CreateTextureFromSurface(g_ren, s);
+    SDL_FreeSurface(s);
+}
+void clearBackdrop() { if (g_backdrop) { SDL_DestroyTexture(g_backdrop); g_backdrop = nullptr; } }
+bool drawBackdrop() {
+    if (!g_ren || !g_backdrop) return false;
+    SDL_RenderSetLogicalSize(g_ren, 0, 0);
+    SDL_RenderSetViewport(g_ren, nullptr);
+    SDL_RenderSetScale(g_ren, 1.0f, 1.0f);
+    SDL_RenderCopy(g_ren, g_backdrop, nullptr, nullptr);
+    g_stretched = false;
+    applyLogicalSize();
+    return true;
+}
+
 void fillScreen(SDL_Color c) { if (g_ren) fullScreenRect({ c.r, c.g, c.b, 255 }, SDL_BLENDMODE_NONE); }
 void dimScreen(float a) {
     if (!g_ren || a <= 0) return;
