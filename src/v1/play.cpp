@@ -105,7 +105,7 @@ const SDL_FRect EPOCH[LEVELS] = { { 48, 200, 200, 540 }, { 272, 200, 200, 540 },
 void run() {
     vc::Settings& st = vc::settings();
     g_hdOff = (uint8_t)st.hdOff;
-    g_cameraFixed = st.camFixed != 0;
+    g_cameraFixed = false;
 
     const int oldW = plat::SCREEN_W, oldH = plat::SCREEN_H;
     // Igual que el original: se ve siempre una pantalla entera del juego (16x12 bloques = 1216x912) y
@@ -171,7 +171,7 @@ void run() {
                         plat::setStretch(false); plat::setLogicalSize(oldW, oldH);
                         vc::runOptionsMenu();
                         menuSpace();
-                        g_hdOff = (uint8_t)st.hdOff; g_cameraFixed = st.camFixed != 0;
+                        g_hdOff = (uint8_t)st.hdOff; g_cameraFixed = false;
                         acc = 0; last = plat::ticksMs();
                     } else if (menuSel == 2) scene = HELP;
                     else if (menuSel == 3) scene = CREDITS;
@@ -229,7 +229,7 @@ void run() {
                             vc::runOptionsMenu();
                             uiSpace();
                             g_hdOff = (uint8_t)st.hdOff;
-                            g_cameraFixed = st.camFixed != 0;
+                            g_cameraFixed = false;
                             acc = 0; last = plat::ticksMs();
                             break;
                         }

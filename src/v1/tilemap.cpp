@@ -75,6 +75,7 @@ bool TileMap::load(const std::string& pakName) {
         }
     }
     if (auto* l = m->FirstChildElement("layer")) {
+        readProps(l, layerProps);
         auto* d = l->FirstChildElement("data");
         auto raw = b64decode(d->GetText());
         gids.assign(width * height, 0);

@@ -29,6 +29,7 @@ struct TileMap {
     int width = 0, height = 0, tileW = 32, tileH = 32;
     Props props;
     std::string tilesetImage;
+    Props layerProps;   // propiedades de la capa de bloques (ej. pMeteorite(13,4))
     int firstGid = 1;
     std::map<int, Props> tileProps;
     std::vector<uint8_t> tileFlagsById;

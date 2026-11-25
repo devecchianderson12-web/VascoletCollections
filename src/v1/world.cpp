@@ -100,6 +100,14 @@ bool World::load(int level, const Counters& carry) {
         if (x1 <= x0) { x0 = 0; y0 = 0; x1 = map.width; y1 = map.height; }
         boundX0 = (float)x0 * map.tileW; boundY0 = (float)y0 * map.tileH; boundX1 = (float)x1 * map.tileW; boundY1 = (float)y1 * map.tileH;
     }
+    for (auto& kv : map.layerProps) {
+        int x = 0, y = 0;
+        if (sscanf(kv.first.c_str(), "pMeteorite(%d,%d)", &x, &y) == 2 && kv.second == "true") meteorScreens.insert((x - 1) * 1000 + (y - 1));
+    }
+    {
+        auto it = map.props.find("pAssetMeteorites");
+        meteorImg = EM(it != map.props.end() ? it->second : std::string("METEORITE"));
+    }
     riding = level == 0 || level == 4;
     mount = level == 0 ? "D_" : level == 4 ? "P_" : "";
     plat::playMusic(std::string("assets/audio/music/") + LEVEL_MUSIC[level] + ".ogg");
@@ -673,11 +681,45 @@ void World::updateEnemies(float dt) {
 }
 
 // ---------------- Cuadro ----------------
+// Lluvia de meteoritos del original: en las pantallas marcadas en el mapa (pMeteorite(x,y), contando
+// desde 1) cae uno cada 3 a 4 s desde arriba, en diagonal a 250 de velocidad con gravedad 400;
+// rebota dos veces en el piso (-650 y -600, gravedad 900 después) y mata al tocar al jugador.
+void World::updateMeteorites(float dt) {
+    const float SW = 16.0f * map.tileW, SH = 12.0f * map.tileH;
+    if (meteorScreens.count(screenX * 1000 + screenY)) {
+        meteorT -= dt;
+        if (meteorT < 0) {
+            meteorT = frand(3.0f, 4.0f);
+            Meteor m;
+            const bool right = frand(0, 1) >= 0.5f;
+            const float a = frand(0.25f, 1.1f);
+            m.x = screenX * SW + (right ? frand(900, 1300) : frand(-100, 300));
+            m.y = screenY * SH - 65;
+            m.vx = (right ? -1.0f : 1.0f) * 250 * std::cos(a);
+            m.vy = 250 * std::sin(a);
+            m.ay = 400;
+            meteors.push_back(m);
+        }
+    }
+    for (auto& m : meteors) {
+        m.vy += m.ay * dt;
+        m.x += m.vx * dt; m.y += m.vy * dt;
+        if (m.vy > 0 && solidAt(m.x, m.y + 20) && m.bounces < 2) {
+            m.y = std::floor((m.y + 20) / map.tileH) * map.tileH - 20;
+            m.vy = m.bounces * 50.0f - 650.0f; m.ay = 900; m.bounces++;
+        }
+        if (hero.state != HS_DEAD && hero.state != HS_WIN && overlap(hero.box, { m.x - 22, m.y - 22, 44, 44 })) killHero();
+        if (m.y > (screenY + 1) * SH + 100 || m.x < screenX * SW - 400 || m.x > (screenX + 1) * SW + 400) m.alive = false;
+    }
+    meteors.erase(std::remove_if(meteors.begin(), meteors.end(), [](const Meteor& m) { return !m.alive; }), meteors.end());
+}
+
 void World::update(float dt) {
     prevCamX = camX; prevCamY = camY; prevHeroX = hero.box.x; prevHeroY = hero.box.y;
     updatePlatforms(dt);
     updateHero(dt);
     updateEnemies(dt);
+    updateMeteorites(dt);
 
     if (messageT > 0) messageT -= dt;
     if (savedT > 0) savedT -= dt;
@@ -791,6 +833,8 @@ void World::drawFrameContents() {
         if (hd) hdSpriteShadow(*f, x, y, flip);
         drawFrame(*f, x, y, flip);
     }
+    if (meteorImg && !meteorImg->frames.empty())
+        for (auto& m : meteors) drawFrame(meteorImg->frames[0], m.x - cx, m.y + 20 - cy, m.vx < 0);
     for (auto& s : shots) if (s.img && !s.img->frames.empty()) {
         if (hd) hdAddLight(s.x, s.y, 90, 1.0f, 0.75f, 0.4f, 0.4f, 0.4f, true);
         drawFrame(s.img->frames[0], s.x - cx, s.y - cy, s.vx < 0);
@@ -848,7 +892,7 @@ void World::drawHud() {
 #ifdef HOST
     if (getenv("V1_DEBUG")) {   // diagnóstico (solo PC)
         char d[160];
-        snprintf(d, sizeof d, "st %d x %.0f bot %.0f vy %.0f g %d cam %.0f,%.0f room %.0f-%.0f %.0f-%.0f", (int)hero.state, hero.box.x, hero.bottom(), hero.vy, hero.onGround ? 1 : 0, cam.x, cam.y, cam.minX, cam.levelW, cam.minY, cam.levelH);
+        snprintf(d, sizeof d, "st %d x %.0f bot %.0f scr %d,%d met %d/%d t %.1f", (int)hero.state, hero.box.x, hero.bottom(), screenX, screenY, (int)meteors.size(), (int)meteorScreens.size(), meteorT);
         f.draw(d, 10, (float)LOGICAL_H - 40, 0.45f, white);
     }
 #endif

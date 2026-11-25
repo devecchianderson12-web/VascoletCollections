@@ -241,7 +241,6 @@ void Launcher::buildRows() {
             rows.push_back({ "Nitidez", [] { return std::string(SHARP[settings().sharpness % 3]); }, cycle(&Settings::sharpness, 3) });
             rows.push_back({ "Calidad HD", [] { return std::string(onOff(settings().hd)); }, toggle(&Settings::hd) });
             rows.push_back({ "Avanzado", nullptr, [this](int) { go(ADVANCED); } });
-            rows.push_back({ "Cámara fija", [] { return std::string(onOff(settings().camFixed)); }, toggle(&Settings::camFixed) });
             rows.push_back({ "120 FPS", [] { return std::string(onOff(settings().fps120)); }, toggle(&Settings::fps120) });
             rows.push_back({ "Efecto TV", [] { return std::string(onOff(settings().tvEffect)); }, toggle(&Settings::tvEffect) });
             break;

@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include "tilemap.h"
 #include "defs.h"
 #include "camera.h"
@@ -56,6 +57,7 @@ struct Door { Box box; std::string key; const ImageMap* img = nullptr; bool open
 struct Platform { Box box; float sx, sy, dx, dy, duration = 2, wait = 0.5f, t = 0, waitT = 0, lastX = 0, lastY = 0; int dir = 1; const ImageMap* img = nullptr; };
 struct Sign { Box box; std::string text; };
 struct SavePoint { Box box; bool active = false; };
+struct Meteor { float x = 0, y = 0, vx = 0, vy = 0, ay = 0; int bounces = 0; bool alive = true; };
 struct Shot { float x, y, vx, vy; bool alive = true; const ImageMap* img = nullptr; };
 struct Effect { float x, y; AnimPlayer anim; bool additive = false; };
 
@@ -121,6 +123,11 @@ private:
     std::vector<Sign> signs;
     std::vector<SavePoint> saves;
     std::vector<Shot> shots;
+    std::vector<Meteor> meteors;
+    std::set<int> meteorScreens;       // pantallas con lluvia de meteoritos (x * 1000 + y)
+    float meteorT = 1.0f;
+    const ImageMap* meteorImg = nullptr;
+    void updateMeteorites(float dt);
     std::vector<Effect> effects;
     const Sign* activeSign = nullptr;
     const Sign* lastSign = nullptr;
