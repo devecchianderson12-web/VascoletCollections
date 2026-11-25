@@ -170,6 +170,7 @@ bool World::load(int level, const Counters& carry) {
             enemies.push_back(e);
         }
     }
+    enemiesInit = enemies;
     hero.state = HS_AIR;
     hero.anim.play(heroAnim("WALK"));
     powerAnim.play(EA("POWER"));
@@ -234,6 +235,7 @@ void World::screenCamera(bool snap) {
     const int sx = (int)std::floor(hx / SW), sy = (int)std::floor(hy / SH);
     const bool cut = snap || sx != screenX || sy != screenY;
     screenX = sx; screenY = sy;
+    if (cut) resetScreenEnemies();
     auto axis = [](float cell0, float cellSize, float view, float focus, float cur, bool jump, float dt) {
         if (view >= cellSize) return cell0 + (cellSize - view) * 0.5f;
         const float target = std::max(cell0, std::min(cell0 + cellSize - view, focus - view * 0.5f));
@@ -246,6 +248,17 @@ void World::screenCamera(bool snap) {
     camY = axis(sy * SH, SH, cam.h, hy - cam.h * 0.08f, camY, cut, dt);
     cam.x = camX; cam.y = camY;
     if (cut) { prevCamX = camX; prevCamY = camY; }   // sin arrastre de interpolación en el corte
+}
+
+void World::resetScreenEnemies() {
+    const float SW = 16.0f * map.tileW, SH = 12.0f * map.tileH;
+    const float x0 = screenX * SW, y0 = screenY * SH;
+    for (size_t i = 0; i < enemies.size() && i < enemiesInit.size(); i++) {
+        const Enemy& e0 = enemiesInit[i];
+        const float cx = e0.box.x + e0.box.w * 0.5f, cy = e0.box.y + e0.box.h * 0.5f;
+        if (cx >= x0 && cx < x0 + SW && cy >= y0 && cy < y0 + SH) enemies[i] = e0;
+    }
+    shots.clear(); meteors.clear();
 }
 
 void World::centerSmallRoom() {
@@ -357,7 +370,7 @@ void World::hurtHero(float fromX) {
 void World::killHero() {
     if (hero.state == HS_DEAD) return;
     hero.state = HS_DEAD; hero.deadT = 0;
-    hero.vx = 0; hero.vy = -700;
+    hero.vx = 0; hero.vy = -800;
     playSfx("death_2.ogg");
 }
 
@@ -416,7 +429,7 @@ void World::updateHero(float dt) {
         h.deadT += dt;
         h.vy = std::min(h.vy + GRAVITY * dt, MAX_FALL);
         h.box.y += h.vy * dt;
-        if (h.deadT > 1.6f) respawn();
+        if (h.box.y > (screenY + 1) * 12.0f * map.tileH + 500 || h.deadT > 4.0f) respawn();
         return;
     }
     if (h.state == HS_WIN) { winT += dt; return; }

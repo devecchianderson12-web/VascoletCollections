@@ -115,6 +115,8 @@ private:
     void roomBounds();
     void centerSmallRoom();
     void screenCamera(bool snap);
+    void resetScreenEnemies();
+    std::vector<Enemy> enemiesInit;   // estado inicial (se restaura al entrar a su pantalla)
     int screenX = -1, screenY = -1;   // pantalla (16x12 bloques) que muestra la cámara
     std::vector<Enemy> enemies;
     std::vector<Item> items;
