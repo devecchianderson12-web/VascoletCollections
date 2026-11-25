@@ -604,8 +604,14 @@ void World::updateEnemies(float dt) {
                 if (e.timer <= 0 && std::fabs(hb.x - e.box.x) < LOGICAL_W) {
                     e.timer = frand(e.minT, e.maxT);
                     if (const Anim* a = EA(e.animName)) e.anim.play(a, true);
-                    Shot s; s.x = e.box.x + e.box.w * 0.5f + (e.left ? -e.offX : e.offX); s.y = e.box.y + e.box.h + e.offY;
-                    s.vx = e.bulletVx; s.vy = 0; s.img = EM(e.bullet);
+                    // Como EnemyThrower (0x440580): la bala sale en (centro + pxOffset, pie + pyOffset),
+                    // corrida su ancho si dispara a la izquierda; ese punto es su esquina superior izquierda.
+                    Shot s; s.img = EM(e.bullet);
+                    const Frame* bf = s.img && !s.img->frames.empty() ? &s.img->frames[0] : nullptr;
+                    const float bw = bf ? bf->w : 60, px = bf ? bf->pivotX : 30, py = bf ? bf->pivotY : 46;
+                    const float tlx = e.box.x + e.box.w * 0.5f + e.offX - (e.offX < 0 ? bw : 0), tly = e.box.y + e.box.h + e.offY;
+                    s.x = tlx + px; s.y = tly + py; s.cy = py - (bf ? bf->h * 0.5f : 30);
+                    s.vx = e.bulletVx; s.vy = 0;
                     shots.push_back(s);
                     playSfx(e.asset == "CANNON_LASER" ? "laser.ogg" : "cannon.ogg");
                 }
@@ -674,8 +680,8 @@ void World::updateEnemies(float dt) {
 
     for (auto& s : shots) {
         s.x += s.vx * dt; s.y += s.vy * dt;
-        if (solidAt(s.x, s.y) || std::fabs(s.x - hero.cx()) > LOGICAL_W * 1.5f) { s.alive = false; continue; }
-        if (hero.state != HS_DEAD && overlap(hero.box, { s.x - 14, s.y - 14, 28, 28 })) { s.alive = false; hurtHero(s.x); }
+        if (solidAt(s.x + (s.vx > 0 ? 20 : -20), s.y - s.cy) || std::fabs(s.x - hero.cx()) > LOGICAL_W * 1.5f) { s.alive = false; continue; }
+        if (hero.state != HS_DEAD && overlap(hero.box, { s.x - 14, s.y - s.cy - 14, 28, 28 })) { s.alive = false; hurtHero(s.x); }
     }
     shots.erase(std::remove_if(shots.begin(), shots.end(), [](const Shot& s) { return !s.alive; }), shots.end());
 }

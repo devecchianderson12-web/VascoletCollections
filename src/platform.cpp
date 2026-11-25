@@ -2392,6 +2392,9 @@ void inputPoll() {
         log("input: %d controller(s), remote controls %s", (int)g_pads.size(), g_remoteMode ? "on" : "off");
         for (auto* p : g_pads) log("input:   %s (%s)", SDL_GameControllerName(p) ? SDL_GameControllerName(p) : "?", isFullPad(p) ? "gamepad" : "remote-like");
         (void)was;
+        // Con un mando conectado (Xbox, Bluetooth, etc.) se ocultan los controles de la pantalla;
+        // vuelven a aparecer apenas se toca la pantalla.
+        for (auto* p : g_pads) if (isFullPad(p)) { g_touchUi = false; break; }
     }
     memset(g_cur, 0, sizeof g_cur);
     const Uint8* k = SDL_GetKeyboardState(nullptr);

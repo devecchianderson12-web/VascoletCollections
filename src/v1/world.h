@@ -58,7 +58,7 @@ struct Platform { Box box; float sx, sy, dx, dy, duration = 2, wait = 0.5f, t = 
 struct Sign { Box box; std::string text; };
 struct SavePoint { Box box; bool active = false; };
 struct Meteor { float x = 0, y = 0, vx = 0, vy = 0, ay = 0; int bounces = 0; bool alive = true; };
-struct Shot { float x, y, vx, vy; bool alive = true; const ImageMap* img = nullptr; };
+struct Shot { float x, y, vx, vy, cy = 0; bool alive = true; const ImageMap* img = nullptr; };   // cy: del pivote al centro
 struct Effect { float x, y; AnimPlayer anim; bool additive = false; };
 
 struct Counters {
