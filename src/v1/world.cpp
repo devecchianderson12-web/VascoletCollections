@@ -468,7 +468,8 @@ void World::updateHero(float dt) {
         }
         bool g = false; float vx = 0, vy = D ? 1 : 0;
         if (D) { moveBox(h.box, vx, vy, 0.0001f, false, &g, nullptr); if (g && !ladderAt(h.cx(), h.bottom() + 2)) { h.state = HS_GROUND; h.onGround = true; } }
-        if (jump && (L || R)) { h.state = HS_AIR; h.vy = JUMP_BY_VASCOLETS[std::min(cnt.vascolets, 4)]; h.left = L; h.doubleJumped = false; }
+        // Como el original (0x4313c0): desde la escalera se puede saltar siempre (con o sin dirección).
+        if (jump) { h.state = HS_AIR; h.vy = JUMP_BY_VASCOLETS[std::min(cnt.vascolets, 4)]; if (L || R) h.left = L; h.doubleJumped = false; h.stillJump = !L && !R; }
         // Como en el original: con izquierda/derecha se baja de la escalera hacia ese lado.
         // Si al costado hay un escalón a la altura de los pies, sube a ese escalón.
         else if ((L || R) && !U && !D) {
@@ -774,13 +775,18 @@ void World::update(float dt) {
             int* k = d.key == "YELLOW_KEY" ? &cnt.keys[0] : d.key == "RED_KEY" ? &cnt.keys[1] : d.key == "GREEN_KEY" ? &cnt.keys[2] : d.key == "BLUE_KEY" ? &cnt.keys[3] : nullptr;
             if (k && *k > 0) { (*k)--; d.opening = true; playSfx("door.ogg"); }
         }
-        for (auto& s : saves)
-            if (!s.active && overlap(hero.box, s.box)) {
+        // SavePoint (0x442cc0): cada vez que se lo toca (después de haberse alejado) guarda el lugar y
+        // muestra "Juego Salvado".
+        for (auto& s : saves) {
+            const bool touching = overlap(hero.box, s.box);
+            if (touching && !s.active) {
                 for (auto& o : saves) o.active = false;
-                s.active = true; spawnX = s.box.x; spawnY = s.box.y + s.box.h - hero.box.h;
+                spawnX = s.box.x; spawnY = s.box.y + s.box.h - hero.box.h;
                 savedT = 2.5f;
                 playSfx("powerup.ogg");
             }
+            s.active = touching;
+        }
         activeSign = nullptr;
         for (auto& s : signs) if (overlap(hero.box, s.box)) activeSign = &s;
         if (activeSign && activeSign != lastSign) showMessage(activeSign->text, SIGN_LINGER);
@@ -832,7 +838,7 @@ void World::drawFrameContents() {
     const ImageMap* signImg = imageMap("SIGN", "AssetsTilemap");
     const ImageMap* saveImg = imageMap("SAVE", "AssetsTilemap");
     for (auto& s : signs) if (signImg && onScreen(s.box.x, s.box.y)) drawFrame(signImg->frames[0], s.box.x + s.box.w * 0.5f - cx, s.box.y + s.box.h - cy);
-    for (auto& s : saves) if (saveImg && onScreen(s.box.x, s.box.y)) drawFrame(saveImg->frames[0], s.box.x + s.box.w * 0.5f - cx, s.box.y + s.box.h - cy, false, s.active ? 255 : 170);
+    for (auto& s : saves) if (saveImg && onScreen(s.box.x, s.box.y)) drawFrame(saveImg->frames[0], s.box.x + s.box.w * 0.5f - cx, s.box.y + s.box.h - cy, false);
     for (auto& d : doors) {
         if (d.gone || !d.img || d.img->frames.empty() || !onScreen(d.box.x, d.box.y)) continue;
         const Frame& f = d.img->frames[0];
