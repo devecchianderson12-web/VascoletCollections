@@ -55,7 +55,7 @@ struct Platform { Box box; float sx, sy, dx, dy, duration = 2, wait = 0.5f, t = 
 struct Sign { Box box; std::string text; };
 struct SavePoint { Box box; bool active = false; };
 struct Shot { float x, y, vx, vy; bool alive = true; const ImageMap* img = nullptr; };
-struct Effect { float x, y; AnimPlayer anim; };
+struct Effect { float x, y; AnimPlayer anim; bool additive = false; };
 
 struct Counters {
     int lives = 10, points = 0;

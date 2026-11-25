@@ -59,7 +59,6 @@ struct ContentFrame {
 };
 ContentFrame contentFrame() {
     ContentFrame f;
-    if (vc::settings().stretch) { f.sx = LOGICAL_W / 1200.0f; f.sy = LOGICAL_H / 900.0f; return f; }
     const float s = std::min(LOGICAL_W / 1200.0f, LOGICAL_H / 900.0f);
     f.sx = f.sy = s; f.x = (LOGICAL_W - 1200 * s) * 0.5f; f.y = (LOGICAL_H - 900 * s) * 0.5f;
     return f;
@@ -100,19 +99,11 @@ void run() {
     g_cameraFixed = st.camFixed != 0;
 
     const int oldW = plat::SCREEN_W, oldH = plat::SCREEN_H;
-    // Vista del original: 1200x900 unidades de mundo (un bloque de 76 = 1/12 del alto). En pantallas
-    // anchas se ve más a los costados, con el mismo alto.
-    // "Original": se ve la pantalla entera del juego (12 bloques de alto). "Cerca": el ancho de la
-    // pantalla del original (en un celular se ve del tamaño de la PC, no todo lejos).
-    if (st.viewNear) {
-        // Exactamente el ancho de una pantalla del original (16 bloques): se ve igual de cerca que en
-        // la PC y la cámara pasa de pantalla en pantalla igual; a lo alto sigue al jugador.
-        LOGICAL_W = 1216;
-        LOGICAL_H = std::max(500, std::min(912, (int)std::lround(1216.0f * oldH / std::max(1, oldW))));
-    } else {
-        LOGICAL_H = 912;
-        LOGICAL_W = std::max(1216, (int)std::lround(912.0f * oldW / std::max(1, oldH)));
-    }
+    // Igual que el original: se ve siempre una pantalla entera del juego (16x12 bloques = 1216x912) y
+    // la cámara salta de pantalla en pantalla. En el celular se estira a toda la pantalla ("Estirar
+    // pantalla", por defecto) o se muestra en 4:3.
+    LOGICAL_W = 1216; LOGICAL_H = 912;
+    plat::setStretch(st.stretch != 0);
     plat::setLogicalSize(LOGICAL_W, LOGICAL_H);
     plat::setView43(false, LOGICAL_W);
     plat::setAssetPrefix("v1/");
@@ -162,9 +153,9 @@ void run() {
                         if (played) { scene = SELECT; sel = 0; }
                         else { level = 0; carry = Counters(); scene = STORY; storyPage = 1; }
                     } else if (menuSel == 1) {
-                        plat::setLogicalSize(oldW, oldH);
+                        plat::setStretch(false); plat::setLogicalSize(oldW, oldH);
                         vc::runOptionsMenu();
-                        plat::setLogicalSize(LOGICAL_W, LOGICAL_H);
+                        plat::setLogicalSize(LOGICAL_W, LOGICAL_H); plat::setStretch(st.stretch != 0);
                         g_hdOff = (uint8_t)st.hdOff; g_cameraFixed = st.camFixed != 0;
                         acc = 0; last = plat::ticksMs();
                     } else if (menuSel == 2) scene = HELP;
@@ -218,9 +209,9 @@ void run() {
                         for (int i = 0; i < 3; i++) if (g_tap.in(cx - 110 * k, cy + (PAUSE_BTN_Y[i] - 30) * k, 220 * k, 60 * k)) { pauseSel = i; act = true; }
                         if (plat::pressed(plat::BTN_START) && !plat::pressed(plat::BTN_ACCEPT)) { pauseSel = 0; act = true; }
                         if (act && pauseSel == 1) {
-                            plat::setLogicalSize(oldW, oldH);
+                            plat::setStretch(false); plat::setLogicalSize(oldW, oldH);
                             vc::runOptionsMenu();
-                            plat::setLogicalSize(LOGICAL_W, LOGICAL_H);
+                            plat::setLogicalSize(LOGICAL_W, LOGICAL_H); plat::setStretch(st.stretch != 0);
                             g_hdOff = (uint8_t)st.hdOff;
                             g_cameraFixed = st.camFixed != 0;
                             acc = 0; last = plat::ticksMs();
@@ -339,6 +330,7 @@ void run() {
     plat::stopMusic();
     plat::setTouchOverlay(false);
     plat::setAssetPrefix("");
+    plat::setStretch(false);
     plat::setLogicalSize(oldW, oldH);
 }
 

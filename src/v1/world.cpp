@@ -31,7 +31,8 @@ const float ENEMY_GRAVITY = 1800, ENEMY_MAX_FALL = 1500;   // los enemigos usan 
 // Carteles del juego: "¡Cada Vascolet que tomes aumenta tu salto!" / "...aumenta tu salto doble!"
 const float JUMP_BY_VASCOLETS[5] = { -900, -1050, -1185, -1215, -1275 };
 const float DJUMP_BY_CEREALS[5] = { 0, -810, -1020, -1080, -1140 };
-const int HUD_SLOTS = 4;   // vasos de Vascolet y bowls de cereales que muestra el HUD
+const int HUD_SLOTS = 4;
+const float SIGN_LINGER = 1.2f;   // segundos que queda el texto del cartel al salir de él   // vasos de Vascolet y bowls de cereales que muestra el HUD
 
 void playSfx(const char* file) { plat::playSound(plat::loadSound(std::string("assets/audio/fx/") + file)); }
 
@@ -382,6 +383,7 @@ void World::award(const Item& it) {
 
 void World::spawnEffect(const char* name, float x, float y) {
     Effect ef; ef.x = x; ef.y = y; ef.anim.play(EA(name));
+    ef.additive = std::string(name) == "POWER";
     if (ef.anim.a) effects.push_back(ef);
 }
 
@@ -427,7 +429,9 @@ void World::updateHero(float dt) {
             h.anim.play(HA("WALK"), true); h.anim.time = 0;
             return;
         }
-        if (!ladderAt(h.cx(), h.box.y + h.box.h * 0.85f) && !ladderAt(h.cx(), h.box.y + h.box.h * 0.3f)) {
+        // Se suelta solo si ya no tiene escalera ni en el cuerpo ni bajo los pies (antes se soltaba
+        // justo antes del borde de arriba, se caía y volvía a agarrarse: nunca terminaba de subir).
+        if (!ladderAt(h.cx(), h.box.y + h.box.h * 0.85f) && !ladderAt(h.cx(), h.box.y + h.box.h * 0.3f) && !ladderAt(h.cx(), h.bottom() - 2)) {
             h.state = HS_AIR; h.vy = 0;
         }
         bool g = false; float vx = 0, vy = D ? 1 : 0;
@@ -676,7 +680,8 @@ void World::update(float dt) {
             }
         activeSign = nullptr;
         for (auto& s : signs) if (overlap(hero.box, s.box)) activeSign = &s;
-        if (activeSign && activeSign != lastSign) showMessage(activeSign->text, 5.0f);
+        if (activeSign && activeSign != lastSign) showMessage(activeSign->text, SIGN_LINGER);
+        if (activeSign) messageT = std::max(messageT, SIGN_LINGER);
         lastSign = activeSign;
     }
 
@@ -772,9 +777,12 @@ void World::drawFrameContents() {
         if (hf) { hdContactShadow(hero.cx(), hero.bottom(), hero.onGround, 34, cx, cy); hdSpriteShadow(*hf, hero.cx() - cx, hero.bottom() - cy, hero.left); }
     }
     if (hf && !blink && hero.state != HS_WIN) drawFrame(*hf, hero.cx() - cx, hero.bottom() - cy, hero.left);
+    plat::setDrawAdditive(true);   // el destello (coinEffect.png) tiene fondo negro: se dibuja sumado
     if (powerT > 0) if (const Frame* pf = powerAnim.current()) drawFrame(*pf, hero.cx() - cx, hero.box.y + hero.box.h * 0.5f - cy, false, (Uint8)(powerT < 2 ? 120 : 200));
 
-    for (auto& ef : effects) if (const Frame* f = ef.anim.current()) drawFrame(*f, ef.x - cx, ef.y - cy);
+    for (auto& ef : effects) if (ef.additive) if (const Frame* f = ef.anim.current()) drawFrame(*f, ef.x - cx, ef.y - cy);
+    plat::setDrawAdditive(false);
+    for (auto& ef : effects) if (!ef.additive) if (const Frame* f = ef.anim.current()) drawFrame(*f, ef.x - cx, ef.y - cy);
     if (hd) hdLighting(cx, cy);
     drawHud();
 }
