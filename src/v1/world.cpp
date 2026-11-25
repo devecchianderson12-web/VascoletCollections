@@ -149,7 +149,7 @@ bool World::load(int level, const Counters& carry) {
             e.box = b; e.x0 = b.x; e.y0 = b.y; e.h0 = b.h; e.asset = asset;
             e.animName = o.prop("pAnim").empty() ? asset : o.prop("pAnim");
             e.collidesFloor = propb(o, "pCollidesFloor"); e.collidesH = propb(o, "pCollidesH"); e.collidesV = propb(o, "pCollidesV");
-            e.vx = propf(o, "pxVel"); e.vy = propf(o, "pyVel"); e.ay = propf(o, "pyAccel");
+            e.vx = propf(o, "pxVel"); e.vy = propf(o, "pyVel"); e.ay = propf(o, "pyAccel", 1800);   // sin pyAccel el original usa 1800 (cargador 0x421560)
             e.duration = std::max(0.1f, propf(o, "pDuration", 2)); e.wait = propf(o, "pWait");
             e.dx = propf(o, "pxDelta"); e.dy = propf(o, "pyDelta");
             e.minT = propf(o, "pMinTime", 1); e.maxT = std::max(e.minT, propf(o, "pMaxTime", e.minT));
