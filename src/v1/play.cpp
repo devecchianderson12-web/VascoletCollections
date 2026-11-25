@@ -4,6 +4,7 @@
 #include "lighting.h"
 #include "../launcher/font.h"
 #include "../launcher/settings.h"
+#include "../launcher/launcher.h"
 #include "../platform.h"
 #include <algorithm>
 #include <cmath>
@@ -133,15 +134,25 @@ void run() {
                     if (!world) { scene = SELECT; break; }
                     if (!paused && (plat::pressed(plat::BTN_START) || plat::pressed(plat::BTN_BACK))) { paused = true; pauseSel = 0; plat::pauseMusic(true); break; }
                     if (paused) {
-                        if (plat::pressed(plat::BTN_UP) || plat::pressed(plat::BTN_DOWN)) pauseSel ^= 1;
+                        // Pausa: Continuar, Opciones (las de la colección) y Salir.
+                        if (plat::pressed(plat::BTN_DOWN)) pauseSel = (pauseSel + 1) % 3;
+                        if (plat::pressed(plat::BTN_UP)) pauseSel = (pauseSel + 2) % 3;
                         const float cx = LOGICAL_W * 0.5f, cy = LOGICAL_H * 0.5f;
                         bool act = plat::pressed(plat::BTN_ACCEPT);
-                        if (g_tap.in(cx - 140, cy - 60, 280, 56)) { pauseSel = 0; act = true; }
-                        if (g_tap.in(cx - 140, cy + 20, 280, 56)) { pauseSel = 1; act = true; }
-                        if (plat::pressed(plat::BTN_START)) { pauseSel = 0; act = true; }
+                        for (int i = 0; i < 3; i++) if (g_tap.in(cx - 140, cy - 100 + i * 80.0f, 280, 60)) { pauseSel = i; act = true; }
+                        if (plat::pressed(plat::BTN_START) && !plat::pressed(plat::BTN_ACCEPT)) { pauseSel = 0; act = true; }
+                        if (act && pauseSel == 1) {
+                            plat::setLogicalSize(oldW, oldH);
+                            vc::runOptionsMenu();
+                            plat::setLogicalSize(LOGICAL_W, LOGICAL_H);
+                            g_hdOff = (uint8_t)st.hdOff;
+                            g_cameraFixed = st.camFixed != 0;
+                            acc = 0; last = plat::ticksMs();
+                            break;
+                        }
                         if (act) {
                             paused = false; plat::pauseMusic(false);
-                            if (pauseSel == 1) { delete world; world = nullptr; scene = SELECT; plat::playMusic("assets/audio/music/andy.ogg"); }
+                            if (pauseSel == 2) { delete world; world = nullptr; scene = SELECT; plat::playMusic("assets/audio/music/andy.ogg"); }
                         }
                         break;
                     }
@@ -184,9 +195,10 @@ void run() {
                 if (paused) {
                     plat::dimScreen(0.55f);
                     const float cx = LOGICAL_W * 0.5f, cy = LOGICAL_H * 0.5f;
-                    text("Pausa", cx, cy - 150, 1.2f, { 255, 222, 60, 255 });
-                    button("Continuar", cx, cy - 32, 280, 56, pauseSel == 0);
-                    button("Salir", cx, cy + 48, 280, 56, pauseSel == 1);
+                    text("Pausa", cx, cy - 170, 1.2f, { 255, 222, 60, 255 });
+                    button("Continuar", cx, cy - 70, 280, 56, pauseSel == 0);
+                    button("Opciones", cx, cy + 10, 280, 56, pauseSel == 1);
+                    button("Salir", cx, cy + 90, 280, 56, pauseSel == 2);
                 }
                 break;
             case END_WIN: drawFull("assets/lang/images/intros/fin.jpg"); break;

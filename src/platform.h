@@ -55,7 +55,7 @@ void setSmooth(bool on);
 void setTvEffect(bool on);
 void setTouchOpacity(int percent);
 // Joystick táctil: tamaño en % (75-150), tema de color de iconos y tipo (0 clásico, 1 moderno).
-void setTouchStick(int sizePercent, int theme, int type, bool style3d);
+void setTouchStick(int sizePercent, int theme, int type, int style);  // style: 0 Brillante, 1 Plano, 2 Aro dorado
 // Mapeo de botones táctiles: 5 botones (joystick, saltar, disparar, pausa, atrás) x (x, y)
 // normalizados 0-65534; 0xFFFF = posición por defecto.
 constexpr int TOUCH_LAYOUT_N = 10;

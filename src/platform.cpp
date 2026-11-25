@@ -1433,12 +1433,14 @@ static bool g_dpad[4];
 static float g_stickScale = 1.0f;
 static int g_stickTheme = 0;
 static bool g_stickModern = false;
-static bool g_btn3d = false;
-void setTouchStick(int sizePercent, int theme, int type, bool style3d) {
+static bool g_btn3d = true;
+static int g_touchStyle = 0;    // 0 Brillante, 1 Plano, 2 Aro dorado (gráficos de data/ui/touch_<estilo>_*.png)
+void setTouchStick(int sizePercent, int theme, int type, int style) {
     g_stickScale = std::max(50, std::min(sizePercent, 200)) / 100.0f;
     g_stickTheme = theme;
     g_stickModern = type == 1;
-    g_btn3d = style3d;
+    g_touchStyle = std::max(0, std::min(style, 2));
+    g_btn3d = g_touchStyle == 0;
 }
 // Estado visual: mientras un dedo controla el joystick, la perilla sigue al dedo (la base queda fija).
 static bool g_stickActive = false;
@@ -1779,6 +1781,63 @@ static SDL_Texture* touchSprite(int i) {
     if (s.tex) { SDL_SetTextureBlendMode(s.tex, SDL_BLENDMODE_BLEND); SDL_SetTextureScaleMode(s.tex, SDL_ScaleModeLinear); }
     return s.tex;
 }
+// ---- Gráficos de los controles: un juego por estilo, recoloreado de verdad según el color elegido ----
+// No es un filtro: el rojo de los botones (y la perilla azul) pasa al tono del color elegido y el
+// resto (bordes negros, aros dorados, íconos blancos) se conserva; con "Blanco" los íconos pasan a oscuros.
+enum { TA_BACK, TA_PAUSE, TA_JUMP, TA_BASE, TA_KNOB, TA_COUNT };
+static SDL_Texture* g_art[3][5][TA_COUNT];
+static bool g_artTried[3][5][TA_COUNT];
+static void recolor(SDL_Surface* s, int theme, bool knob) {
+    if (theme == 0) return;                       // Rojo: los colores originales
+    static const float HUE[5] = { 0, 85, 192, 28, 0 };
+    Uint32* px = (Uint32*)s->pixels;
+    for (int y = 0; y < s->h; y++)
+        for (int x = 0; x < s->w; x++) {
+            Uint32& p = px[y * (s->pitch / 4) + x];
+            Uint8 r, g, b, a; SDL_GetRGBA(p, s->format, &r, &g, &b, &a);
+            if (!a) continue;
+            const float R = r / 255.f, G = g / 255.f, B = b / 255.f;
+            const float mx = std::max(R, std::max(G, B)), mn = std::min(R, std::min(G, B)), c = mx - mn;
+            float h = 0;
+            if (c > 0) { if (mx == R) h = 60 * std::fmod((G - B) / c, 6.0f); else if (mx == G) h = 60 * ((B - R) / c + 2); else h = 60 * ((R - G) / c + 4); }
+            if (h < 0) h += 360;
+            const float sat = mx > 0 ? c / mx : 0, v = mx;
+            const bool red = sat > 0.42f && v > 0.2f && (h < 22 || h > 335);
+            const bool blue = knob && sat > 0.35f && h > 180 && h < 230;
+            const bool white = sat < 0.12f && v > 0.82f;
+            float nh = h, ns = sat, nv = v;
+            if (red || blue) {
+                if (theme == 4) { ns = sat * 0.05f; nv = 0.62f + 0.33f * v; }   // Blanco: cuerpo gris claro
+                else nh = HUE[theme];
+            } else if (white && theme == 4 && !knob) { ns = 0; nv = 0.2f; }     // Blanco: íconos oscuros para distinguirlos
+            else continue;
+            const float C = nv * ns, X = C * (1 - std::fabs(std::fmod(nh / 60, 2.0f) - 1)), m = nv - C;
+            float rr, gg, bb;
+            if (nh < 60) { rr = C; gg = X; bb = 0; } else if (nh < 120) { rr = X; gg = C; bb = 0; } else if (nh < 180) { rr = 0; gg = C; bb = X; }
+            else if (nh < 240) { rr = 0; gg = X; bb = C; } else if (nh < 300) { rr = X; gg = 0; bb = C; } else { rr = C; gg = 0; bb = X; }
+            p = SDL_MapRGBA(s->format, (Uint8)((rr + m) * 255), (Uint8)((gg + m) * 255), (Uint8)((bb + m) * 255), a);
+        }
+}
+static SDL_Texture* artTexture(int part) {
+    const int st = g_touchStyle, th = (unsigned)g_stickTheme < 5 ? g_stickTheme : 0;
+    if (g_artTried[st][th][part]) return g_art[st][th][part];
+    g_artTried[st][th][part] = true;
+    static const char* STYLE[3] = { "brillante", "plano", "aro" };
+    static const char* PART[TA_COUNT] = { "back", "pause", "jump", "base", "knob" };
+    auto data = assetRead(std::string("data/ui/touch_") + STYLE[st] + "_" + PART[part] + ".png");
+    SDL_Surface* raw = data.empty() ? nullptr : IMG_Load_RW(SDL_RWFromConstMem(data.data(), (int)data.size()), 1);
+    if (!raw) return nullptr;
+    SDL_Surface* s = SDL_ConvertSurfaceFormat(raw, SDL_PIXELFORMAT_RGBA32, 0);
+    SDL_FreeSurface(raw);
+    if (!s) return nullptr;
+    recolor(s, th, part == TA_KNOB);
+    SDL_Texture* t = SDL_CreateTextureFromSurface(g_ren, s);
+    SDL_FreeSurface(s);
+    if (t) { SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND); SDL_SetTextureScaleMode(t, SDL_ScaleModeLinear); }
+    g_art[st][th][part] = t;
+    return t;
+}
+
 static void spriteAt(int i, float cx, float cy, float h, double angle, Uint8 alpha, bool flip = false, SDL_Color tint = { 255, 255, 255, 255 }) {
     SDL_Texture* t = touchSprite(i);
     if (!t) return;
@@ -1837,9 +1896,10 @@ static void drawTouchOverlay() {
     const float op = g_mapEdit ? std::max(g_touchOpacity, 0.85f) : g_touchOpacity;
     auto A = [op](SDL_Color c) { c.a = (Uint8)(c.a * op); return c; };
     auto AS = [op](int a) { return (Uint8)(a * op); };
-    // Temas de color de los iconos: LIMA (original), CIAN, FUEGO, BLANCO.
+    // Temas de color: ROJO, LIMA, CIAN, FUEGO, BLANCO.
     struct Theme { SDL_Color ring, hot, press; };
     static const Theme THEMES[] = {
+        { { 230, 40, 40, 255 }, { 255, 120, 100, 255 }, { 90, 10, 10, 255 } },
         { { 160, 214, 40, 255 }, { 214, 255, 90, 255 }, { 40, 70, 10, 255 } },
         { { 40, 190, 220, 255 }, { 130, 235, 255, 255 }, { 10, 50, 70, 255 } },
         { { 235, 130, 30, 255 }, { 255, 200, 90, 255 }, { 80, 35, 5, 255 } },
@@ -1881,13 +1941,18 @@ static void drawTouchOverlay() {
             if (i != TB_SHOOT || g_touchShoot) geoCircle(b[i].x, b[i].y, b[i].r + 3.0f, b[i].r + (g_mapDrag == i ? 7.0f : 5.0f), Ca(g_mapDrag == i ? th.hot : th.ring, g_mapDrag == i ? 230 : 120));
     auto pressedVis = [](int i) { return g_tbDown[i] || g_mapDrag == i; };
 
-    // Estilo 3D: gráficos de la colección (si están). Se respetan tamaño, mapeo y opacidad.
-    // (El estilo 2D sigue con el dibujo anterior hasta tener sus gráficos.)
-    if (g_btn3d && touchSprite(TS_BASE) && touchSprite(TS_KNOB) && touchSprite(TS_TRI) && touchSprite(TS_PAUSE) && touchSprite(TS_BACK)) {
+    // Gráficos del estilo elegido, recoloreados con el color elegido. Se respetan tamaño, mapeo y opacidad.
+    if (artTexture(TA_BASE) && artTexture(TA_KNOB) && artTexture(TA_JUMP) && artTexture(TA_PAUSE) && artTexture(TA_BACK)) {
         auto art = [&](int s, float cx, float cy, float size, bool down) {
+            if (s == TS_SHOOT) { spriteAt(s, cx, cy, size, 0, down ? HOT : AS(235)); return; }
+            SDL_Texture* t = artTexture(s == TS_BASE ? TA_BASE : s == TS_KNOB ? TA_KNOB : s == TS_TRI ? TA_JUMP : s == TS_PAUSE ? TA_PAUSE : TA_BACK);
             const float sz = size * (down ? 0.92f : 1.0f);
             const float push = down ? sz * 0.04f : 0.0f;
-            spriteAt(s, cx, cy + push, sz, 0, down ? HOT : AS(235), false, down ? SDL_Color{ 255, 250, 225, 255 } : SDL_Color{ 255, 255, 255, 255 });
+            const SDL_FRect d = { cx - sz * 0.5f, cy - sz * 0.5f + push, sz, sz };
+            SDL_SetTextureAlphaMod(t, down ? HOT : AS(235));
+            const Uint8 lit = down ? 255 : 245;
+            SDL_SetTextureColorMod(t, lit, lit, lit);
+            SDL_RenderCopyF(g_ren, t, nullptr, &d);
         };
         TouchBtn j = b[TB_DPAD];
         if (g_stickActive) { j.x = g_stickBase.x; j.y = g_stickBase.y; }
@@ -1975,7 +2040,7 @@ static void drawTouchOverlay() {
 
 #ifndef XA_TOUCH
 void setTouchOpacity(int) {}
-void setTouchStick(int, int, int, bool) {}
+void setTouchStick(int, int, int, int) {}
 void setTouchLayout(const uint16_t*) {}
 void setTouchOverlay(bool) {}
 void setTouchShoot(bool) {}

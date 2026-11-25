@@ -128,6 +128,7 @@ const char* onOff(int v) { return v ? "Sí" : "No"; }
 class Launcher {
 public:
     void run();
+    void runOptions();   // solo las opciones (desde la pausa de un juego)
 private:
     Page page = HOME;
     int sel = 0, gameSel = 0;
@@ -214,9 +215,9 @@ void Launcher::buildRows() {
         case CONTROLS:
             back = OPTIONS;
             rows.push_back({ "Joystick", [] { return std::string(settings().stickType ? "Moderno" : "Clásico"); }, toggle(&Settings::stickType) });
-            rows.push_back({ "Estilo", [] { return std::string(settings().btn3d ? "3D" : "2D"); }, toggle(&Settings::btn3d) });
+            rows.push_back({ "Estilo", [] { return std::string(TOUCH_STYLES[settings().touchStyle % 3]); }, cycle(&Settings::touchStyle, 3) });
             rows.push_back({ "Tamaño", [] { return std::to_string(STICK_SIZES[settings().stickSize & 3]) + "%"; }, cycle(&Settings::stickSize, 4) });
-            rows.push_back({ "Íconos", [] { return std::string(STICK_THEMES[settings().stickTheme & 3]); }, cycle(&Settings::stickTheme, 4) });
+            rows.push_back({ "Color", [] { return std::string(STICK_THEMES[settings().stickTheme % 5]); }, cycle(&Settings::stickTheme, 5) });
             rows.push_back({ "Opacidad", [] { return settings().touchAlpha ? std::to_string(settings().touchAlpha) + "%" : std::string("No"); },
                              [](int d) { int& a = settings().touchAlpha; a = ((a / 25) + 5 + d) % 5 * 25; } });
             rows.push_back({ "Mapeo de botones", nullptr, [this](int) { go(MAPPING); } });
@@ -418,6 +419,30 @@ void Launcher::run() {
 }
 
 } // namespace
+
+// Opciones abiertas desde la pausa de un juego: mismas pantallas; vuelve al salir de "Opciones".
+void Launcher::runOptions() {
+    if (!g_click) g_click = plat::loadSound("v2/assets/audio/fx/win/coin.ogg");
+    plat::setTouchOverlay(false);
+    go(OPTIONS); switchPage();
+    const float STEP = 1.0f / 60.0f;
+    float acc = 0;
+    uint32_t last = plat::ticksMs();
+    while (!plat::quitRequested() && page != HOME) {
+        const uint32_t now = plat::ticksMs();
+        acc = std::min(0.25f, acc + (now - last) / 1000.0f); last = now;
+        while (acc >= STEP && page != HOME) { acc -= STEP; plat::inputPoll(); update(); }
+        plat::beginFrame();
+        if (page != HOME) draw();
+        plat::endFrame();
+    }
+    if (page == MAPPING) { go(HOME); switchPage(); }
+}
+
+void runOptionsMenu() {
+    Launcher l;
+    l.runOptions();
+}
 
 void runLauncher() {
     settings().load();

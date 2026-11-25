@@ -15,7 +15,7 @@ struct Settings {
     int camFixed = 0, fps120 = 0, modernArt = 0;
     int hdOff = 0;            // bits de HdFx apagados
     // Controles táctiles
-    int stickType = 0, btn3d = 1, stickSize = 1, stickTheme = 0, touchAlpha = 100;
+    int stickType = 0, touchStyle = 0, stickSize = 1, stickTheme = 0, touchAlpha = 100;
     uint16_t touchPos[10] = { 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF };
 
     bool fx(HdFx f) const { return hd && !((hdOff >> f) & 1); }
@@ -27,6 +27,7 @@ struct Settings {
 Settings& settings();
 
 extern const int STICK_SIZES[4];
-extern const char* const STICK_THEMES[4];
+extern const char* const STICK_THEMES[5];
+extern const char* const TOUCH_STYLES[3];
 
 }

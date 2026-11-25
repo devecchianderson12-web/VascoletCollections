@@ -10,7 +10,8 @@
 namespace vc {
 
 const int STICK_SIZES[4] = { 75, 100, 125, 150 };
-const char* const STICK_THEMES[4] = { "Lima", "Cian", "Fuego", "Blanco" };
+const char* const STICK_THEMES[5] = { "Rojo", "Lima", "Cian", "Fuego", "Blanco" };
+const char* const TOUCH_STYLES[3] = { "Brillante", "Plano", "Aro dorado" };
 
 Settings& settings() { static Settings s; return s; }
 
@@ -25,8 +26,8 @@ static const Field FIELDS[] = {
     { "tv", &Settings::tvEffect, 0, 1 }, { "camFixed", &Settings::camFixed, 0, 1 },
     { "fps120", &Settings::fps120, 0, 1 }, { "modernArt", &Settings::modernArt, 0, 1 },
     { "hdOff", &Settings::hdOff, 0, 255 }, { "stickType", &Settings::stickType, 0, 1 },
-    { "btn3d", &Settings::btn3d, 0, 1 }, { "stickSize", &Settings::stickSize, 0, 3 },
-    { "stickTheme", &Settings::stickTheme, 0, 3 }, { "touchAlpha", &Settings::touchAlpha, 0, 100 },
+    { "touchStyle", &Settings::touchStyle, 0, 2 }, { "stickSize", &Settings::stickSize, 0, 3 },
+    { "touchColor", &Settings::stickTheme, 0, 4 }, { "touchAlpha", &Settings::touchAlpha, 0, 100 },
 };
 
 void Settings::load() {
@@ -66,7 +67,7 @@ void Settings::apply() const {
     plat::setTvEffect(tvEffect != 0);
     plat::setImageQuality(sharpness, hd != 0);
     plat::setTouchOpacity(touchAlpha);
-    plat::setTouchStick(STICK_SIZES[stickSize & 3], stickTheme, stickType, btn3d != 0);
+    plat::setTouchStick(STICK_SIZES[stickSize & 3], stickTheme, stickType, touchStyle);
     plat::setTouchLayout(touchPos);
     plat::setHighFps(fps120 != 0);
     plat::setModernArt(modernArt != 0);
