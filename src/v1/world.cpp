@@ -377,19 +377,27 @@ void World::respawn() {
 void World::award(const Item& it) {
     const std::string& c = it.counter;
     if (c == "VASCOLETS" || c == "CEREALS") spawnEffect("POWER", hero.cx(), hero.box.y + hero.box.h * 0.5f);
-    if (c == "POINTS") { cnt.points += it.count; if (it.asset == "COIN") cnt.coins++; playSfx("item.ogg"); }
+    // Como el original (0x433fb0 / 0x42db50): solo los ítems de puntos suman; cada 2.000 puntos, una vida
+    // (máximo 99 vidas y 999.999 puntos). Vascolets, cereales y enemigos no dan puntos.
+    if (c == "POINTS") {
+        const int before = cnt.points / 2000;
+        cnt.points = std::min(999999, cnt.points + it.count);
+        if (cnt.points / 2000 > before) cnt.lives = std::min(99, cnt.lives + cnt.points / 2000 - before);
+        if (it.asset == "COIN") cnt.coins++;
+        playSfx("item.ogg");
+    }
     else if (c == "LIVES") { cnt.lives = std::min(99, cnt.lives + it.count); playSfx("extra_life.ogg"); }
-    else if (c == "VASCOLETS") { cnt.vascolets = std::min(HUD_SLOTS, cnt.vascolets + 1); cnt.points += 100; playSfx("jump_vascolet.ogg"); }
-    else if (c == "CEREALS") { cnt.cereals = std::min(HUD_SLOTS, cnt.cereals + 1); cnt.points += 100; playSfx("powerup.ogg"); }
-    else if (c == "YELLOW_KEY") { cnt.keys[0]++; playSfx("item.ogg"); }
-    else if (c == "RED_KEY") { cnt.keys[1]++; playSfx("item.ogg"); }
-    else if (c == "GREEN_KEY") { cnt.keys[2]++; playSfx("item.ogg"); }
-    else if (c == "BLUE_KEY") { cnt.keys[3]++; playSfx("item.ogg"); }
+    else if (c == "VASCOLETS") { cnt.vascolets = std::min(HUD_SLOTS, cnt.vascolets + 1); playSfx("jump_vascolet.ogg"); }
+    else if (c == "CEREALS") { cnt.cereals = std::min(HUD_SLOTS, cnt.cereals + 1); playSfx("powerup.ogg"); }
+    else if (c == "YELLOW_KEY") { cnt.keys[0] = std::min(9, cnt.keys[0] + 1); playSfx("item.ogg"); }
+    else if (c == "RED_KEY") { cnt.keys[1] = std::min(9, cnt.keys[1] + 1); playSfx("item.ogg"); }
+    else if (c == "GREEN_KEY") { cnt.keys[2] = std::min(9, cnt.keys[2] + 1); playSfx("item.ogg"); }
+    else if (c == "BLUE_KEY") { cnt.keys[3] = std::min(9, cnt.keys[3] + 1); playSfx("item.ogg"); }
     else if (c == "MICROWAVE") {
         hero.state = HS_WIN; hero.vx = 0; hero.vy = 0; winT = 0;
         spawnEffect("POWER", hero.cx(), hero.box.y + hero.box.h * 0.5f);   // como en el original: desaparece en un destello
         plat::stopMusic(); playSfx("microwave.ogg");
-    } else { cnt.points += 10; playSfx("item.ogg"); }
+    } else playSfx("item.ogg");
 }
 
 void World::spawnEffect(const char* name, float x, float y) {
@@ -654,7 +662,15 @@ void World::updateEnemies(float dt) {
                 break;
             }
             case EK_STALACTITE: {
-                if (!e.falling && std::fabs(hero.cx() - (e.box.x + e.box.w * 0.5f)) < std::max(60.0f, e.offX) && hb.y > e.box.y) e.falling = true;
+                // Como EnemyStalactite (0x43ff40..0x440060): cae cuando el jugador pasa debajo, entre ella
+                // y el primer bloque sólido que tiene abajo (calculado al cargar).
+                if (e.dy == 0) {
+                    float y = e.box.y + e.box.h;
+                    while (y < map.height * map.tileH && !solidAt(e.box.x + e.box.w * 0.5f, y)) y += map.tileH;
+                    e.dy = y - e.box.y;
+                }
+                if (!e.falling && std::fabs(hero.cx() - (e.box.x + e.box.w * 0.5f)) < std::max(60.0f, e.offX) &&
+                    hb.y + hb.h > e.box.y && hb.y < e.box.y + e.dy) e.falling = true;
                 if (e.falling) {
                     e.vy += e.ay * dt; e.box.y += e.vy * dt;
                     if (solidAt(e.box.x + e.box.w * 0.5f, e.box.y + e.box.h)) { e.dead = true; spawnEffect("ENEMY_DEATH", e.box.x + e.box.w * 0.5f, e.box.y + e.box.h * 0.5f); }
@@ -669,10 +685,10 @@ void World::updateEnemies(float dt) {
         if (!overlap(hb, eb)) continue;
         const bool fromAbove = hero.vy > 0 && hb.y + hb.h - hero.vy * (1.0f / 60.0f) <= eb.y + 18;
         if (powerT > 0 && e.stompable) {
-            e.dead = true; cnt.points += 100;
+            e.dead = true;
             spawnEffect("ENEMY_DEATH", eb.x + eb.w * 0.5f, eb.y + eb.h * 0.5f); playSfx("explosion.ogg");
         } else if (fromAbove && e.stompable) {
-            e.dead = true; cnt.points += 100;
+            e.dead = true;
             hero.vy = STOMP; hero.state = HS_AIR;
             spawnEffect("ENEMY_DEATH", eb.x + eb.w * 0.5f, eb.y + eb.h * 0.5f); playSfx("explosion.ogg");
         } else hurtHero(eb.x + eb.w * 0.5f);
