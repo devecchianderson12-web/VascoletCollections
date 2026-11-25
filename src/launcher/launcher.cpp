@@ -125,6 +125,46 @@ void panel(float x, float y, float w, float h) {
 
 const char* onOff(int v) { return v ? "Sí" : "No"; }
 
+}  // namespace
+
+// Arte del menú de "La Máquina del Tiempo" (la parte de 1200x900 de menu.jpg) ocupando el alto de la
+// pantalla; a los costados siguen los rayos rojos animados y los bordes del arte se funden con ellos.
+// bw: ancho de la columna de botones de la derecha. Lo usan el inicio y el menú de Vascolet 1.
+void drawTitleArt(float bw) {
+    const float t = plat::ticksMs() / 1000.0f;
+    const float zoom = 1.0f + 0.025f * (0.5f + 0.5f * std::sin(t * 0.7f));   // respira despacio
+    // Ocupa todo el alto; en pantallas poco anchas se achica para que no lo tapen los botones.
+    // El 15% derecho del arte son solo rayos: los botones pueden quedar encima.
+    const float baseH = H(), baseW = baseH * 4.0f / 3.0f;   // siempre todo el alto, sin bordes
+    const float aw = baseW * zoom, ah = baseH * zoom;
+    const float ax = std::max(0.0f, (W() - bw - 36 - baseW * 0.85f) * 0.5f) - (aw - baseW) * 0.5f;
+    const float ay = (H() - ah) * 0.5f;
+    rays(ax + aw * 0.5f, ay + ah * 0.47f, 0.25f);
+    if (plat::Image* e = img("v1/assets/images/menuelements/menu.jpg")) {
+        // Franjas verticales: el centro opaco y los bordes con transparencia creciente.
+        const int STRIPS = 16; const float feather = aw * 0.07f;
+        const float mid0 = ax + feather, mid1 = ax + aw - feather;
+        plat::drawImage(e, SDL_Rect{ (int)(1200 * 0.07f), 0, (int)(1200 * 0.86f), 900 }, SDL_FRect{ mid0, ay, mid1 - mid0, ah });
+        for (int side = 0; side < 2; side++)
+            for (int k = 0; k < STRIPS; k++) {
+                const float f0 = k / (float)STRIPS, f1 = (k + 1) / (float)STRIPS;   // 0 = borde externo
+                const float sx0 = side ? 1200 * (1 - 0.07f * f1) : 1200 * 0.07f * f0;
+                const float sx1 = side ? 1200 * (1 - 0.07f * f0) : 1200 * 0.07f * f1;
+                const float dx0 = ax + aw * sx0 / 1200, dx1 = ax + aw * sx1 / 1200;
+                const Uint8 a = (Uint8)(255 * (k + 0.5f) / STRIPS);
+                plat::setDrawTint({ 255, 255, 255, a });
+                plat::drawImage(e, SDL_Rect{ (int)sx0, 0, std::max(1, (int)(sx1 - sx0)), 900 }, SDL_FRect{ dx0, ay, dx1 - dx0, ah });
+            }
+        plat::setDrawTint({ 255, 255, 255, 255 });
+    }
+}
+
+void titleButton(const std::string& label, float cx, float cy, float w, float h, bool hot, bool pressed) {
+    button(label, cx, cy, w, h, hot, pressed);
+}
+
+namespace {
+
 class Launcher {
 public:
     void run();
@@ -260,35 +300,8 @@ void Launcher::updateHome() {
 }
 
 void Launcher::drawHome() {
-    // Arte del menú de "La Máquina del Tiempo" (la parte de 1200x900 de menu.jpg) ocupando el alto de la
-    // pantalla; a los costados siguen los rayos rojos animados y los bordes del arte se funden con ellos.
     const float bw = homeBtnW();
-    const float t = plat::ticksMs() / 1000.0f;
-    const float zoom = 1.0f + 0.025f * (0.5f + 0.5f * std::sin(t * 0.7f));   // respira despacio
-    // Ocupa todo el alto; en pantallas poco anchas se achica para que no lo tapen los botones.
-    // El 15% derecho del arte son solo rayos: los botones pueden quedar encima.
-    const float baseH = H(), baseW = baseH * 4.0f / 3.0f;   // siempre todo el alto, sin bordes
-    const float aw = baseW * zoom, ah = baseH * zoom;
-    const float ax = std::max(0.0f, (W() - bw - 36 - baseW * 0.85f) * 0.5f) - (aw - baseW) * 0.5f;
-    const float ay = (H() - ah) * 0.5f;
-    rays(ax + aw * 0.5f, ay + ah * 0.47f, 0.25f);
-    if (plat::Image* e = img("v1/assets/images/menuelements/menu.jpg")) {
-        // Franjas verticales: el centro opaco y los bordes con transparencia creciente.
-        const int STRIPS = 16; const float feather = aw * 0.07f;
-        const float mid0 = ax + feather, mid1 = ax + aw - feather;
-        plat::drawImage(e, SDL_Rect{ (int)(1200 * 0.07f), 0, (int)(1200 * 0.86f), 900 }, SDL_FRect{ mid0, ay, mid1 - mid0, ah });
-        for (int side = 0; side < 2; side++)
-            for (int k = 0; k < STRIPS; k++) {
-                const float f0 = k / (float)STRIPS, f1 = (k + 1) / (float)STRIPS;   // 0 = borde externo
-                const float sx0 = side ? 1200 * (1 - 0.07f * f1) : 1200 * 0.07f * f0;
-                const float sx1 = side ? 1200 * (1 - 0.07f * f0) : 1200 * 0.07f * f1;
-                const float dx0 = ax + aw * sx0 / 1200, dx1 = ax + aw * sx1 / 1200;
-                const Uint8 a = (Uint8)(255 * (k + 0.5f) / STRIPS);
-                plat::setDrawTint({ 255, 255, 255, a });
-                plat::drawImage(e, SDL_Rect{ (int)sx0, 0, std::max(1, (int)(sx1 - sx0)), 900 }, SDL_FRect{ dx0, ay, dx1 - dx0, ah });
-            }
-        plat::setDrawTint({ 255, 255, 255, 255 });
-    }
+    drawTitleArt(bw);
     for (int i = 0; i < 4; i++) {
         const float x = homeBtnX() - bw * 0.5f, y = homeBtnY(i) - HB_H * 0.5f;
         button(HOME_BTNS[i], homeBtnX(), homeBtnY(i), bw, HB_H, sel == i, g_ptr.pressIn(x, y, bw, HB_H));

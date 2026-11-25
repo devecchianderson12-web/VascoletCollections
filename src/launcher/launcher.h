@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace vc {
 
@@ -7,6 +8,9 @@ namespace vc {
 void runLauncher();
 // Abre las opciones (gráficos, controles, sonido) y vuelve cuando el jugador sale de ellas.
 void runOptionsMenu();
+// Arte del inicio (menu.jpg a todo el alto con rayos animados) y botón rojo, en la resolución actual.
+void drawTitleArt(float buttonColumnW);
+void titleButton(const std::string& label, float cx, float cy, float w, float h, bool hot, bool pressed = false);
 
 constexpr int BASE_W = 512, BASE_H = 384, WIDE_W = 684;
 

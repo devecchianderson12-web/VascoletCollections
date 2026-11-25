@@ -26,6 +26,7 @@ struct Hero {
     Box box{};
     float vx = 0, vy = 0;
     bool left = false, onGround = false, doubleJumped = false;
+    bool stillJump = false;   // saltó sin dirección: en el aire acelera la mitad (original)
     HeroState state = HS_AIR;
     float invuln = 0, hurtT = 0, deadT = 0;
     int platform = -1;          // plataforma móvil sobre la que está parado
@@ -75,6 +76,7 @@ public:
     int level() const { return levelNo; }
     void setInterp(float a) { interp = a < 0 ? 0 : (a > 1 ? 1 : a); }
     void refitCamera();
+    void drawHud();   // HUD y carteles (se dibuja aparte, en el espacio de la interfaz)
 
 private:
     // ---- lógica ----
@@ -91,7 +93,7 @@ private:
     void respawn();
     void award(const Item& it);
     void spawnEffect(const char* anim, float x, float y);
-    void drawHud();
+
     void drawBackground();
     void drawFrameContents();
 

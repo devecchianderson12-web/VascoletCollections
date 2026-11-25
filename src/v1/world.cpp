@@ -23,14 +23,18 @@ const char* const LEVEL_NAME[LEVELS] = { "Prehistoria", "Egipto", "Castillo", "P
 // ---- Física del jugador (en píxeles del mapa: un bloque mide 76) ----
 // Valores medidos en el juego original (memoria del proceso): velocidad 250, salto -600, gravedad 1800,
 // caída máxima 1500, caja del jugador 50x90.
-// Medido en una grabación del original a 60 fps (unidades del mapa, bloque = 76): corre a 250/s; con
-// 1 Vascolet sube 204 en 0,39 s (gravedad 2700, salto 1050) y el doble salto con 1 Cereal sube ~120 (810).
-// La tabla de salto es la del motor (600/700/790/810/850) en la escala de 800x600, x1,5.
-const float RUN = 250, GRAVITY = 2700, MAX_FALL = 2250, CLIMB = 150, STOMP = -675;
-const float ENEMY_GRAVITY = 1800, ENEMY_MAX_FALL = 1500;   // los enemigos usan las velocidades del mapa
+// Valores del Vascolet.exe original (decompilado con REA + Ghidra: constructor Vascolet 0x430dd0 y
+// actualización 0x4313c0; tablas en .data 0x50a7c0-0x50a820). Unidades del mapa (bloque = 76).
+//  - gravedad 1800, caída máxima 1500, correr 250 (instantáneo en el piso), escalera 150.
+//  - salto según Vascolets: 600/700/790/810/850; doble salto según Cereales: 640/680/720/760.
+//  - en el aire la velocidad horizontal se acelera 20 por cuadro (10 si saltó quieto) hasta 250 y
+//    sin dirección conserva la que traía.
+const float RUN = 250, GRAVITY = 1800, MAX_FALL = 1500, CLIMB = 150, STOMP = -450;
+const float AIR_ACCEL = 20, AIR_ACCEL_STILL = 10;   // por cuadro de 60 Hz
+const float ENEMY_GRAVITY = 1800, ENEMY_MAX_FALL = 1500;
 // Carteles del juego: "¡Cada Vascolet que tomes aumenta tu salto!" / "...aumenta tu salto doble!"
-const float JUMP_BY_VASCOLETS[5] = { -900, -1050, -1185, -1215, -1275 };
-const float DJUMP_BY_CEREALS[5] = { 0, -810, -1020, -1080, -1140 };
+const float JUMP_BY_VASCOLETS[5] = { -600, -700, -790, -810, -850 };
+const float DJUMP_BY_CEREALS[5] = { 0, -640, -680, -720, -760 };
 const int HUD_SLOTS = 4;
 const float SIGN_LINGER = 1.2f;   // segundos que queda el texto del cartel al salir de él   // vasos de Vascolet y bowls de cereales que muestra el HUD
 
@@ -455,18 +459,24 @@ void World::updateHero(float dt) {
         h.hurtT -= dt;
         if (h.hurtT <= 0 && h.onGround) h.state = HS_GROUND;
     } else {
-        const float target = (R ? RUN : 0) - (L ? RUN : 0);
-        h.vx = target;
+        const float dir = (R ? 1.0f : 0.0f) - (L ? 1.0f : 0.0f);
+        if (h.onGround) h.vx = dir * RUN;
+        else {
+            // Control en el aire del original: acelera hacia la dirección elegida, sin frenar solo.
+            h.vx += dir * (h.stillJump ? AIR_ACCEL_STILL : AIR_ACCEL) * dt * 60.0f;
+            h.vx = std::max(-RUN, std::min(RUN, h.vx));
+        }
         if (L && !R) h.left = true;
         if (R && !L) h.left = false;
         if (jump && !h.onGround && h.state == HS_AIR && cnt.cereals > 0 && !h.doubleJumped) {
             // Doble salto: se habilita con el primer Cereal; cada Cereal lo hace más alto.
-            h.vy = DJUMP_BY_CEREALS[std::min(cnt.cereals, 4)]; h.doubleJumped = true;
+            h.vy = DJUMP_BY_CEREALS[std::min(cnt.cereals, 4)]; h.doubleJumped = true; h.stillJump = !L && !R;
             playSfx("jump.ogg");
             h.anim.play(heroAnim("JUMP"), true);
         }
         if (jump && h.onGround) {
             h.vy = JUMP_BY_VASCOLETS[std::min(cnt.vascolets, 4)]; h.onGround = false; h.state = HS_AIR; h.platform = -1; h.doubleJumped = false;
+            h.stillJump = !L && !R;
             playSfx("jump.ogg");
             h.anim.play(heroAnim("JUMP"), true);
         }
@@ -784,10 +794,11 @@ void World::drawFrameContents() {
     plat::setDrawAdditive(false);
     for (auto& ef : effects) if (!ef.additive) if (const Frame* f = ef.anim.current()) drawFrame(*f, ef.x - cx, ef.y - cy);
     if (hd) hdLighting(cx, cy);
-    drawHud();
 }
 
 void World::drawHud() {
+    // El HUD va en el ancho actual (pantalla completa sin deformar, o la pantalla 4:3 del original).
+    const int hudW = plat::SCREEN_W;
     // Igual que el original (800x600): sin fondo, cara y vidas, puntos, 4 vasos, 4 bowls y 4 llaves.
     vc::Font& f = vc::uiFont();
     const SDL_Color white = { 255, 255, 255, 255 };
@@ -798,7 +809,7 @@ void World::drawHud() {
         SDL_Renderer* r = plat::renderer();
         SDL_SetRenderDrawBlendMode(r, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(r, 0, 0, 0, 128);
-        const SDL_FRect hb = { 0, 0, (float)LOGICAL_W, 92.0f };
+        const SDL_FRect hb = { 0, 0, (float)hudW, 92.0f };
         SDL_RenderFillRectF(r, &hb);
     }
     // Posiciones y tamaños medidos sobre el video del juego original (pantalla de 800x600).
@@ -812,7 +823,7 @@ void World::drawHud() {
         for (int i = 0; i < HUD_SLOTS; i++) drawFrameScaled(c->frames[i < cnt.cereals ? 0 : 1], (430 + i * 48.0f) * u, 32 * u, 0.68f * u);
     if (const ImageMap* k = imageMap("HUD_KEYS", "AssetsGeneral"); k && k->frames.size() >= 4)
         for (int i = 0; i < 4; i++) {
-            const float x = (float)LOGICAL_W - (152 - i * 39.0f) * u;
+            const float x = (float)hudW - (152 - i * 39.0f) * u;
             drawFrameScaled(k->frames[i], x, 28 * u, 0.62f * u);
             snprintf(b, sizeof b, "%d", cnt.keys[i]); f.draw(b, x + 8 * u, 36 * u, 0.42f * u, white);
         }
@@ -833,9 +844,9 @@ void World::drawHud() {
         SDL_Renderer* r = plat::renderer();
         SDL_SetRenderDrawBlendMode(r, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
-        const SDL_FRect rc = { 0, top, (float)LOGICAL_W, lines.size() * lh + 16 * v };
+        const SDL_FRect rc = { 0, top, (float)hudW, lines.size() * lh + 16 * v };
         SDL_RenderFillRectF(r, &rc);
-        for (size_t i = 0; i < lines.size(); i++) f.drawCentered(lines[i], LOGICAL_W * 0.5f, top + 8 * v + i * lh, sc, white);
+        for (size_t i = 0; i < lines.size(); i++) f.drawCentered(lines[i], hudW * 0.5f, top + 8 * v + i * lh, sc, white);
     };
     if (messageT > 0 && !message.empty()) band(message, 152 * v);
     if (savedT > 0) band("Juego Salvado", 257 * v);

@@ -12,7 +12,8 @@
 
 namespace v1 {
 
-int LOGICAL_W = 1200, LOGICAL_H = 900;
+int LOGICAL_W = 1216, LOGICAL_H = 912;
+int UI_W = 1216;   // ancho de la interfaz (HUD, pausa, menús) en la resolución sin deformar
 
 namespace {
 
@@ -23,12 +24,19 @@ const char* const INTRO_IMG[LEVELS] = { "intro_prehistoria", "intro_egipto", "in
 const float INTRO_LOADING = 0.6f;   // segundos con "Cargando..." antes de poder seguir
 enum Scene { MENU, HELP, CREDITS, SELECT, STORY, INTRO, PLAY, END_WIN, END_LOSE };
 // Menú del juego original (sobre menu.jpg, en píxeles de la imagen de 1200x900).
-const char* const MENU_LBL[5] = { "Jugar", "Opciones", "Ayuda", "Creditos", "Salir" };
-const float MENU_X = 1059, MENU_Y0 = 129, MENU_DY = 79.5f;
+const char* const MENU_LBL[5] = { "Jugar", "Opciones", "Ayuda", "Créditos", "Salir" };
+// Mismo diseño que el inicio de la colección: arte a la izquierda y botones a la derecha, con su
+// misma separación (medidas del inicio, pensadas para 384 de alto).
+struct MenuBtn { float cx, cy, w, h; };
+MenuBtn menuButton(int i) {
+    const float k = LOGICAL_H / 384.0f;
+    const float w = std::min(230.0f, UI_W / k * 0.3f) * k;
+    return { UI_W - w * 0.5f - 18 * k, LOGICAL_H * 0.5f + (i - 2) * 58 * k, w, 46 * k };
+}
 // Botones del cartel de pausa (alto 548, centrado): Jugar, Opciones, Salir.
 const float PAUSE_BTN_Y[3] = { 62, 118, 174 };
 // El cartel (548 de alto) ocupa el 92% del alto de la pantalla.
-inline float pauseScale() { return LOGICAL_H * 0.92f / 548.0f; }
+inline float pauseScale() { return LOGICAL_H * 0.86f / 548.0f; }
 
 struct Tap {
     bool down = false, was = false, tapped = false; float sx = 0, sy = 0, tx = 0, ty = 0, move = 0;
@@ -59,8 +67,9 @@ struct ContentFrame {
 };
 ContentFrame contentFrame() {
     ContentFrame f;
-    const float s = std::min(LOGICAL_W / 1200.0f, LOGICAL_H / 900.0f);
-    f.sx = f.sy = s; f.x = (LOGICAL_W - 1200 * s) * 0.5f; f.y = (LOGICAL_H - 900 * s) * 0.5f;
+    if (vc::settings().stretch) { f.sx = UI_W / 1200.0f; f.sy = LOGICAL_H / 900.0f; return f; }
+    const float s = std::min(UI_W / 1200.0f, LOGICAL_H / 900.0f);
+    f.sx = f.sy = s; f.x = (UI_W - 1200 * s) * 0.5f; f.y = (LOGICAL_H - 900 * s) * 0.5f;
     return f;
 }
 
@@ -103,8 +112,13 @@ void run() {
     // la cámara salta de pantalla en pantalla. En el celular se estira a toda la pantalla ("Estirar
     // pantalla", por defecto) o se muestra en 4:3.
     LOGICAL_W = 1216; LOGICAL_H = 912;
-    plat::setStretch(st.stretch != 0);
-    plat::setLogicalSize(LOGICAL_W, LOGICAL_H);
+    UI_W = std::max(1216, (int)std::lround(912.0f * oldW / std::max(1, oldH)));
+    // Por defecto se trabaja en la resolución de la interfaz (sin deformar); solo el mundo se dibuja
+    // en la pantalla 4:3 del original, estirada a lo ancho si está activado "Estirar pantalla".
+    auto uiSpace = [&] { plat::setStretch(false); plat::setLogicalSize(st.stretch ? UI_W : LOGICAL_W, LOGICAL_H); };
+    auto worldSpace = [&] { plat::setStretch(st.stretch != 0); plat::setLogicalSize(LOGICAL_W, LOGICAL_H); };
+    auto menuSpace = [&] { plat::setStretch(false); plat::setLogicalSize(UI_W, LOGICAL_H); };
+    menuSpace();
     plat::setView43(false, LOGICAL_W);
     plat::setAssetPrefix("v1/");
     static bool defsLoaded = false;
@@ -139,10 +153,11 @@ void run() {
                 case MENU: {
                     if (plat::pressed(plat::BTN_DOWN)) menuSel = (menuSel + 1) % 5;
                     if (plat::pressed(plat::BTN_UP)) menuSel = (menuSel + 4) % 5;
-                    const ContentFrame f = contentFrame();
                     bool go = accept;
-                    for (int i = 0; i < 5; i++)
-                        if (g_tap.in(f.X(MENU_X - 115), f.Y(MENU_Y0 + i * MENU_DY - 32), 230 * f.sx, 64 * f.sy)) { menuSel = i; go = true; }
+                    for (int i = 0; i < 5; i++) {
+                        const MenuBtn b = menuButton(i);
+                        if (g_tap.in(b.cx - b.w * 0.5f, b.cy - b.h * 0.5f, b.w, b.h)) { menuSel = i; go = true; }
+                    }
                     if (plat::pressed(plat::BTN_BACK)) { quit = true; break; }
                     if (!go) break;
                     playSfx("item.ogg");
@@ -155,7 +170,7 @@ void run() {
                     } else if (menuSel == 1) {
                         plat::setStretch(false); plat::setLogicalSize(oldW, oldH);
                         vc::runOptionsMenu();
-                        plat::setLogicalSize(LOGICAL_W, LOGICAL_H); plat::setStretch(st.stretch != 0);
+                        menuSpace();
                         g_hdOff = (uint8_t)st.hdOff; g_cameraFixed = st.camFixed != 0;
                         acc = 0; last = plat::ticksMs();
                     } else if (menuSel == 2) scene = HELP;
@@ -193,6 +208,7 @@ void run() {
                         delete world; world = new World;
                         if (!world->load(level, carry)) { delete world; world = nullptr; scene = SELECT; break; }
                         scene = PLAY; paused = false; acc = 0; last = plat::ticksMs();
+                        uiSpace();
                     }
                     if (plat::pressed(plat::BTN_BACK)) scene = SELECT;
                     break;
@@ -203,7 +219,7 @@ void run() {
                         // Pausa: Continuar, Opciones (las de la colección) y Salir.
                         if (plat::pressed(plat::BTN_DOWN)) pauseSel = (pauseSel + 1) % 3;
                         if (plat::pressed(plat::BTN_UP)) pauseSel = (pauseSel + 2) % 3;
-                        const float cx = LOGICAL_W * 0.5f, cy = LOGICAL_H * 0.5f;
+                        const float cx = (st.stretch ? UI_W : LOGICAL_W) * 0.5f, cy = LOGICAL_H * 0.5f;
                         bool act = plat::pressed(plat::BTN_ACCEPT);
                         const float k = pauseScale();
                         for (int i = 0; i < 3; i++) if (g_tap.in(cx - 110 * k, cy + (PAUSE_BTN_Y[i] - 30) * k, 220 * k, 60 * k)) { pauseSel = i; act = true; }
@@ -211,7 +227,7 @@ void run() {
                         if (act && pauseSel == 1) {
                             plat::setStretch(false); plat::setLogicalSize(oldW, oldH);
                             vc::runOptionsMenu();
-                            plat::setLogicalSize(LOGICAL_W, LOGICAL_H); plat::setStretch(st.stretch != 0);
+                            uiSpace();
                             g_hdOff = (uint8_t)st.hdOff;
                             g_cameraFixed = st.camFixed != 0;
                             acc = 0; last = plat::ticksMs();
@@ -241,20 +257,14 @@ void run() {
             }
         }
 
+        if (scene != PLAY) menuSpace();
         plat::beginFrame();
-        plat::setView43(false, LOGICAL_W);
         switch (scene) {
             case MENU: {
-                drawFull("assets/images/menuelements/menu.jpg");
-                const ContentFrame f = contentFrame();
-                const float s = f.sy;
-                const ImageMap* sb = imageMap("SMALL_BUTTON", "AssetsGeneral");
+                vc::drawTitleArt(menuButton(0).w);
                 for (int i = 0; i < 5; i++) {
-                    const float bx = f.X(MENU_X), by = f.Y(MENU_Y0 + i * MENU_DY);
-                    // Los botones se estiran igual que el arte, así ocupan su columna a cualquier proporción.
-                    if (sb && sb->frames.size() >= 2) drawFrameStretched(sb->frames[menuSel == i ? 1 : 0], bx, by, 1.65f * f.sx, 1.65f * f.sy);
-                    const float ls = 34 * f.sy / vc::uiFont().height(1.0f);
-                    text(MENU_LBL[i], bx, by - vc::uiFont().height(ls) * 0.5f, ls);
+                    const MenuBtn b = menuButton(i);
+                    vc::titleButton(MENU_LBL[i], b.cx, b.cy, b.w, b.h, menuSel == i);
                 }
                 break;
             }
@@ -304,9 +314,15 @@ void run() {
                 break;
             }
             case PLAY:
-                if (world) { world->setInterp(plat::highFps() && !paused ? acc / STEP : 1.0f); world->draw(); }
+                if (world) {
+                    world->setInterp(plat::highFps() && !paused ? acc / STEP : 1.0f);
+                    worldSpace();
+                    world->draw();
+                    uiSpace();
+                    world->drawHud();
+                } else uiSpace();
                 if (paused) {
-                    const float cx = LOGICAL_W * 0.5f, cy = LOGICAL_H * 0.5f;
+                    const float cx = (st.stretch ? UI_W : LOGICAL_W) * 0.5f, cy = LOGICAL_H * 0.5f;
                     // Cartel de pausa del original (emblema + "Pausa") con sus botones rojos.
                     const ImageMap* pd = imageMap("PAUSE_DIALOG", "AssetsGeneral");
                     const ImageMap* mb = imageMap("MENU_BUTTON", "AssetsGeneral");
