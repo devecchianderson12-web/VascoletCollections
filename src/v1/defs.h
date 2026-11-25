@@ -58,6 +58,7 @@ void setFrameTexture(const char* map, const char* set, int idx, const std::strin
 void drawFrame(const Frame& f, float x, float y, bool flipH = false, uint8_t alpha = 255, bool flipV = false);
 // Dibuja el cuadro entero escalado, centrado en (cx, cy) (HUD).
 void drawFrameScaled(const Frame& f, float cx, float cy, float scale);
+void drawFrameStretched(const Frame& f, float cx, float cy, float sx, float sy);
 
 struct AnimPlayer {
     const Anim* a = nullptr;

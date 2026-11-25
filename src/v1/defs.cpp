@@ -176,6 +176,15 @@ void drawFrameScaled(const Frame& fc, float cx, float cy, float scale) {
     plat::drawImage(img, SDL_Rect{ (int)f.x, (int)f.y, (int)f.w, (int)f.h }, SDL_FRect{ cx - w * 0.5f, cy - h * 0.5f, w, h });
 }
 
+// Igual pero con escala distinta a lo ancho y a lo alto (pantallas 4:3 estiradas a la pantalla).
+void drawFrameStretched(const Frame& fc, float cx, float cy, float sx, float sy) {
+    Frame& f = const_cast<Frame&>(fc);
+    plat::Image* img = texture(f);
+    if (!img) return;
+    const float w = f.w * sx, h = f.h * sy;
+    plat::drawImage(img, SDL_Rect{ (int)f.x, (int)f.y, (int)f.w, (int)f.h }, SDL_FRect{ cx - w * 0.5f, cy - h * 0.5f, w, h });
+}
+
 bool AnimPlayer::finished() const {
     if (!a || a->loop || a->totalTicks <= 0) return false;
     return time * a->fps >= a->totalTicks;

@@ -27,6 +27,8 @@ const char* const MENU_LBL[5] = { "Jugar", "Opciones", "Ayuda", "Creditos", "Sal
 const float MENU_X = 1059, MENU_Y0 = 129, MENU_DY = 79.5f;
 // Botones del cartel de pausa (alto 548, centrado): Jugar, Opciones, Salir.
 const float PAUSE_BTN_Y[3] = { 62, 118, 174 };
+// El cartel (548 de alto) ocupa el 92% del alto de la pantalla.
+inline float pauseScale() { return LOGICAL_H * 0.92f / 548.0f; }
 
 struct Tap {
     bool down = false, was = false, tapped = false; float sx = 0, sy = 0, tx = 0, ty = 0, move = 0;
@@ -203,7 +205,8 @@ void run() {
                         if (plat::pressed(plat::BTN_UP)) pauseSel = (pauseSel + 2) % 3;
                         const float cx = LOGICAL_W * 0.5f, cy = LOGICAL_H * 0.5f;
                         bool act = plat::pressed(plat::BTN_ACCEPT);
-                        for (int i = 0; i < 3; i++) if (g_tap.in(cx - 110, cy + PAUSE_BTN_Y[i] - 30, 220, 60)) { pauseSel = i; act = true; }
+                        const float k = pauseScale();
+                        for (int i = 0; i < 3; i++) if (g_tap.in(cx - 110 * k, cy + (PAUSE_BTN_Y[i] - 30) * k, 220 * k, 60 * k)) { pauseSel = i; act = true; }
                         if (plat::pressed(plat::BTN_START) && !plat::pressed(plat::BTN_ACCEPT)) { pauseSel = 0; act = true; }
                         if (act && pauseSel == 1) {
                             plat::setLogicalSize(oldW, oldH);
@@ -248,8 +251,10 @@ void run() {
                 const ImageMap* sb = imageMap("SMALL_BUTTON", "AssetsGeneral");
                 for (int i = 0; i < 5; i++) {
                     const float bx = f.X(MENU_X), by = f.Y(MENU_Y0 + i * MENU_DY);
-                    if (sb && sb->frames.size() >= 2) drawFrameScaled(sb->frames[menuSel == i ? 1 : 0], bx, by, s * 1.65f);
-                    text(MENU_LBL[i], bx, by - vc::uiFont().height(0.5f) * 0.5f, 0.5f);
+                    // Los botones se estiran igual que el arte, así ocupan su columna a cualquier proporción.
+                    if (sb && sb->frames.size() >= 2) drawFrameStretched(sb->frames[menuSel == i ? 1 : 0], bx, by, 1.65f * f.sx, 1.65f * f.sy);
+                    const float ls = 34 * f.sy / vc::uiFont().height(1.0f);
+                    text(MENU_LBL[i], bx, by - vc::uiFont().height(ls) * 0.5f, ls);
                 }
                 break;
             }
@@ -305,12 +310,13 @@ void run() {
                     // Cartel de pausa del original (emblema + "Pausa") con sus botones rojos.
                     const ImageMap* pd = imageMap("PAUSE_DIALOG", "AssetsGeneral");
                     const ImageMap* mb = imageMap("MENU_BUTTON", "AssetsGeneral");
-                    if (pd && !pd->frames.empty()) drawFrame(pd->frames[0], cx, cy);
+                    const float k = pauseScale();
+                    if (pd && !pd->frames.empty()) drawFrameScaled(pd->frames[0], cx, cy, k);
                     static const char* const LBL[3] = { "Jugar", "Opciones", "Salir" };
                     for (int i = 0; i < 3; i++) {
-                        const float by = cy + PAUSE_BTN_Y[i];
-                        if (mb && mb->frames.size() >= 2) drawFrameScaled(mb->frames[pauseSel == i ? 1 : 0], cx, by, 0.85f);
-                        text(LBL[i], cx, by - vc::uiFont().height(0.62f) * 0.5f, 0.62f);
+                        const float by = cy + PAUSE_BTN_Y[i] * k;
+                        if (mb && mb->frames.size() >= 2) drawFrameScaled(mb->frames[pauseSel == i ? 1 : 0], cx, by, 0.85f * k);
+                        text(LBL[i], cx, by - vc::uiFont().height(0.62f * k) * 0.5f, 0.62f * k);
                     }
                 }
                 break;
