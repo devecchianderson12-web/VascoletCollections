@@ -62,7 +62,7 @@ static const CharDef DEFS[] = {
     { "SkullDoor", "puerta-calavera", "normal", 0, 1, 16, 16, 128 },
     { "Platform", "plataforma", "normal", 0, 1, 46, 46, 32 },
     { "Info", "carteles-ayuda-guardar", "info", 0, 1, 16, 16, 60 },
-    { "Save", "carteles-ayuda-guardar", "savePoint", 0, 1, 16, 16, 60 },
+    { "Save", "carteles-ayuda-guardar", "saveStale", 0, 1, 16, 16, 60 },
     { "Portal", "portal", "stand", 0, 1, 24, 24, 96 },
 };
 
@@ -326,7 +326,7 @@ Actor* World::find(const std::string& type) {
 
 void World::showMsg(const std::string& key, bool sign) {
     msg = text(key);
-    msgT = 3.0f;
+    msgT = 1.2f;
     msgLinger = sign;
 }
 
@@ -381,6 +381,7 @@ void World::hurtPlayer(bool fromTile) {
     (void)fromTile;
     Actor& p = *player;
     if (invT > 0 || p.state == P_DAMAGE || p.state == P_LOSING || p.state == P_GONE || winT >= 0) return;
+    if (vc::settings().ghost) return;   // modo fantasma: nada le hace daño
     playerState(P_DAMAGE);
 }
 
@@ -419,7 +420,7 @@ void World::updatePlayer(float dt) {
             }
             if (p.a > 0) { p.a -= dt; if (p.a <= 0) p.anim.play("flyingWithWilly"); }
             const bool dmgTile = (tileFlags(p.x, p.y - 4) & T_DAMAGE) || (tileFlags(p.x, p.y - p.h() + 4) & T_DAMAGE);
-            if (dmgTile && invT <= 0) playerState(P_FLY_DAMAGE);
+            if (dmgTile && invT <= 0 && !vc::settings().ghost) playerState(P_FLY_DAMAGE);
         } else if (p.stateT > 0.6f) {
             if (prog.energy <= 0) { p.state = P_LOSING; p.stateT = 0; p.gravity = 900; p.solidCollide = false; sfx("vasco_death"); plat::stopMusic(); }
             else playerState(P_FLY);
@@ -428,7 +429,7 @@ void World::updatePlayer(float dt) {
         // La cámara automática empuja al jugador; si queda aplastado contra una pared, pierde.
         if (autoCam && p.state != P_LOSING) {
             const float minX = camX + p.w(), maxX = camX + VIEW_W - p.w();
-            if (p.x < minX) { p.x = minX; if (solidAt(p.x + p.w() + 1, p.y - p.h() * 0.5f)) { prog.energy = 0; playerState(P_FLY_DAMAGE); p.state = P_FLY_DAMAGE; p.stateT = 0.6f; } }
+            if (p.x < minX) { p.x = minX; if (solidAt(p.x + p.w() + 1, p.y - p.h() * 0.5f) && !vc::settings().ghost) { prog.energy = 0; playerState(P_FLY_DAMAGE); p.state = P_FLY_DAMAGE; p.stateT = 0.6f; } }
             if (p.x > maxX) p.x = maxX;
             if (p.y - p.h() < camY) { p.y = camY + p.h(); if (p.vy < 0) p.vy = 0; }
             if (p.y > camY + VIEW_H) { p.y = camY + VIEW_H; p.vy = std::min(p.vy, 0.0f); }
@@ -582,6 +583,11 @@ void World::updatePlayer(float dt) {
         (void)scale;
     }
     // Se cae por un pozo: pierde la vida directamente.
+    if (p.state != P_LOSING && p.state != P_GONE && p.y - p.h() > map.h * 32 + 16 && vc::settings().ghost) {
+        // Modo fantasma: vuelve al último punto de guardado sin perder la vida.
+        p.x = p.px = saveX; p.y = p.py = saveY; p.vx = p.vy = 0; camD = saveCamD;
+        updateCamera(true);
+    }
     if (p.state != P_LOSING && p.state != P_GONE && p.y - p.h() > map.h * 32 + 16) {
         prog.energy = 0; hasLosing = true;
         p.state = P_GONE; p.stateT = 0;
@@ -1063,19 +1069,19 @@ void World::interactions() {
             continue;
         }
         if (t == "Info") {
-            if (overlap(pb, ab)) { onInfo = true; if (msgSign != &a || msgT <= 0) { showMsg(a.props["info"], true); msgSign = &a; } msgT = std::max(msgT, 1.2f); }
+            // Se ve mientras se toca el cartel y queda 1,2 s al alejarse (como en Vascolet 1).
+            if (overlap(pb, ab)) { onInfo = true; if (msgSign != &a || msgT <= 0) { showMsg(a.props["info"], true); msgSign = &a; } msgT = 1.2f; }
             continue;
         }
         if (t == "Save") {
-            // Cada vez que se lo toca: "Juego salvado." y se guarda el lugar.
-            const bool in = overlap(pb, ab);
-            if (in && a.phase == 0) {
-                a.phase = 1; saveX = a.x; saveY = a.y; saveCamD = camD;
+            // Al tocar un punto nuevo: "Juego salvado.", se guarda el lugar y su disquete queda animado.
+            if (overlap(pb, ab) && (std::fabs(saveX - a.x) > 1 || std::fabs(saveY - a.y) > 1)) {
+                saveX = a.x; saveY = a.y; saveCamD = camD;
                 msg = "Juego salvado."; msgT = 2.0f; msgLinger = false; msgSign = &a;
                 sfx("save");
+                for (auto& o : actors) if (o->type == "Save") o->anim.play("saveStale");
                 a.anim.play("savePoint");
             }
-            if (!in && a.phase == 1) { a.phase = 0; a.anim.play("saveStale"); }
             continue;
         }
         if (t.find("Door") != std::string::npos) {
@@ -1282,7 +1288,7 @@ void World::draw() {
 }
 
 // HUD del original (images/hud): vidas, energía, monedas x/total, zapatilla y resorte, llaves.
-void World::drawHud(float uiW) {
+void World::drawHud(float uiW, bool messages) {
     const SpriteLib* hud = spriteLib("v2/assets/images/hud/hud.xml");
     auto spr = [&](const char* k, float x, float y) { drawSprite(hud->get(k), x, y); };
     const float s = VIEW_H / 384.0f; (void)s;
@@ -1326,15 +1332,11 @@ void World::drawHud(float uiW) {
     }
 #endif
     // Cartel rojo de mensajes (tips, "Juego salvado.")
-    if (msgT > 0 && !msg.empty()) {
+    if (messages && msgT > 0 && !msg.empty()) {
         const Sprite* bn = hud->get("cartelDialogos");
         const float bx = uiW * 0.5f, by = 70;
         if (bn) drawSprite(bn, bx, by);
-        size_t st = 0; int line = 0; std::vector<std::string> lines;
-        while (st <= msg.size()) { size_t e = msg.find('\n', st); if (e == std::string::npos) e = msg.size(); lines.push_back(msg.substr(st, e - st)); st = e + 1; }
-        const float sc = 0.62f, lh = 21;
-        float y = by + 23 - lines.size() * lh * 0.5f + (lh - textHeight(sc)) * 0.5f;
-        for (auto& l : lines) { drawText(l, bx - textWidth(l, sc) * 0.5f, y, sc); y += lh; line++; }
+        drawTextBox(msg, bx, by + 23, 470, 44);
     }
 }
 

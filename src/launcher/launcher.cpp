@@ -338,6 +338,7 @@ void Launcher::buildRows() {
                              [](int d) { int& a = settings().touchAlpha; a = ((a / 25) + 5 + d) % 5 * 25; } });
             rows.push_back({ "Mapeo de botones", nullptr, [this](int) { go(MAPPING); } });
             rows.push_back({ "Mando", nullptr, [this](int) { go(PAD); } });
+            rows.push_back({ "Modo fantasma", [] { return std::string(onOff(settings().ghost)); }, toggle(&Settings::ghost) });
             break;
         case PAD: {
             // Botones del mando (Xbox Series X|S u otro): elegir una acción y apretar el botón nuevo;

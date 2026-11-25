@@ -367,6 +367,16 @@ void World::hurtHero(float fromX) {
 
 void World::killHero() {
     if (hero.state == HS_DEAD) return;
+    if (vc::settings().ghost) {
+        // Modo fantasma (Opciones > Controles): nada le hace daño; si cae al vacío vuelve al último
+        // punto de guardado sin perder la vida.
+        if (hero.box.y > map.height * map.tileH) {
+            hero.box.x = spawnX; hero.box.y = spawnY; hero.vx = hero.vy = 0;
+            hero.state = HS_AIR; hero.platform = -1;
+            refitCamera();
+        }
+        return;
+    }
     hero.state = HS_DEAD; hero.deadT = 0;
     hero.vx = 0; hero.vy = -800;
     playSfx("death_1.ogg");   // DEATH_1 al recibir el golpe

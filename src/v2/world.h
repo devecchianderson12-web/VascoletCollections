@@ -66,7 +66,7 @@ public:
     bool load(int level, const Progress& p);     // level 1..5
     void update(float dt);
     void draw();
-    void drawHud(float uiW);
+    void drawHud(float uiW, bool messages = true);
     void setInterp(float a) { interp = a; }
     bool won() const { return winT > 3.0f; }
     bool gameOver() const { return overT > 3.0f; }

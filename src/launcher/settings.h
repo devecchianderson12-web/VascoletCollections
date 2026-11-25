@@ -13,6 +13,7 @@ struct Settings {
     // Gráficos
     int fullscreen = 0, smooth = 1, sharpness = 0, hd = 0, tvEffect = 0;
     int camFixed = 0, fps120 = 0, modernArt = 0;
+    int ghost = 0;            // modo fantasma (los dos juegos): el jugador no recibe daño ni muere
     int stretch = 1;          // Vascolet 1: estirar la pantalla 4:3 del juego a toda la pantalla
     int hdOff = 0;            // bits de HdFx apagados
     // Progreso

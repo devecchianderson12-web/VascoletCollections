@@ -195,11 +195,11 @@ void run() {
                         if (plat::pressed(plat::BTN_UP)) pauseSel = (pauseSel + 2) % 3;
                         bool act = plat::pressed(plat::BTN_ACCEPT);
                         const float cx = UI_W * 0.5f, cy = UI_H * 0.5f;
-                        for (int i = 0; i < 3; i++) if (g_tap.in(cx - 60, cy + i * 40 - 15, 120, 30)) { pauseSel = i; act = true; }
+                        for (int i = 0; i < 3; i++) if (g_tap.in(cx - 60, cy + 12 + i * 42 - 15, 120, 30)) { pauseSel = i; act = true; }
                         if (plat::pressed(plat::BTN_START) && !plat::pressed(plat::BTN_ACCEPT)) { pauseSel = 0; act = true; }
                         if (act && pauseSel == 1) {
                             plat::beginFrame();
-                            worldSpace(); world->draw(); uiSpace(); world->drawHud((float)UI_W);
+                            worldSpace(); world->draw(); uiSpace(); world->drawHud((float)UI_W, false);
                             plat::captureBackdrop();
                             plat::setStretch(false); plat::setLogicalSize(oldW, oldH);
                             vc::runOptionsMenu();
@@ -294,15 +294,15 @@ void run() {
                     worldSpace();
                     world->draw();
                     uiSpace();
-                    world->drawHud((float)UI_W);
+                    world->drawHud((float)UI_W, !paused);
                 } else uiSpace();
                 if (paused) {
-                    plat::dimScreen(0.4f);
+                    plat::dimScreen(0.55f);
                     const float cx = UI_W * 0.5f, cy = UI_H * 0.5f;
                     const SpriteLib* q = spriteLib("v2/assets/gui/hud/quit-confirmation.xml");
                     drawSprite(q->get("pause"), cx, cy);
                     static const char* const K[3] = { "continuar", "opciones", "salir" };
-                    for (int i = 0; i < 3; i++) guiButton(K[i], cx, cy + i * 40, pauseSel == i);
+                    for (int i = 0; i < 3; i++) guiButton(K[i], cx, cy + 12 + i * 42, pauseSel == i);
                 }
                 break;
             case GAMEOVER: drawFull("v2/assets/gui/gameover/gameover.png"); break;

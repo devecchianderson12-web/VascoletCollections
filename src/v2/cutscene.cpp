@@ -356,24 +356,18 @@ void Cutscene::drawUi(float uiW) {
     const SpriteLib* hud = spriteLib("v2/assets/images/hud/hud.xml");
     if (!sayKey.empty()) {
         const std::string msg = text(sayKey);
-        std::vector<std::string> lines;
-        size_t st = 0;
-        while (st <= msg.size()) { size_t e = msg.find('\n', st); if (e == std::string::npos) e = msg.size(); lines.push_back(msg.substr(st, e - st)); st = e + 1; }
-        const float sc = 0.62f, lh = 21;
         if (speaker.empty()) {
             // Título del capítulo: cartel rojo como los de los carteles de ayuda.
             const float bx = uiW * 0.5f, by = 70;
             drawSprite(hud->get("cartelDialogos"), bx, by);
-            float y = by + 23 - lines.size() * lh * 0.5f + (lh - textHeight(sc)) * 0.5f;
-            for (auto& l : lines) { drawText(l, bx - textWidth(l, sc) * 0.5f, y, sc); y += lh; }
+            drawTextBox(msg, bx, by + 23, 470, 44);
         } else {
             // Diálogo: cartel con la cara del que habla a la izquierda (dialogBanner*).
             const float bx = uiW * 0.5f + 24, by = 8;
             drawSprite(hud->get("dialogBanner"), bx, by);
             drawSprite(hud->get(speaker), bx - 218 + 20, by + 20);
             const float cx = bx + 10;
-            float y = by + 24 - lines.size() * lh * 0.5f + (lh - textHeight(sc)) * 0.5f;
-            for (auto& l : lines) { drawText(l, cx - textWidth(l, sc) * 0.5f, y, sc); y += lh; }
+            drawTextBox(msg, cx, by + 24, 400, 48);
         }
     }
     const SpriteLib* skip = spriteLib("v2/assets/gui/menu/skip.xml");

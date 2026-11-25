@@ -233,6 +233,36 @@ void drawText(const std::string& s, float x, float y, float scale, SDL_Color c, 
     font(f)->draw(s, x, y, scale, c);
 }
 float textWidth(const std::string& s, float scale, int f) { return font(f)->width(s, scale); }
+
+void drawTextBox(const std::string& msg, float cx, float cy, float maxW, float maxH) {
+    std::vector<std::string> lines;
+    float sc = 0.62f;
+    for (; sc >= 0.38f; sc -= 0.04f) {
+        lines.clear();
+        size_t st = 0;
+        while (st <= msg.size()) {
+            size_t e = msg.find('\n', st);
+            if (e == std::string::npos) e = msg.size();
+            std::string para = msg.substr(st, e - st), cur;
+            size_t p = 0;
+            while (p <= para.size()) {
+                size_t q = para.find(' ', p);
+                if (q == std::string::npos) q = para.size();
+                const std::string w = para.substr(p, q - p);
+                const std::string tryL = cur.empty() ? w : cur + " " + w;
+                if (!cur.empty() && font(0)->width(tryL, sc) > maxW) { lines.push_back(cur); cur = w; }
+                else cur = tryL;
+                p = q + 1;
+            }
+            lines.push_back(cur);
+            st = e + 1;
+        }
+        if (lines.size() * 34.0f * sc <= maxH) break;
+    }
+    const float lh = 34.0f * sc;
+    float y = cy - lines.size() * lh * 0.5f + (lh - textHeight(sc)) * 0.5f;
+    for (auto& l : lines) { drawText(l, cx - textWidth(l, sc) * 0.5f, y, sc); y += lh; }
+}
 float textHeight(float scale, int f) { return font(f)->height(scale); }
 
 }

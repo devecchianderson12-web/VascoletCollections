@@ -72,5 +72,8 @@ void drawText(const std::string& s, float x, float y, float scale = 1.0f, SDL_Co
 float textWidth(const std::string& s, float scale = 1.0f, int font = 0);
 float textHeight(float scale = 1.0f, int font = 0);
 enum { FONT_MAIN = 0, FONT_HUD = 1, FONT_SMALL = 2 };
+// Texto de un cartel centrado en (cx, cy): respeta los saltos de línea, corta palabras que no entran en maxW y
+// achica la letra hasta que todo entre en maxH.
+void drawTextBox(const std::string& msg, float cx, float cy, float maxW, float maxH);
 
 }
