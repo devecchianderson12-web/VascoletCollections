@@ -371,7 +371,7 @@ void World::killHero() {
     if (hero.state == HS_DEAD) return;
     hero.state = HS_DEAD; hero.deadT = 0;
     hero.vx = 0; hero.vy = -800;
-    playSfx("death_2.ogg");
+    playSfx(rand() & 1 ? "death_1.ogg" : "death_2.ogg");   // DEATH_1 / DEATH_2 del original
 }
 
 void World::respawn() {
@@ -400,7 +400,7 @@ void World::award(const Item& it) {
         playSfx("item.ogg");
     }
     else if (c == "LIVES") { cnt.lives = std::min(99, cnt.lives + it.count); playSfx("extra_life.ogg"); }
-    else if (c == "VASCOLETS") { cnt.vascolets = std::min(HUD_SLOTS, cnt.vascolets + 1); playSfx("jump_vascolet.ogg"); }
+    else if (c == "VASCOLETS") { cnt.vascolets = std::min(HUD_SLOTS, cnt.vascolets + 1); playSfx("powerup.ogg"); }   // POWERUP (0x433fb0)
     else if (c == "CEREALS") { cnt.cereals = std::min(HUD_SLOTS, cnt.cereals + 1); playSfx("powerup.ogg"); }
     else if (c == "YELLOW_KEY") { cnt.keys[0] = std::min(9, cnt.keys[0] + 1); playSfx("item.ogg"); }
     else if (c == "RED_KEY") { cnt.keys[1] = std::min(9, cnt.keys[1] + 1); playSfx("item.ogg"); }
@@ -500,13 +500,13 @@ void World::updateHero(float dt) {
         if (jump && !h.onGround && h.state == HS_AIR && cnt.cereals > 0 && !h.doubleJumped) {
             // Doble salto: se habilita con el primer Cereal; cada Cereal lo hace más alto.
             h.vy = DJUMP_BY_CEREALS[std::min(cnt.cereals, 4)]; h.doubleJumped = true; h.stillJump = !L && !R;
-            playSfx("jump.ogg");
+            playSfx("jump_vascolet.ogg");   // el salto de Alejandro; "jump.ogg" es el de las serpientes
             h.anim.play(heroAnim("JUMP"), true);
         }
         if (jump && h.onGround) {
             h.vy = JUMP_BY_VASCOLETS[std::min(cnt.vascolets, 4)]; h.onGround = false; h.state = HS_AIR; h.platform = -1; h.doubleJumped = false;
             h.stillJump = !L && !R;
-            playSfx("jump.ogg");
+            playSfx("jump_vascolet.ogg");   // el salto de Alejandro; "jump.ogg" es el de las serpientes
             h.anim.play(heroAnim("JUMP"), true);
         }
     }
@@ -598,6 +598,7 @@ void World::updateEnemies(float dt) {
                     vx = 0; e.vy = 0;
                     if (e.anim.finished() || (e.landT += dt) > 0.5f) {
                         e.landed = false; e.landT = 0; e.vx = e.savedVx; e.vy = e.jumpVy; vx = e.vx;
+                        playSfx("jump.ogg");   // JUMP_ENEMY (Jumper 0x440a00)
                         if (const Anim* a = EA(e.animName)) e.anim.play(a, true);
                     }
                 }
@@ -783,7 +784,7 @@ void World::update(float dt) {
                 for (auto& o : saves) o.active = false;
                 spawnX = s.box.x; spawnY = s.box.y + s.box.h - hero.box.h;
                 savedT = 2.5f;
-                playSfx("powerup.ogg");
+                playSfx("item.ogg");
             }
             s.active = touching;
         }
