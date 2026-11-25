@@ -297,13 +297,15 @@ void Launcher::drawHome() {
 }
 
 // ---------------- Listas de opciones ----------------
-const float ROW_H = 29;
+// Alto de cada fila: 29, o menos si la lista no entra (siempre se ve el botón "Volver").
+float rowH(int n) { return std::min(29.0f, (H() - 112.0f) / std::max(1, n)); }
 float listW() { return std::min(470.0f, W() - 40); }
 float listX() { return (W() - listW()) * 0.5f; }
-float listY0(int n) { return std::max(58.0f, (H() - (n * ROW_H + 70)) * 0.5f + 20); }
+float listY0(int n) { return std::max(58.0f, (H() - (n * rowH(n) + 70)) * 0.5f + 20); }
 
 void Launcher::updateList() {
     const int n = (int)rows.size();             // la fila n es "Volver"
+    const float RH = rowH(n);
     if (plat::pressed(plat::BTN_DOWN)) { sel = (sel + 1) % (n + 1); click(); }
     if (plat::pressed(plat::BTN_UP)) { sel = (sel + n) % (n + 1); click(); }
     bool act = plat::pressed(plat::BTN_ACCEPT);
@@ -312,11 +314,11 @@ void Launcher::updateList() {
     if (plat::pressed(plat::BTN_LEFT)) d = -1;
     const float x = listX(), w = listW(), y0 = listY0(n);
     for (int i = 0; i < n; i++) {
-        const float y = y0 + i * ROW_H;
-        if (g_ptr.hoverIn(x, y, w, ROW_H) || g_ptr.pressIn(x, y, w, ROW_H)) sel = i;
-        if (g_ptr.tapIn(x, y, w, ROW_H)) { sel = i; act = true; }
+        const float y = y0 + i * RH;
+        if (g_ptr.hoverIn(x, y, w, RH) || g_ptr.pressIn(x, y, w, RH)) sel = i;
+        if (g_ptr.tapIn(x, y, w, RH)) { sel = i; act = true; }
     }
-    const float by = y0 + n * ROW_H + 30;
+    const float by = y0 + n * RH + 30;
     if (g_ptr.hoverIn(W() * 0.5f - 80, by - 18, 160, 36) || g_ptr.pressIn(W() * 0.5f - 80, by - 18, 160, 36)) sel = n;
     if (g_ptr.tapIn(W() * 0.5f - 80, by - 18, 160, 36)) { sel = n; act = true; }
     if (sel == n) {
@@ -332,23 +334,24 @@ void Launcher::updateList() {
 void Launcher::drawList() {
     rays(W() * 0.5f, H() * 0.45f, 0.25f);
     const int n = (int)rows.size();
+    const float RH = rowH(n);
     const float x = listX(), w = listW(), y0 = listY0(n);
     textC(pageTitle(page), W() * 0.5f, y0 - 50, 0.85f, YELLOW);
-    panel(x - 14, y0 - 12, w + 28, n * ROW_H + 24);
+    panel(x - 14, y0 - 12, w + 28, n * RH + 24);
     const float sc = TXT * 0.92f, th = font().height(sc);
     for (int i = 0; i < n; i++) {
-        const float y = y0 + i * ROW_H;
-        if (sel == i) button("", x + w * 0.5f, y + ROW_H * 0.5f, w, ROW_H + 2, true);
-        text(rows[i].label, x + 16, y + (ROW_H - th) * 0.5f, sc, WHITE);
+        const float y = y0 + i * RH;
+        if (sel == i) button("", x + w * 0.5f, y + RH * 0.5f, w, RH + 2, true);
+        text(rows[i].label, x + 16, y + (RH - th) * 0.5f, sc, WHITE);
         if (rows[i].value) {
             const std::string v = rows[i].value();
-            text(v, x + w - 16 - font().width(v, sc), y + (ROW_H - th) * 0.5f, sc, YELLOW);
+            text(v, x + w - 16 - font().width(v, sc), y + (RH - th) * 0.5f, sc, YELLOW);
         } else {   // submenú: flecha
-            const float ax = x + w - 22, ay = y + ROW_H * 0.5f;
+            const float ax = x + w - 22, ay = y + RH * 0.5f;
             plat::fillTriangle({ ax - 6, ay - 8 }, { ax + 6, ay }, { ax - 6, ay + 8 }, YELLOW);
         }
     }
-    const float by = y0 + n * ROW_H + 30;
+    const float by = y0 + n * RH + 30;
     button("Volver", W() * 0.5f, by, 160, 36, sel == n, g_ptr.pressIn(W() * 0.5f - 80, by - 18, 160, 36));
 }
 

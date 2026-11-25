@@ -161,6 +161,10 @@ bool World::load(int level, const Counters& carry) {
     hero.state = HS_AIR;
     hero.anim.play(heroAnim("WALK"));
     powerAnim.play(EA("POWER"));
+#ifdef HOST
+    // Pruebas en la PC: V1_POS=x,y pone al jugador en ese punto del mapa.
+    if (const char* p = getenv("V1_POS")) { float x, y; if (sscanf(p, "%f,%f", &x, &y) == 2) { hero.box.x = x; hero.box.y = y - hero.box.h; } }
+#endif
     refitCamera();
     return true;
 }
