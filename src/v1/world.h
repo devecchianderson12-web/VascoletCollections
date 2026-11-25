@@ -60,6 +60,7 @@ struct Effect { float x, y; AnimPlayer anim; };
 struct Counters {
     int lives = 10, points = 0;
     int vascolets = 0, cereals = 0;   // del nivel actual (4 vasos y 4 bowls en el HUD)
+    int coins = 0;                    // monedas juntadas en el nivel (de 100)
     int keys[4] = {};           // amarilla, roja, verde, azul
 };
 
@@ -101,7 +102,10 @@ private:
     float boundX0 = 0, boundY0 = 0, boundX1 = 0, boundY1 = 0;   // zona jugable (límites de la cámara)
     Hero hero;
     float spawnX = 0, spawnY = 0;
-    bool riding = false;        // prehistoria: montado en el dinosaurio
+    bool riding = false;        // montado (dinosaurio en la Prehistoria, patineta en el Futuro)
+    const char* mount = "";     // prefijo de las animaciones: "D_" dinosaurio, "P_" patineta
+    const Anim* heroAnim(const char* name) const;
+    float liquidBottom(float x, float y) const;
     std::vector<Enemy> enemies;
     std::vector<Item> items;
     std::vector<Door> doors;

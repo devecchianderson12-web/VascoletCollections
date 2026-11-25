@@ -4,7 +4,7 @@
 namespace v1 {
 
 extern int LOGICAL_W;   // ancho visible (depende de la pantalla)
-extern int LOGICAL_H;   // alto visible: 600, como el juego original
+extern int LOGICAL_H;   // alto visible: 900 (vista del original, 1200x900)
 
 // Corre el juego hasta que el jugador vuelve al menú de la colección.
 void run();

@@ -7,6 +7,9 @@ namespace vc {
 static unsigned nextCp(const std::string& s, size_t& i) {
     const unsigned char c = (unsigned char)s[i++];
     if (c < 0x80) return c;
+    // Byte suelto de Latin-1 (no es el comienzo de un UTF-8 válido): se usa tal cual.
+    const bool cont = i < s.size() && ((unsigned char)s[i] & 0xC0) == 0x80;
+    if ((c & 0xC0) == 0x80 || !cont) return c;
     int extra = (c & 0xE0) == 0xC0 ? 1 : (c & 0xF0) == 0xE0 ? 2 : (c & 0xF8) == 0xF0 ? 3 : 0;
     unsigned cp = c & (0x3F >> extra);
     for (int k = 0; k < extra && i < s.size(); k++) cp = (cp << 6) | ((unsigned char)s[i++] & 0x3F);

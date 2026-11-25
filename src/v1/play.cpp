@@ -12,7 +12,7 @@
 
 namespace v1 {
 
-int LOGICAL_W = 800, LOGICAL_H = 600;
+int LOGICAL_W = 1200, LOGICAL_H = 900;
 
 namespace {
 
@@ -20,7 +20,10 @@ namespace {
 const SDL_Rect FULL = { 0, 0, 1200, 900 };
 const char* const INTRO_IMG[LEVELS] = { "intro_prehistoria", "intro_egipto", "intro_castillo", "intro_pirata", "intro_futuro" };
 
-enum Scene { SELECT, STORY, INTRO, PLAY, END_WIN, END_LOSE };
+enum Scene { MENU, HELP, CREDITS, SELECT, STORY, INTRO, PLAY, END_WIN, END_LOSE };
+// Menú del juego original (sobre menu.jpg, en píxeles de la imagen de 1200x900).
+const char* const MENU_LBL[5] = { "Jugar", "Opciones", "Ayuda", "Creditos", "Salir" };
+const float MENU_X = 1059, MENU_Y0 = 129, MENU_DY = 79.5f;
 // Botones del cartel de pausa (alto 548, centrado): Jugar, Opciones, Salir.
 const float PAUSE_BTN_Y[3] = { 62, 118, 174 };
 
@@ -80,15 +83,19 @@ void run() {
     g_cameraFixed = st.camFixed != 0;
 
     const int oldW = plat::SCREEN_W, oldH = plat::SCREEN_H;
-    LOGICAL_H = 600;
-    LOGICAL_W = std::max(800, (int)std::lround(600.0f * oldW / std::max(1, oldH)));
+    // Vista del original: 1200x900 unidades de mundo (un bloque de 76 = 1/12 del alto). En pantallas
+    // anchas se ve más a los costados, con el mismo alto.
+    LOGICAL_H = 900;
+    LOGICAL_W = std::max(1200, (int)std::lround(900.0f * oldW / std::max(1, oldH)));
     plat::setLogicalSize(LOGICAL_W, LOGICAL_H);
     plat::setView43(false, LOGICAL_W);
     plat::setAssetPrefix("v1/");
     static bool defsLoaded = false;
     if (!defsLoaded) defsLoaded = loadDefs();
 
-    Scene scene = SELECT;
+    Scene scene = MENU;
+    int menuSel = 0;
+    bool backHot = false;
     int sel = 0, storyPage = 1, level = 0;
     bool quit = false, paused = false;
     int pauseSel = 0;
@@ -109,6 +116,36 @@ void run() {
             plat::setTouchOverlay(scene == PLAY && !paused);
             const bool accept = plat::pressed(plat::BTN_ACCEPT) || plat::pressed(plat::BTN_START);
             switch (scene) {
+                case MENU: {
+                    if (plat::pressed(plat::BTN_DOWN)) menuSel = (menuSel + 1) % 5;
+                    if (plat::pressed(plat::BTN_UP)) menuSel = (menuSel + 4) % 5;
+                    const float s = std::min(LOGICAL_W / 1200.0f, LOGICAL_H / 900.0f), ox = (LOGICAL_W - 1200 * s) * 0.5f, oy = (LOGICAL_H - 900 * s) * 0.5f;
+                    bool go = accept;
+                    for (int i = 0; i < 5; i++)
+                        if (g_tap.in(ox + (MENU_X - 115) * s, oy + (MENU_Y0 + i * MENU_DY - 32) * s, 230 * s, 64 * s)) { menuSel = i; go = true; }
+                    if (plat::pressed(plat::BTN_BACK)) { quit = true; break; }
+                    if (!go) break;
+                    playSfx("item.ogg");
+                    if (menuSel == 0) {
+                        // Primera vez: historia y directo a la Prehistoria; después, elegir época.
+                        bool played = st.v1Unlocked > 1;
+                        for (int c : st.v1Coins) played = played || c > 0;
+                        if (played) { scene = SELECT; sel = 0; }
+                        else { level = 0; carry = Counters(); scene = STORY; storyPage = 1; }
+                    } else if (menuSel == 1) {
+                        plat::setLogicalSize(oldW, oldH);
+                        vc::runOptionsMenu();
+                        plat::setLogicalSize(LOGICAL_W, LOGICAL_H);
+                        g_hdOff = (uint8_t)st.hdOff; g_cameraFixed = st.camFixed != 0;
+                        acc = 0; last = plat::ticksMs();
+                    } else if (menuSel == 2) scene = HELP;
+                    else if (menuSel == 3) scene = CREDITS;
+                    else quit = true;
+                    break;
+                }
+                case HELP: case CREDITS:
+                    if (accept || g_tap.tapped || plat::pressed(plat::BTN_BACK) || plat::pressed(plat::BTN_JUMP)) scene = MENU;
+                    break;
                 case SELECT: {
                     // Solo se puede elegir hasta la última época habilitada.
                     const int open = std::max(1, std::min(LEVELS, st.v1Unlocked));
@@ -121,7 +158,8 @@ void run() {
                         if (g_tap.in(ox + EPOCH[i].x * s, oy + EPOCH[i].y * s, EPOCH[i].w * s, EPOCH[i].h * s)) {
                             if (i < open) { sel = i; go = true; }
                         }
-                    if (g_tap.in(10, LOGICAL_H - 70.0f, 200, 60) || plat::pressed(plat::BTN_BACK)) { quit = true; break; }
+                    { float hx, hy; backHot = plat::pointerHover(&hx, &hy) && hx >= ox + 534 * s && hx < ox + 666 * s && hy >= oy + 835 * s && hy < oy + 889 * s; }
+                    if (g_tap.in(ox + 534 * s, oy + 835 * s, 132 * s, 54 * s) || plat::pressed(plat::BTN_BACK)) { scene = MENU; break; }
                     if (go) { level = sel; carry = Counters(); scene = level == 0 ? STORY : INTRO; storyPage = 1; playSfx("item.ogg"); }
                     break;
                 }
@@ -166,14 +204,17 @@ void run() {
                     world->update(STEP);
                     if (world->won()) {
                         carry = world->counters();
-                        if (level + 2 > st.v1Unlocked) { st.v1Unlocked = std::min(LEVELS, level + 2); st.save(); }
+                        if (level + 2 > st.v1Unlocked) st.v1Unlocked = std::min(LEVELS, level + 2);
+                        st.v1Coins[level] = std::max(st.v1Coins[level], world->counters().coins);
+                        st.save();
                         if (++level >= LEVELS) { scene = END_WIN; delete world; world = nullptr; plat::playMusic("assets/audio/music/andy.ogg"); }
                         else { scene = INTRO; delete world; world = nullptr; }
                     } else if (world->gameOver()) { scene = END_LOSE; delete world; world = nullptr; plat::stopMusic(); }
                     break;
                 }
                 case END_WIN: case END_LOSE:
-                    if (accept || g_tap.tapped || plat::pressed(plat::BTN_BACK)) { scene = SELECT; plat::playMusic("assets/audio/music/andy.ogg"); }
+                    // Como en el original: al terminar se ve la selección de épocas (con las monedas); al perder, el menú.
+                    if (accept || g_tap.tapped || plat::pressed(plat::BTN_BACK)) { scene = scene == END_WIN ? SELECT : MENU; plat::playMusic("assets/audio/music/andy.ogg"); }
                     break;
             }
         }
@@ -181,6 +222,19 @@ void run() {
         plat::beginFrame();
         plat::setView43(false, LOGICAL_W);
         switch (scene) {
+            case MENU: {
+                const SDL_FRect d = drawFull("assets/images/menuelements/menu.jpg");
+                const float s = d.w / 1200.0f;
+                const ImageMap* sb = imageMap("SMALL_BUTTON", "AssetsGeneral");
+                for (int i = 0; i < 5; i++) {
+                    const float bx = d.x + MENU_X * s, by = d.y + (MENU_Y0 + i * MENU_DY) * s;
+                    if (sb && sb->frames.size() >= 2) drawFrameScaled(sb->frames[menuSel == i ? 1 : 0], bx, by, s * 1.65f);
+                    text(MENU_LBL[i], bx, by - vc::uiFont().height(0.5f) * 0.5f, 0.5f);
+                }
+                break;
+            }
+            case HELP: drawFull("assets/lang/images/help/ayuda.jpg"); break;
+            case CREDITS: drawFull("assets/lang/images/credits/creditos.jpg"); break;
             case SELECT: {
                 const SDL_FRect d = drawFull("assets/lang/images/seleccionar_nivel/fondo_seleccionar_nivel.jpg");
                 const float s = d.w / 1200.0f;
@@ -198,7 +252,19 @@ void run() {
                     const float k = r.w / 212.0f, cw = c.w * k, ch = c.h * k;
                     plat::drawImage(b, c, SDL_FRect{ r.x + r.w * 0.5f - cw * 0.5f, r.y + r.h - ch, cw, ch });
                 }
-                button("Volver", 110, LOGICAL_H - 40.0f, 190, 52, false);
+                // Monedas juntadas en cada época habilitada ("N / 100") y el botón "Atrás", como en el original.
+                // Debajo del año de cada época: "N / 100" y el ícono de la moneda.
+                const float ts = 27 * s / vc::uiFont().height(1.0f);
+                const ImageMap* coin = imageMap("COIN", "AssetsItems");
+                for (int i = 0; i < open; i++) {
+                    char cb[16]; snprintf(cb, sizeof cb, "%d / 100", st.v1Coins[i]);
+                    const float cx = d.x + (EPOCH[i].x + EPOCH[i].w * 0.5f - 10) * s, tw = vc::uiFont().width(cb, ts);
+                    text(cb, cx, d.y + 807 * s - vc::uiFont().height(ts) * 0.5f, ts);
+                    if (coin && !coin->frames.empty()) drawFrameScaled(coin->frames[0], cx + tw * 0.5f + 20 * s, d.y + 822 * s, s * 0.36f);
+                }
+                if (const ImageMap* sb = imageMap("SMALL_BUTTON", "AssetsGeneral"); sb && sb->frames.size() >= 2)
+                    drawFrameScaled(sb->frames[backHot ? 1 : 0], d.x + 600 * s, d.y + 862 * s, s * 0.95f);
+                text("Atrás", d.x + 600 * s, d.y + 862 * s - vc::uiFont().height(ts) * 0.5f, ts);
                 break;
             }
             case STORY: drawFull("assets/lang/images/intros/intro_page" + std::to_string(storyPage) + ".jpg"); break;

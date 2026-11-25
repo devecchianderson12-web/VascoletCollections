@@ -16,6 +16,7 @@ struct Settings {
     int hdOff = 0;            // bits de HdFx apagados
     // Progreso
     int v1Unlocked = 1;       // Vascolet 1: épocas habilitadas (se habilita la siguiente al pasar una)
+    int v1Coins[5] = {};      // Vascolet 1: mejores monedas juntadas en cada época (de 100)
     // Controles táctiles
     int stickType = 0, touchStyle = 0, stickSize = 1, stickTheme = 0, touchAlpha = 100;
     uint16_t touchPos[10] = { 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF };

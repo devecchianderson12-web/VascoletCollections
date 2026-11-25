@@ -47,6 +47,10 @@ void Settings::load() {
             std::istringstream vs(v);
             for (auto& p : touchPos) { unsigned u = 0xFFFF; if (vs >> u) p = (uint16_t)std::min(u, 0xFFFFu); }
         }
+        if (k == "v1Coins") {
+            std::istringstream vs(v);
+            for (auto& c : v1Coins) { int n = 0; if (vs >> n) c = std::max(0, std::min(100, n)); }
+        }
     }
 }
 
@@ -55,6 +59,8 @@ void Settings::save() const {
     for (const Field& f : FIELDS) out += std::string(f.key) + "=" + std::to_string(this->*f.ptr) + "\n";
     out += "touchPos=";
     for (int i = 0; i < 10; i++) out += (i ? " " : "") + std::to_string(touchPos[i]);
+    out += "\nv1Coins=";
+    for (int i = 0; i < 5; i++) out += (i ? " " : "") + std::to_string(v1Coins[i]);
     out += "\n";
     plat::saveWrite(std::vector<uint8_t>(out.begin(), out.end()));
     plat::flushSave();

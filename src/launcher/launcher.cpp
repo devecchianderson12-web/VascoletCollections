@@ -149,7 +149,8 @@ private:
     void updateGame(); void drawGame();
     static const char* pageTitle(Page p);
     // Botones del inicio (a la derecha del emblema).
-    float homeBtnX() const { return W() - std::min(150.0f, W() * 0.22f) - 24; }
+    float homeBtnW() const { return std::min(230.0f, W() * 0.3f); }
+    float homeBtnX() const { return W() - homeBtnW() * 0.5f - 18; }
     float homeBtnY(int i) const { return H() * 0.5f - 96 + i * 58; }
 };
 
@@ -241,7 +242,7 @@ void Launcher::updateHome() {
     if (plat::pressed(plat::BTN_DOWN)) { sel = (sel + 1) % 4; click(); }
     if (plat::pressed(plat::BTN_UP)) { sel = (sel + 3) % 4; click(); }
     bool act = plat::pressed(plat::BTN_ACCEPT) || plat::pressed(plat::BTN_START);
-    const float bw = std::min(250.0f, W() * 0.36f);
+    const float bw = homeBtnW();
     for (int i = 0; i < 4; i++) {
         const float x = homeBtnX() - bw * 0.5f, y = homeBtnY(i) - HB_H * 0.5f;
         if (g_ptr.hoverIn(x, y, bw, HB_H) || g_ptr.pressIn(x, y, bw, HB_H)) sel = i;
@@ -258,19 +259,39 @@ void Launcher::updateHome() {
 }
 
 void Launcher::drawHome() {
-    const float ex = std::max(H() * 0.5f, homeBtnX() - std::min(250.0f, W() * 0.36f) * 0.5f - 24) * 0.5f;
-    rays(ex, H() * 0.46f);
-    if (plat::Image* e = img("data/ui/emblem_v1.png")) {
-        const float eh = H() * 0.94f, ew = eh * e->w / std::max(1, e->h);
-        const float bob = std::sin(plat::ticksMs() / 1000.0f * 1.6f) * 3.0f;
-        plat::drawImage(e, SDL_Rect{ 0, 0, e->w, e->h }, SDL_FRect{ ex - ew * 0.5f, H() * 0.03f + bob, ew, eh });
+    // Arte del menú de "La Máquina del Tiempo" (la parte de 1200x900 de menu.jpg) ocupando el alto de la
+    // pantalla; a los costados siguen los rayos rojos animados y los bordes del arte se funden con ellos.
+    const float bw = homeBtnW();
+    const float t = plat::ticksMs() / 1000.0f;
+    const float zoom = 1.0f + 0.025f * (0.5f + 0.5f * std::sin(t * 0.7f));   // respira despacio
+    // Ocupa todo el alto; en pantallas poco anchas se achica para que no lo tapen los botones.
+    // El 15% derecho del arte son solo rayos: los botones pueden quedar encima.
+    const float baseW = std::min(H() * 4.0f / 3.0f, (W() - bw - 36) / 0.85f), baseH = baseW * 0.75f;
+    const float aw = baseW * zoom, ah = baseH * zoom;
+    const float ax = std::max(0.0f, (W() - bw - 36 - baseW * 0.85f) * 0.5f) - (aw - baseW) * 0.5f;
+    const float ay = (H() - ah) * 0.5f;
+    rays(ax + aw * 0.5f, ay + ah * 0.47f, 0.25f);
+    if (plat::Image* e = img("v1/assets/images/menuelements/menu.jpg")) {
+        // Franjas verticales: el centro opaco y los bordes con transparencia creciente.
+        const int STRIPS = 16; const float feather = aw * 0.07f;
+        const float mid0 = ax + feather, mid1 = ax + aw - feather;
+        plat::drawImage(e, SDL_Rect{ (int)(1200 * 0.07f), 0, (int)(1200 * 0.86f), 900 }, SDL_FRect{ mid0, ay, mid1 - mid0, ah });
+        for (int side = 0; side < 2; side++)
+            for (int k = 0; k < STRIPS; k++) {
+                const float f0 = k / (float)STRIPS, f1 = (k + 1) / (float)STRIPS;   // 0 = borde externo
+                const float sx0 = side ? 1200 * (1 - 0.07f * f1) : 1200 * 0.07f * f0;
+                const float sx1 = side ? 1200 * (1 - 0.07f * f0) : 1200 * 0.07f * f1;
+                const float dx0 = ax + aw * sx0 / 1200, dx1 = ax + aw * sx1 / 1200;
+                const Uint8 a = (Uint8)(255 * (k + 0.5f) / STRIPS);
+                plat::setDrawTint({ 255, 255, 255, a });
+                plat::drawImage(e, SDL_Rect{ (int)sx0, 0, std::max(1, (int)(sx1 - sx0)), 900 }, SDL_FRect{ dx0, ay, dx1 - dx0, ah });
+            }
+        plat::setDrawTint({ 255, 255, 255, 255 });
     }
-    const float bw = std::min(250.0f, W() * 0.36f);
     for (int i = 0; i < 4; i++) {
         const float x = homeBtnX() - bw * 0.5f, y = homeBtnY(i) - HB_H * 0.5f;
         button(HOME_BTNS[i], homeBtnX(), homeBtnY(i), bw, HB_H, sel == i, g_ptr.pressIn(x, y, bw, HB_H));
     }
-    textC("La Máquina del Tiempo  /  La Fórmula Secreta", homeBtnX(), homeBtnY(3) + 40, 0.34f, YELLOW);
 }
 
 // ---------------- Listas de opciones ----------------
