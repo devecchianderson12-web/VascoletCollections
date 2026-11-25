@@ -28,6 +28,7 @@ static const Field FIELDS[] = {
     { "hdOff", &Settings::hdOff, 0, 255 }, { "stickType", &Settings::stickType, 0, 1 },
     { "touchStyle", &Settings::touchStyle, 0, 2 }, { "stickSize", &Settings::stickSize, 0, 3 },
     { "touchColor", &Settings::stickTheme, 0, 4 }, { "touchAlpha", &Settings::touchAlpha, 0, 100 },
+    { "v1Unlocked", &Settings::v1Unlocked, 1, 5 },
 };
 
 void Settings::load() {

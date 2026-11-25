@@ -14,6 +14,8 @@ struct Settings {
     int fullscreen = 0, smooth = 1, sharpness = 0, hd = 0, tvEffect = 0;
     int camFixed = 0, fps120 = 0, modernArt = 0;
     int hdOff = 0;            // bits de HdFx apagados
+    // Progreso
+    int v1Unlocked = 1;       // Vascolet 1: épocas habilitadas (se habilita la siguiente al pasar una)
     // Controles táctiles
     int stickType = 0, touchStyle = 0, stickSize = 1, stickTheme = 0, touchAlpha = 100;
     uint16_t touchPos[10] = { 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF };

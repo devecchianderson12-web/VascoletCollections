@@ -28,6 +28,7 @@ struct Anim {
     std::string set, name;
     int fps = 30;
     bool loop = false;
+    bool facesRight = false;   // el dibujo original mira a la derecha (banderas 0xffffffxx del juego)
     int totalTicks = 0;
     std::vector<KeyFrame> keys;
 };

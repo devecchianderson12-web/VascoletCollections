@@ -63,6 +63,7 @@ static void parseDefs(const std::string& text) {
             if (!an) { g_anims.emplace_back(new Anim); an = g_anims.back().get(); an->set = curSet; an->name = name; }
             an->fps = fps; an->totalTicks = total;
             an->loop = (strtoul(flags.c_str(), nullptr, 16) & 0xff) != 0;
+            an->facesRight = (strtoul(flags.c_str(), nullptr, 16) >> 8) == 0xffffff;
         } else if (tag == "K" && an) {
             KeyFrame k; std::string mapName; float start;
             ls >> mapName >> k.frame >> k.ticks >> start;

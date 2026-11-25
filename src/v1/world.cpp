@@ -23,7 +23,7 @@ const char* const LEVEL_NAME[LEVELS] = { "Prehistoria", "Egipto", "Castillo", "P
 // ---- Física del jugador (en píxeles del mapa: un bloque mide 76) ----
 // Valores medidos en el juego original (memoria del proceso): velocidad 250, salto -600, gravedad 1800,
 // caída máxima 1500, caja del jugador 50x90.
-const float RUN = 250, GRAVITY = 1800, JUMP = -600, MAX_FALL = 1500, CLIMB = 150, STOMP = -450;
+const float RUN = 250, GRAVITY = 1800, JUMP = -900, JUMP_DINO = -600, MAX_FALL = 1500, CLIMB = 150, STOMP = -450;
 const int HUD_SLOTS = 4;   // vasos de Vascolet y bowls de cereales que muestra el HUD
 
 void playSfx(const char* file) { plat::playSound(plat::loadSound(std::string("assets/audio/fx/") + file)); }
@@ -319,13 +319,33 @@ void World::updateHero(float dt) {
     if (h.state == HS_CLIMB) {
         h.vy = U ? -CLIMB : D ? CLIMB : 0;
         if (!U && !D) h.anim.time -= dt;   // quieto en la escalera
+        const float prevBottom = h.bottom();
         h.box.y += h.vy * dt;
+        // Arriba de todo: si los pies pasan el borde superior de la escalera, queda parado arriba.
+        if (U && !ladderAt(h.cx(), h.bottom() - 2)) {
+            const float top = std::floor((prevBottom - 1) / map.tileH) * map.tileH;
+            h.box.y = top - h.box.h;
+            h.state = HS_GROUND; h.onGround = true; h.vy = 0;
+            h.anim.play(HA("WALK"), true); h.anim.time = 0;
+            return;
+        }
         if (!ladderAt(h.cx(), h.box.y + h.box.h * 0.85f) && !ladderAt(h.cx(), h.box.y + h.box.h * 0.3f)) {
-            h.state = HS_AIR; h.vy = U ? -200 : 0;
+            h.state = HS_AIR; h.vy = 0;
         }
         bool g = false; float vx = 0, vy = D ? 1 : 0;
         if (D) { moveBox(h.box, vx, vy, 0.0001f, false, &g, nullptr); if (g && !ladderAt(h.cx(), h.bottom() + 2)) { h.state = HS_GROUND; h.onGround = true; } }
-        if (jump && (L || R)) { h.state = HS_AIR; h.vy = JUMP * 0.7f; h.left = L; }
+        if (jump && (L || R)) { h.state = HS_AIR; h.vy = JUMP * 0.6f; h.left = L; }
+        // Como en el original: con izquierda/derecha se baja de la escalera hacia ese lado.
+        // Si al costado hay un escalón a la altura de los pies, sube a ese escalón.
+        else if ((L || R) && !U && !D) {
+            const float col = std::floor(h.cx() / map.tileW) * map.tileW;   // columna de la escalera
+            const float side = L ? col - 2 : col + map.tileW + 2;
+            const int row = (int)std::floor((h.bottom() - 1) / map.tileH);
+            const float rowTop = (float)row * map.tileH;
+            if (solidAt(side, h.bottom() - 1) && !solidAt(side, rowTop - 2)) h.box.y = rowTop - h.box.h;
+            h.state = HS_AIR; h.vy = 0; h.left = L;
+            h.vx = L ? -RUN : RUN;
+        }
         return;
     }
 
@@ -338,7 +358,7 @@ void World::updateHero(float dt) {
         if (L && !R) h.left = true;
         if (R && !L) h.left = false;
         if (jump && h.onGround) {
-            h.vy = JUMP; h.onGround = false; h.state = HS_AIR; h.platform = -1;
+            h.vy = riding ? JUMP_DINO : JUMP; h.onGround = false; h.state = HS_AIR; h.platform = -1;
             playSfx("jump.ogg");
             h.anim.play(HA(riding ? "D_JUMP" : "JUMP"), true);
         }
@@ -401,13 +421,16 @@ void World::updateEnemies(float dt) {
                 bool g = false, wall = false;
                 if (e.collidesV) e.vy = std::min(e.vy + GRAVITY * dt, MAX_FALL);
                 float vx = e.vx;
-                // Darse vuelta en el borde de una plataforma.
-                if (e.collidesFloor && e.kind == EK_WALKER) {
-                    const float ahead = e.vx > 0 ? e.box.x + e.box.w + 4 : e.box.x - 4;
-                    if (!solidAt(ahead, e.box.y + e.box.h + 6) && !platformTop(ahead, e.box.y + e.box.h + 6, e.box.y + e.box.h)) { e.vx = -e.vx; vx = 0; }
+                bool turn = false;
+                // Darse vuelta en el borde de una plataforma (solo si está parado en el piso).
+                if (e.collidesFloor && e.kind == EK_WALKER && e.vy == 0 && e.vx != 0) {
+                    const float ahead = e.vx > 0 ? e.box.x + e.box.w + 2 : e.box.x - 2;
+                    const float below = e.box.y + e.box.h + 4;
+                    if (!solidAt(ahead, below) && !platformTop(ahead, below, e.box.y + e.box.h)) { turn = true; vx = 0; }
                 }
                 moveBox(e.box, vx, e.vy, dt, true, &g, &wall);
-                if (wall || (e.collidesH && vx == 0 && e.vx != 0)) e.vx = -e.vx;
+                if (wall) turn = true;
+                if (turn) e.vx = -e.vx;
                 if (e.kind == EK_JUMPER && g) e.vy = e.jumpVy;
                 if (e.vx != 0) e.left = e.vx < 0;
                 break;
@@ -610,8 +633,9 @@ void World::drawFrameContents() {
             continue;
         }
         if (e.kind == EK_PIRANHA && e.timer > 0) continue;
-        if (hd) hdSpriteShadow(*f, x, y, !e.left);
-        drawFrame(*f, x, y, !e.left);
+        const bool flip = (e.anim.a && e.anim.a->facesRight) ? e.left : !e.left;
+        if (hd) hdSpriteShadow(*f, x, y, flip);
+        drawFrame(*f, x, y, flip);
     }
     for (auto& s : shots) if (s.img && !s.img->frames.empty()) {
         if (hd) hdAddLight(s.x, s.y, 90, 1.0f, 0.75f, 0.4f, 0.4f, 0.4f, true);
@@ -654,6 +678,13 @@ void World::drawHud() {
             drawFrameScaled(k->frames[i], x, 28, 0.62f);
             snprintf(b, sizeof b, "%d", cnt.keys[i]); f.draw(b, x + 8, 36, 0.42f, white);
         }
+#ifdef HOST
+    if (getenv("V1_DEBUG")) {   // diagnóstico (solo PC)
+        char d[160];
+        snprintf(d, sizeof d, "st %d x %.0f bot %.0f vy %.0f row %d g %d", (int)hero.state, hero.box.x, hero.bottom(), hero.vy, (int)std::floor((hero.bottom() - 1) / map.tileH), hero.onGround ? 1 : 0);
+        f.draw(d, 10, (float)LOGICAL_H - 40, 0.45f, white);
+    }
+#endif
     if (messageT > 0 && !message.empty()) {
         // Como en el original: franja negra debajo del HUD con el texto centrado en blanco.
         std::vector<std::string> lines; std::string cur;

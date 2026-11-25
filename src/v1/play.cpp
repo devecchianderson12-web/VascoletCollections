@@ -108,12 +108,17 @@ void run() {
             const bool accept = plat::pressed(plat::BTN_ACCEPT) || plat::pressed(plat::BTN_START);
             switch (scene) {
                 case SELECT: {
-                    if (plat::pressed(plat::BTN_RIGHT)) sel = (sel + 1) % LEVELS;
-                    if (plat::pressed(plat::BTN_LEFT)) sel = (sel + LEVELS - 1) % LEVELS;
+                    // Solo se puede elegir hasta la última época habilitada.
+                    const int open = std::max(1, std::min(LEVELS, st.v1Unlocked));
+                    if (sel >= open) sel = open - 1;
+                    if (plat::pressed(plat::BTN_RIGHT)) sel = (sel + 1) % open;
+                    if (plat::pressed(plat::BTN_LEFT)) sel = (sel + open - 1) % open;
                     const float s = std::min(LOGICAL_W / 1200.0f, LOGICAL_H / 900.0f), ox = (LOGICAL_W - 1200 * s) * 0.5f, oy = (LOGICAL_H - 900 * s) * 0.5f;
                     bool go = accept;
                     for (int i = 0; i < LEVELS; i++)
-                        if (g_tap.in(ox + EPOCH[i].x * s, oy + EPOCH[i].y * s, EPOCH[i].w * s, EPOCH[i].h * s)) { sel = i; go = true; }
+                        if (g_tap.in(ox + EPOCH[i].x * s, oy + EPOCH[i].y * s, EPOCH[i].w * s, EPOCH[i].h * s)) {
+                            if (i < open) { sel = i; go = true; }
+                        }
                     if (g_tap.in(10, LOGICAL_H - 70.0f, 200, 60) || plat::pressed(plat::BTN_BACK)) { quit = true; break; }
                     if (go) { level = sel; carry = Counters(); scene = level == 0 ? STORY : INTRO; storyPage = 1; playSfx("item.ogg"); }
                     break;
@@ -159,6 +164,7 @@ void run() {
                     world->update(STEP);
                     if (world->won()) {
                         carry = world->counters();
+                        if (level + 2 > st.v1Unlocked) { st.v1Unlocked = std::min(LEVELS, level + 2); st.save(); }
                         if (++level >= LEVELS) { scene = END_WIN; delete world; world = nullptr; plat::playMusic("assets/audio/music/andy.ogg"); }
                         else { scene = INTRO; delete world; world = nullptr; }
                     } else if (world->gameOver()) { scene = END_LOSE; delete world; world = nullptr; plat::stopMusic(); }
@@ -176,15 +182,20 @@ void run() {
             case SELECT: {
                 const SDL_FRect d = drawFull("assets/lang/images/seleccionar_nivel/fondo_seleccionar_nivel.jpg");
                 const float s = d.w / 1200.0f;
-                const SDL_FRect& r = EPOCH[sel];
-                const float t = plat::ticksMs() / 1000.0f;
-                const Uint8 a = (Uint8)(150 + 80 * std::sin(t * 4));
-                const SDL_FRect hr = { d.x + r.x * s - 6, d.y + r.y * s - 6, r.w * s + 12, r.h * s + 12 };
-                plat::fillRoundRect({ hr.x, hr.y, hr.w, 6 }, 3, { 255, 222, 60, a });
-                plat::fillRoundRect({ hr.x, hr.y + hr.h - 6, hr.w, 6 }, 3, { 255, 222, 60, a });
-                plat::fillRoundRect({ hr.x, hr.y, 6, hr.h }, 3, { 255, 222, 60, a });
-                plat::fillRoundRect({ hr.x + hr.w - 6, hr.y, 6, hr.h }, 3, { 255, 222, 60, a });
-                text(LEVEL_NAME[sel], LOGICAL_W * 0.5f, d.y + d.h - 70 * s, 0.9f, { 255, 222, 60, 255 });
+                // Épocas habilitadas: panel de color con su personaje (boton_*.png); las bloqueadas quedan
+                // como en el fondo (oscuras). La elegida usa el panel resaltado.
+                static const char* const BTN[LEVELS] = { "prehistoria", "egipto", "castillo", "piratas", "futuro" };
+                static const SDL_Rect CHAR[LEVELS] = { { 442, 18, 246, 522 }, { 442, 4, 230, 536 }, { 446, 4, 194, 616 }, { 442, 2, 252, 438 }, { 442, 8, 258, 392 } };
+                const int open = std::max(1, std::min(LEVELS, st.v1Unlocked));
+                for (int i = 0; i < open; i++) {
+                    plat::Image* b = img(std::string("assets/lang/images/seleccionar_nivel/boton_") + BTN[i] + ".png");
+                    if (!b) continue;
+                    const SDL_FRect r = { d.x + EPOCH[i].x * s, d.y + EPOCH[i].y * s, EPOCH[i].w * s, EPOCH[i].h * s };
+                    plat::drawImage(b, i == sel ? SDL_Rect{ 224, 4, 212, 534 } : SDL_Rect{ 4, 4, 212, 534 }, r);
+                    const SDL_Rect& c = CHAR[i];
+                    const float k = r.w / 212.0f, cw = c.w * k, ch = c.h * k;
+                    plat::drawImage(b, c, SDL_FRect{ r.x + r.w * 0.5f - cw * 0.5f, r.y + r.h - ch, cw, ch });
+                }
                 button("Volver", 110, LOGICAL_H - 40.0f, 190, 52, false);
                 break;
             }
