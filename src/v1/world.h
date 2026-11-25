@@ -109,6 +109,8 @@ private:
     bool fillerCell(int tx, int ty) const;
     void roomBounds();
     void centerSmallRoom();
+    void screenCamera(bool snap);
+    int screenX = -1, screenY = -1;   // pantalla (16x12 bloques) que muestra la cámara
     std::vector<Enemy> enemies;
     std::vector<Item> items;
     std::vector<Door> doors;

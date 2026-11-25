@@ -23,7 +23,7 @@ static const Field FIELDS[] = {
     { "music", &Settings::music, 0, 100 }, { "sfx", &Settings::sfx, 0, 100 },
     { "fullscreen", &Settings::fullscreen, 0, 1 }, { "smooth", &Settings::smooth, 0, 1 },
     { "sharpness", &Settings::sharpness, 0, 2 }, { "hd", &Settings::hd, 0, 1 },
-    { "tv", &Settings::tvEffect, 0, 1 }, { "camFixed", &Settings::camFixed, 0, 1 }, { "stretch", &Settings::stretch, 0, 1 },
+    { "tv", &Settings::tvEffect, 0, 1 }, { "camFixed", &Settings::camFixed, 0, 1 }, { "stretch", &Settings::stretch, 0, 1 }, { "viewNear", &Settings::viewNear, 0, 1 },
     { "fps120", &Settings::fps120, 0, 1 }, { "modernArt", &Settings::modernArt, 0, 1 },
     { "hdOff", &Settings::hdOff, 0, 255 }, { "stickType", &Settings::stickType, 0, 1 },
     { "touchStyle", &Settings::touchStyle, 0, 2 }, { "stickSize", &Settings::stickSize, 0, 3 },

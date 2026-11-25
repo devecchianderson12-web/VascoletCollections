@@ -13,6 +13,7 @@ struct Settings {
     // Gráficos
     int fullscreen = 0, smooth = 1, sharpness = 0, hd = 0, tvEffect = 0;
     int camFixed = 0, fps120 = 0, modernArt = 0;
+    int viewNear = 1;         // Vascolet 1: vista "Cerca" (16 bloques de ancho) u "Original" (12 de alto)
     int stretch = 1;          // estirar a pantalla completa las pantallas 4:3 (menús, historia)
     int hdOff = 0;            // bits de HdFx apagados
     // Progreso

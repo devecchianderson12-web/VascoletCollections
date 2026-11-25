@@ -23,12 +23,14 @@ const char* const LEVEL_NAME[LEVELS] = { "Prehistoria", "Egipto", "Castillo", "P
 // ---- Física del jugador (en píxeles del mapa: un bloque mide 76) ----
 // Valores medidos en el juego original (memoria del proceso): velocidad 250, salto -600, gravedad 1800,
 // caída máxima 1500, caja del jugador 50x90.
-const float RUN = 250, GRAVITY = 1800, MAX_FALL = 1500, CLIMB = 150, STOMP = -450;
-// Salto según los Vascolet tomados en el nivel (0-4) y doble salto según los Cereales (0 = no hay).
-// Es la tabla del motor del XA (mismo motor): el salto inicial medido en el original, -600, coincide.
+// Medido en una grabación del original a 60 fps (unidades del mapa, bloque = 76): corre a 250/s; con
+// 1 Vascolet sube 204 en 0,39 s (gravedad 2700, salto 1050) y el doble salto con 1 Cereal sube ~120 (810).
+// La tabla de salto es la del motor (600/700/790/810/850) en la escala de 800x600, x1,5.
+const float RUN = 250, GRAVITY = 2700, MAX_FALL = 2250, CLIMB = 150, STOMP = -675;
+const float ENEMY_GRAVITY = 1800, ENEMY_MAX_FALL = 1500;   // los enemigos usan las velocidades del mapa
 // Carteles del juego: "¡Cada Vascolet que tomes aumenta tu salto!" / "...aumenta tu salto doble!"
-const float JUMP_BY_VASCOLETS[5] = { -600, -700, -790, -810, -850 };
-const float DJUMP_BY_CEREALS[5] = { 0, -440, -680, -720, -760 };
+const float JUMP_BY_VASCOLETS[5] = { -900, -1050, -1185, -1215, -1275 };
+const float DJUMP_BY_CEREALS[5] = { 0, -810, -1020, -1080, -1140 };
 const int HUD_SLOTS = 4;   // vasos de Vascolet y bowls de cereales que muestra el HUD
 
 void playSfx(const char* file) { plat::playSound(plat::loadSound(std::string("assets/audio/fx/") + file)); }
@@ -171,6 +173,7 @@ void World::refitCamera() {
     roomBounds();
     cam.init(cam.levelW, cam.levelH, hero.cx(), hero.bottom());
     centerSmallRoom();
+    if (!g_cameraFixed) { screenCamera(true); return; }
     camX = cam.x; camY = cam.y; prevCamX = camX; prevCamY = camY;
 }
 
@@ -204,6 +207,29 @@ void World::roomBounds() {
     y0 = std::max(y0, boundY0); y1 = std::min(y1, boundY1);
     if (y1 <= y0) { y0 = boundY0; y1 = boundY1; }
     cam.minX = x0; cam.levelW = x1; cam.minY = y0; cam.levelH = y1;
+}
+
+// Cámara del original: el nivel está dividido en pantallas de 16x12 bloques y se ve la pantalla donde
+// está el jugador; al cruzar el borde, corte directo a la siguiente. Si la vista es más chica que la
+// pantalla (vista "Cerca"), dentro de la pantalla sigue al jugador; si es más grande, la centra.
+void World::screenCamera(bool snap) {
+    const float SW = 16.0f * map.tileW, SH = 12.0f * map.tileH;
+    const float hx = hero.cx(), hy = hero.box.y + hero.box.h * 0.5f;
+    const int sx = (int)std::floor(hx / SW), sy = (int)std::floor(hy / SH);
+    const bool cut = snap || sx != screenX || sy != screenY;
+    screenX = sx; screenY = sy;
+    auto axis = [](float cell0, float cellSize, float view, float focus, float cur, bool jump, float dt) {
+        if (view >= cellSize) return cell0 + (cellSize - view) * 0.5f;
+        const float target = std::max(cell0, std::min(cell0 + cellSize - view, focus - view * 0.5f));
+        if (jump) return target;
+        const float k = std::min(1.0f, dt * 8.0f);     // seguimiento suave dentro de la pantalla
+        return std::max(cell0, std::min(cell0 + cellSize - view, cur + (target - cur) * k));
+    };
+    const float dt = 1.0f / 60.0f;
+    camX = axis(sx * SW, SW, cam.w, hx, camX, cut, dt);
+    camY = axis(sy * SH, SH, cam.h, hy - cam.h * 0.08f, camY, cut, dt);
+    cam.x = camX; cam.y = camY;
+    if (cut) { prevCamX = camX; prevCamY = camY; }   // sin arrastre de interpolación en el corte
 }
 
 void World::centerSmallRoom() {
@@ -513,7 +539,7 @@ void World::updateEnemies(float dt) {
                     const float below = e.box.y + e.box.h + 4;
                     if (!solidAt(ahead, below) && !platformTop(ahead, below, e.box.y + e.box.h)) { turn = true; vx = 0; }
                 }
-                if (e.collidesV) e.vy = std::min(e.vy + GRAVITY * dt, MAX_FALL);
+                if (e.collidesV) e.vy = std::min(e.vy + ENEMY_GRAVITY * dt, ENEMY_MAX_FALL);
                 moveBox(e.box, vx, e.vy, dt, true, &g, &wall);
                 if (wall) turn = true;
                 if (turn) e.vx = -e.vx;
@@ -651,10 +677,12 @@ void World::update(float dt) {
     }
 
     if (hero.state != HS_DEAD) {
-        roomBounds();
-        cam.update(dt, hero.cx(), hero.bottom(), hero.left ? -1 : 1, hero.vy, hero.box.h);
-        centerSmallRoom();
-        camX = cam.x; camY = cam.y;
+        if (g_cameraFixed) {
+            roomBounds();
+            cam.update(dt, hero.cx(), hero.bottom(), hero.left ? -1 : 1, hero.vy, hero.box.h);
+            centerSmallRoom();
+            camX = cam.x; camY = cam.y;
+        } else screenCamera(false);
     }
 }
 
@@ -753,12 +781,12 @@ void World::drawHud() {
     const SDL_Color white = { 255, 255, 255, 255 };
     char b[32];
     // El HUD se midió sobre 800x600; la vista es de 900 de alto (como el original, 1200x900): se escala.
-    const float u = LOGICAL_H / 600.0f;
+    const float u = 912.0f / 600.0f;   // el HUD va en unidades del mundo, como en el original
     {
         SDL_Renderer* r = plat::renderer();
         SDL_SetRenderDrawBlendMode(r, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(r, 0, 0, 0, 128);
-        const SDL_FRect hb = { 0, 0, (float)LOGICAL_W, 92 * LOGICAL_H / 900.0f };
+        const SDL_FRect hb = { 0, 0, (float)LOGICAL_W, 92.0f };
         SDL_RenderFillRectF(r, &hb);
     }
     // Posiciones y tamaños medidos sobre el video del juego original (pantalla de 800x600).
@@ -785,7 +813,7 @@ void World::drawHud() {
 #endif
     // Franjas negras con texto blanco centrado, medidas en el video (vista de 900 de alto):
     // la de los carteles empieza en 152 y la de "Juego Salvado" en 257; cada renglón mide 30.
-    const float v = LOGICAL_H / 900.0f, lh = 30 * v, sc = lh / f.height(1.0f);
+    const float v = 1.0f, lh = 30 * v, sc = lh / f.height(1.0f);
     auto band = [&](const std::string& msg, float top) {
         std::vector<std::string> lines; std::string cur;
         for (char c : msg) { if (c == '\n') { lines.push_back(cur); cur.clear(); } else cur += c; }

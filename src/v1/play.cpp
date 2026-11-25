@@ -102,8 +102,17 @@ void run() {
     const int oldW = plat::SCREEN_W, oldH = plat::SCREEN_H;
     // Vista del original: 1200x900 unidades de mundo (un bloque de 76 = 1/12 del alto). En pantallas
     // anchas se ve más a los costados, con el mismo alto.
-    LOGICAL_H = 900;
-    LOGICAL_W = std::max(1200, (int)std::lround(900.0f * oldW / std::max(1, oldH)));
+    // "Original": se ve la pantalla entera del juego (12 bloques de alto). "Cerca": el ancho de la
+    // pantalla del original (en un celular se ve del tamaño de la PC, no todo lejos).
+    if (st.viewNear) {
+        // Exactamente el ancho de una pantalla del original (16 bloques): se ve igual de cerca que en
+        // la PC y la cámara pasa de pantalla en pantalla igual; a lo alto sigue al jugador.
+        LOGICAL_W = 1216;
+        LOGICAL_H = std::max(500, std::min(912, (int)std::lround(1216.0f * oldH / std::max(1, oldW))));
+    } else {
+        LOGICAL_H = 912;
+        LOGICAL_W = std::max(1216, (int)std::lround(912.0f * oldW / std::max(1, oldH)));
+    }
     plat::setLogicalSize(LOGICAL_W, LOGICAL_H);
     plat::setView43(false, LOGICAL_W);
     plat::setAssetPrefix("v1/");
