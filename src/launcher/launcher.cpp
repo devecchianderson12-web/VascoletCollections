@@ -17,7 +17,7 @@ namespace {
 const SDL_Color WHITE = { 255, 255, 255, 255 }, YELLOW = { 255, 222, 60, 255 };
 const float TXT = 0.56f;          // escala de la letra en botones y filas (la fuente mide 40 px)
 
-enum Page { HOME, OPTIONS, GRAPHICS, ADVANCED, CONTROLS, SOUND, MAPPING, GAME };
+enum Page { HOME, OPTIONS, GRAPHICS, ADVANCED, CONTROLS, SOUND, MAPPING, GAME, PAD };
 
 struct Row {
     std::string label;
@@ -139,6 +139,65 @@ void panel(float x, float y, float w, float h) {
 
 const char* onOff(int v) { return v ? "Sí" : "No"; }
 
+// ---- Página "Mando": acciones del juego y dibujo de un mando Xbox Series X|S ----
+const int PAD_ACTIONS = 7;
+const int PAD_ACTION_IDS[PAD_ACTIONS] = { plat::BIND_LEFT, plat::BIND_RIGHT, plat::BIND_UP, plat::BIND_DOWN, plat::BIND_JUMP, plat::BIND_BACK, plat::BIND_PAUSE };
+const char* const PAD_ACTION_NAMES[PAD_ACTIONS] = { "Izquierda", "Derecha", "Arriba", "Abajo", "Saltar", "Volver", "Pausa" };
+std::string padLabel(int b) {
+    switch (b) {
+        case -1: return "-";
+        case SDL_CONTROLLER_BUTTON_DPAD_LEFT: return "Cruz izq.";
+        case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: return "Cruz der.";
+        case SDL_CONTROLLER_BUTTON_DPAD_UP: return "Cruz arriba";
+        case SDL_CONTROLLER_BUTTON_DPAD_DOWN: return "Cruz abajo";
+        case SDL_CONTROLLER_BUTTON_BACK: return "View";
+        case SDL_CONTROLLER_BUTTON_START: return "Menú (Start)";
+        case SDL_CONTROLLER_BUTTON_GUIDE: return "Xbox";
+        default: return plat::padName(b);
+    }
+}
+
+void circle(float cx, float cy, float r, SDL_Color c) { plat::fillRoundRect({ cx - r, cy - r, r * 2, r * 2 }, r, c); }
+
+// Mando Xbox Series X|S dibujado con figuras (cuerpo, cruceta, palancas, A/B/X/Y, View/Menú, LB/RB).
+// El botón asignado a la acción elegida se marca en amarillo.
+void drawPadDiagram(float cx, float cy, float k, int hot) {
+    const SDL_Color body = { 236, 236, 240, 255 }, edge = { 40, 40, 46, 255 }, dark = { 58, 58, 66, 255 }, hl = { 255, 222, 60, 255 };
+    auto hotc = [&](int b, SDL_Color c) { return b == hot ? hl : c; };
+    // Gatillos y bumpers.
+    plat::fillRoundRect({ cx - 112 * k, cy - 70 * k, 64 * k, 22 * k }, 10 * k, hotc(SDL_CONTROLLER_BUTTON_LEFTSHOULDER, dark));
+    plat::fillRoundRect({ cx + 48 * k, cy - 70 * k, 64 * k, 22 * k }, 10 * k, hotc(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, dark));
+    // Cuerpo con empuñaduras.
+    circle(cx - 78 * k, cy + 30 * k, 50 * k, edge); circle(cx + 78 * k, cy + 30 * k, 50 * k, edge);
+    plat::fillRoundRect({ cx - 124 * k, cy - 56 * k, 248 * k, 98 * k }, 44 * k, edge);
+    circle(cx - 78 * k, cy + 30 * k, 46 * k, body); circle(cx + 78 * k, cy + 30 * k, 46 * k, body);
+    plat::fillRoundRect({ cx - 120 * k, cy - 52 * k, 240 * k, 90 * k }, 42 * k, body);
+    // Palanca izquierda (arriba a la izquierda) y derecha.
+    circle(cx - 70 * k, cy - 14 * k, 17 * k, edge); circle(cx - 70 * k, cy - 14 * k, 12 * k, hotc(SDL_CONTROLLER_BUTTON_LEFTSTICK, dark));
+    circle(cx + 32 * k, cy + 22 * k, 17 * k, edge); circle(cx + 32 * k, cy + 22 * k, 12 * k, hotc(SDL_CONTROLLER_BUTTON_RIGHTSTICK, dark));
+    // Cruceta.
+    const float dx = cx - 32 * k, dy = cy + 22 * k, a = 9 * k, l = 26 * k;
+    plat::fillRoundRect({ dx - a, dy - l, a * 2, l * 2 }, 3 * k, edge);
+    plat::fillRoundRect({ dx - l, dy - a, l * 2, a * 2 }, 3 * k, edge);
+    plat::fillRoundRect({ dx - a + 2 * k, dy - l + 2 * k, a * 2 - 4 * k, l - 4 * k }, 2 * k, hotc(SDL_CONTROLLER_BUTTON_DPAD_UP, dark));
+    plat::fillRoundRect({ dx - a + 2 * k, dy + 2 * k, a * 2 - 4 * k, l - 4 * k }, 2 * k, hotc(SDL_CONTROLLER_BUTTON_DPAD_DOWN, dark));
+    plat::fillRoundRect({ dx - l + 2 * k, dy - a + 2 * k, l - 4 * k, a * 2 - 4 * k }, 2 * k, hotc(SDL_CONTROLLER_BUTTON_DPAD_LEFT, dark));
+    plat::fillRoundRect({ dx + 2 * k, dy - a + 2 * k, l - 4 * k, a * 2 - 4 * k }, 2 * k, hotc(SDL_CONTROLLER_BUTTON_DPAD_RIGHT, dark));
+    // Botón Xbox, View y Menú.
+    circle(cx, cy - 34 * k, 10 * k, hotc(SDL_CONTROLLER_BUTTON_GUIDE, SDL_Color{ 90, 90, 98, 255 }));
+    circle(cx - 18 * k, cy - 10 * k, 6 * k, hotc(SDL_CONTROLLER_BUTTON_BACK, dark));
+    circle(cx + 18 * k, cy - 10 * k, 6 * k, hotc(SDL_CONTROLLER_BUTTON_START, dark));
+    // A, B, X, Y con sus colores.
+    struct Face { int b; float x, y; SDL_Color c; const char* t; };
+    const Face faces[4] = { { SDL_CONTROLLER_BUTTON_A, 70, 4, { 60, 170, 60, 255 }, "A" }, { SDL_CONTROLLER_BUTTON_B, 92, -18, { 210, 50, 50, 255 }, "B" },
+                            { SDL_CONTROLLER_BUTTON_X, 48, -18, { 50, 110, 220, 255 }, "X" }, { SDL_CONTROLLER_BUTTON_Y, 70, -40, { 230, 180, 30, 255 }, "Y" } };
+    for (const Face& f : faces) {
+        if (f.b == hot) circle(cx + f.x * k, cy + f.y * k, 15 * k, hl);
+        circle(cx + f.x * k, cy + f.y * k, 11 * k, f.c);
+        textC(f.t, cx + f.x * k, cy + f.y * k - font().height(0.3f * k) * 0.5f, 0.3f * k, WHITE);
+    }
+}
+
 }  // namespace
 
 // Arte del menú de "La Máquina del Tiempo" (la parte de 1200x900 de menu.jpg) ocupando el alto de la
@@ -185,6 +244,7 @@ public:
     void runOptions();   // solo las opciones (desde la pausa de un juego)
 private:
     Page page = HOME;
+    int capturing = -1;   // acción del mando esperando un botón (página Mando)
     int sel = 0, gameSel = 0;
     Page back = HOME;
     std::vector<Row> rows;
@@ -214,6 +274,7 @@ const char* Launcher::pageTitle(Page p) {
         case GRAPHICS: return "Gráficos";
         case ADVANCED: return "Avanzado";
         case CONTROLS: return "Controles";
+        case PAD: return "Mando";
         case SOUND: return "Sonido";
         default: return "";
     }
@@ -276,7 +337,23 @@ void Launcher::buildRows() {
             rows.push_back({ "Opacidad", [] { return settings().touchAlpha ? std::to_string(settings().touchAlpha) + "%" : std::string("No"); },
                              [](int d) { int& a = settings().touchAlpha; a = ((a / 25) + 5 + d) % 5 * 25; } });
             rows.push_back({ "Mapeo de botones", nullptr, [this](int) { go(MAPPING); } });
+            rows.push_back({ "Mando", nullptr, [this](int) { go(PAD); } });
             break;
+        case PAD: {
+            // Botones del mando (Xbox Series X|S u otro): elegir una acción y apretar el botón nuevo;
+            // con izquierda se borra (ese botón deja de hacer algo).
+            back = CONTROLS;
+            for (int i = 0; i < PAD_ACTIONS; i++) {
+                const int a = PAD_ACTION_IDS[i];
+                rows.push_back({ PAD_ACTION_NAMES[i], [this, a] { return capturing == a ? std::string("...") : padLabel(plat::binding(a).pad); },
+                                 [this, a](int d) {
+                                     if (d < 0) { plat::clearPadBinding(a); plat::saveBindings(); }
+                                     else { capturing = a; plat::beginCapture(); }
+                                 } });
+            }
+            rows.push_back({ "Restablecer", [] { return std::string(""); }, [](int) { plat::resetBindings(); plat::saveBindings(); } });
+            break;
+        }
         case SOUND: {
             back = OPTIONS;
             auto vol = [](int Settings::* f) { return [f](int d) { int& v = settings().*f; v = (v + 110 + d * 10) % 110; }; };
@@ -325,10 +402,20 @@ void Launcher::drawHome() {
 // Alto de cada fila: 29, o menos si la lista no entra (siempre se ve el botón "Volver").
 float rowH(int n) { return std::min(29.0f, (H() - 112.0f) / std::max(1, n)); }
 float listW() { return std::min(470.0f, W() - 40); }
-float listX() { return (W() - listW()) * 0.5f; }
+float g_listShift = 0;   // la página del mando corre la lista a la izquierda
+float listX() { return (W() - listW()) * 0.5f - g_listShift; }
 float listY0(int n) { return std::max(58.0f, (H() - (n * rowH(n) + 70)) * 0.5f + 20); }
 
 void Launcher::updateList() {
+    if (capturing >= 0) {
+        // Esperando un botón del mando: el primero que se apriete queda asignado (Escape cancela).
+        plat::Binding b{ -1, -1 };
+        const int r = plat::captureResult(&b);
+        if (r == 1 && b.pad >= 0) { plat::setBinding(capturing, plat::Binding{ -1, b.pad }); plat::saveBindings(); capturing = -1; click(); }
+        else if (r == 1) plat::beginCapture();   // tecla del teclado: se sigue esperando el mando
+        else if (r < 0) capturing = -1;
+        return;
+    }
     const int n = (int)rows.size();             // la fila n es "Volver"
     const float RH = rowH(n);
     if (plat::pressed(plat::BTN_DOWN)) { sel = (sel + 1) % (n + 1); click(); }
@@ -358,6 +445,13 @@ void Launcher::updateList() {
 
 void Launcher::drawList() {
     optionsBackdrop();
+    g_listShift = page == PAD && W() > 560 ? std::min(130.0f, W() * 0.18f) : 0;
+    if (page == PAD) {
+        const int a = sel < PAD_ACTIONS ? PAD_ACTION_IDS[sel] : -1;
+        const float k = std::min(1.1f, (W() - (listX() + listW()) - 40) / 260.0f);
+        if (k > 0.45f) drawPadDiagram(listX() + listW() + 30 + 130 * k, H() * 0.5f, k, a >= 0 ? plat::binding(a).pad : -2);
+        textC(plat::padConnected() ? "Mando conectado" : "Conectá un mando", listX() + listW() + 30 + 130 * std::max(0.45f, k), H() * 0.5f + 92 * std::max(0.45f, k), 0.36f, plat::padConnected() ? YELLOW : WHITE);
+    }
     const int n = (int)rows.size();
     const float RH = rowH(n);
     const float x = listX(), w = listW(), y0 = listY0(n);
@@ -378,6 +472,13 @@ void Launcher::drawList() {
     }
     const float by = y0 + n * RH + 30;
     button("Volver", W() * 0.5f, by, 160, 36, sel == n, g_ptr.pressIn(W() * 0.5f - 80, by - 18, 160, 36));
+    if (page == PAD) {
+        if (capturing >= 0) {
+            plat::dimScreen(0.6f);
+            textC("Apretá el botón del mando para esta acción", W() * 0.5f, H() * 0.5f - 20, 0.5f, YELLOW);
+            textC("(Escape para cancelar)", W() * 0.5f, H() * 0.5f + 10, 0.36f, WHITE);
+        } else textC("A: cambiar   Izquierda: borrar", W() * 0.5f, H() - 14, 0.3f, WHITE);
+    }
 }
 
 // ---------------- Mapeo de botones táctiles ----------------

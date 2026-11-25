@@ -2252,13 +2252,14 @@ static const Binding DEFAULT_BINDS[BIND_COUNT] = {
     { SDL_SCANCODE_UP,    SDL_CONTROLLER_BUTTON_DPAD_UP,    SDL_SCANCODE_W },
     { SDL_SCANCODE_DOWN,  SDL_CONTROLLER_BUTTON_DPAD_DOWN,  SDL_SCANCODE_S },
     { SDL_SCANCODE_Z,     SDL_CONTROLLER_BUTTON_A,          -1 },
-    { SDL_SCANCODE_X,     SDL_CONTROLLER_BUTTON_X,          -1 },
+    { SDL_SCANCODE_X,     -1,                               -1 },
     { SDL_SCANCODE_RETURN, SDL_CONTROLLER_BUTTON_START,     -1 },
+    { -1,                 SDL_CONTROLLER_BUTTON_B,          -1 },
 };
 static Binding g_bind[BIND_COUNT] = {
-    DEFAULT_BINDS[0], DEFAULT_BINDS[1], DEFAULT_BINDS[2], DEFAULT_BINDS[3], DEFAULT_BINDS[4], DEFAULT_BINDS[5], DEFAULT_BINDS[6],
+    DEFAULT_BINDS[0], DEFAULT_BINDS[1], DEFAULT_BINDS[2], DEFAULT_BINDS[3], DEFAULT_BINDS[4], DEFAULT_BINDS[5], DEFAULT_BINDS[6], DEFAULT_BINDS[7],
 };
-static const char* BIND_IDS[BIND_COUNT] = { "left", "right", "up", "down", "jump", "shoot", "pause" };
+static const char* BIND_IDS[BIND_COUNT] = { "left", "right", "up", "down", "jump", "shoot", "pause", "back" };
 
 static std::string controlsPath();
 const Binding& binding(int a) { return g_bind[std::max(0, std::min(a, BIND_COUNT - 1))]; }
@@ -2274,6 +2275,8 @@ void setBinding(int a, Binding b) {
     if (b.pad >= 0) g_bind[a].pad = b.pad;
 }
 void resetBindings() { for (int i = 0; i < BIND_COUNT; i++) g_bind[i] = DEFAULT_BINDS[i]; }
+void clearPadBinding(int a) { if (a >= 0 && a < BIND_COUNT) g_bind[a].pad = -1; }
+bool padConnected() { for (auto* p : g_pads) if (isFullPad(p)) return true; return false; }
 static bool isDefault(int a) { return g_bind[a].key == DEFAULT_BINDS[a].key && g_bind[a].key2 == DEFAULT_BINDS[a].key2 && g_bind[a].pad == DEFAULT_BINDS[a].pad; }
 
 bool saveBindings() {
@@ -2458,25 +2461,25 @@ void inputPoll() {
         int ay = SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_LEFTY);
         const int dz = 16000;
         auto Pb = [&](int a) { int bt = g_bind[a].pad; return bt >= 0 && b((SDL_GameControllerButton)bt); };
-        g_cur[BTN_LEFT]   |= Pb(BIND_LEFT) || ax < -dz;
-        g_cur[BTN_RIGHT]  |= Pb(BIND_RIGHT) || ax > dz;
-        g_cur[BTN_UP]     |= Pb(BIND_UP) || ay < -dz;
-        g_cur[BTN_DOWN]   |= Pb(BIND_DOWN) || ay > dz;
-        if (g_remoteMode) {
-            g_cur[BTN_LEFT] |= b(SDL_CONTROLLER_BUTTON_DPAD_LEFT); g_cur[BTN_RIGHT] |= b(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-            g_cur[BTN_UP] |= b(SDL_CONTROLLER_BUTTON_DPAD_UP); g_cur[BTN_DOWN] |= b(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+        if (g_remoteMode) {   // control remoto de Android TV: como antes
+            g_cur[BTN_LEFT] |= b(SDL_CONTROLLER_BUTTON_DPAD_LEFT) || ax < -dz; g_cur[BTN_RIGHT] |= b(SDL_CONTROLLER_BUTTON_DPAD_RIGHT) || ax > dz;
+            g_cur[BTN_UP] |= b(SDL_CONTROLLER_BUTTON_DPAD_UP) || ay < -dz; g_cur[BTN_DOWN] |= b(SDL_CONTROLLER_BUTTON_DPAD_DOWN) || ay > dz;
             g_cur[BTN_SHOOT] |= b(SDL_CONTROLLER_BUTTON_A);
-        } else {
-            g_cur[BTN_JUMP]  |= Pb(BIND_JUMP);
-            g_cur[BTN_SHOOT] |= Pb(BIND_SHOOT) || (isDefault(BIND_SHOOT) && b(SDL_CONTROLLER_BUTTON_B));
+            g_cur[BTN_ACCEPT] |= b(SDL_CONTROLLER_BUTTON_A);
+            g_cur[BTN_BACK] |= b(SDL_CONTROLLER_BUTTON_B) || b(SDL_CONTROLLER_BUTTON_BACK);
+            g_cur[BTN_START] |= b(SDL_CONTROLLER_BUTTON_START);
+            continue;
         }
-        g_cur[BTN_DEFEND] |= b(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
-        g_cur[BTN_ACCEPT] |= b(SDL_CONTROLLER_BUTTON_A) || Pb(BIND_JUMP);
-        g_cur[BTN_BACK]   |= b(SDL_CONTROLLER_BUTTON_Y) || b(SDL_CONTROLLER_BUTTON_B) || (!g_remoteMode && Pb(BIND_SHOOT));
-        g_cur[BTN_BACK]   |= b(SDL_CONTROLLER_BUTTON_BACK);
-        g_cur[BTN_START]  |= Pb(BIND_PAUSE) || b(SDL_CONTROLLER_BUTTON_BACK);
-        g_cur[BTN_CHEAT]  |= SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 8000
-                          && SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 8000;
+        // Mando: solo lo que está mapeado (por defecto cruceta, A saltar, B volver, Start pausa).
+        g_cur[BTN_LEFT]   |= Pb(BIND_LEFT);
+        g_cur[BTN_RIGHT]  |= Pb(BIND_RIGHT);
+        g_cur[BTN_UP]     |= Pb(BIND_UP);
+        g_cur[BTN_DOWN]   |= Pb(BIND_DOWN);
+        g_cur[BTN_JUMP]   |= Pb(BIND_JUMP);
+        g_cur[BTN_SHOOT]  |= Pb(BIND_SHOOT);
+        g_cur[BTN_ACCEPT] |= Pb(BIND_JUMP);
+        g_cur[BTN_BACK]   |= Pb(BIND_BACK);
+        g_cur[BTN_START]  |= Pb(BIND_PAUSE);
     }
     if (g_capture == 1 || g_waitRelease) {
         bool any = false;

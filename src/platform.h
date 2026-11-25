@@ -147,11 +147,13 @@ bool anyPressed();
 bool quitRequested();
 bool remoteControls();
 
-enum BindAction { BIND_LEFT, BIND_RIGHT, BIND_UP, BIND_DOWN, BIND_JUMP, BIND_SHOOT, BIND_PAUSE, BIND_COUNT };
+enum BindAction { BIND_LEFT, BIND_RIGHT, BIND_UP, BIND_DOWN, BIND_JUMP, BIND_SHOOT, BIND_PAUSE, BIND_BACK, BIND_COUNT };
 struct Binding { int key; int pad; int key2 = -1; };
 const Binding& binding(int action);
 void setBinding(int action, Binding b);
 void resetBindings();
+void clearPadBinding(int action);      // el botón del mando de esa acción no hace nada
+bool padConnected();                   // hay un mando (Xbox, Bluetooth, etc.) conectado
 bool saveBindings();
 void loadBindings();
 std::string keyName(int scancode);
