@@ -620,7 +620,8 @@ void World::updateEnemies(float dt) {
             case EK_BIRD: {
                 e.t += dt;
                 const float ph = std::fmod(e.t / e.duration, 2.0f), k = ph < 1 ? ph : 2 - ph;
-                const float nx = e.x0 + e.dx * (0.5f - 0.5f * std::cos(k * 3.14159265f));
+                // EnemyBird (tween 0x44bc70): cada tramo arranca rápido y frena, sin(t·π/2).
+                const float nx = ph < 1 ? e.x0 + e.dx * std::sin(ph * 1.5707963f) : e.x0 + e.dx * (1.0f - std::sin((ph - 1) * 1.5707963f));
                 e.left = (nx < e.box.x);
                 e.box.x = nx;
                 e.box.y = e.y0 + std::sin(e.t * 3.0f) * e.dy;
@@ -667,7 +668,8 @@ void World::updateEnemies(float dt) {
                 }
                 e.t += dt;
                 const float k = std::min(1.0f, e.t / e.duration);
-                e.box.y = e.y0 + e.dy * std::sin(k * 3.14159265f);
+                // EnemyLava (tween 0x44bc40): sube con curva 1-(1-t)^3 y baja en espejo.
+                { const float u = 1.0f - (k < 0.5f ? 2 * k : 2 - 2 * k); e.box.y = e.y0 + e.dy * (1.0f - u * u * u); }
                 if (e.up && k > 0.5f) { e.up = false; e.anim.play(EA(e.animName + "_DOWN"), true); }
                 if (k >= 1) {
                     e.timer = frand(e.minT, e.maxT);
