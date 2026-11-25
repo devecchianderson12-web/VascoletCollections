@@ -2,6 +2,7 @@
 #include "font.h"
 #include "settings.h"
 #include "../v1/game.h"
+#include "../v2/game.h"
 #include "../platform.h"
 #include <algorithm>
 #include <cmath>
@@ -17,7 +18,7 @@ namespace {
 const SDL_Color WHITE = { 255, 255, 255, 255 }, YELLOW = { 255, 222, 60, 255 };
 const float TXT = 0.56f;          // escala de la letra en botones y filas (la fuente mide 40 px)
 
-enum Page { HOME, OPTIONS, GRAPHICS, ADVANCED, CONTROLS, SOUND, MAPPING, GAME, PAD };
+enum Page { HOME, OPTIONS, GRAPHICS, ADVANCED, CONTROLS, SOUND, MAPPING, PAD };
 
 struct Row {
     std::string label;
@@ -140,9 +141,9 @@ void panel(float x, float y, float w, float h) {
 const char* onOff(int v) { return v ? "Sí" : "No"; }
 
 // ---- Página "Mando": acciones del juego y dibujo de un mando Xbox Series X|S ----
-const int PAD_ACTIONS = 7;
-const int PAD_ACTION_IDS[PAD_ACTIONS] = { plat::BIND_LEFT, plat::BIND_RIGHT, plat::BIND_UP, plat::BIND_DOWN, plat::BIND_JUMP, plat::BIND_BACK, plat::BIND_PAUSE };
-const char* const PAD_ACTION_NAMES[PAD_ACTIONS] = { "Izquierda", "Derecha", "Arriba", "Abajo", "Saltar", "Volver", "Pausa" };
+const int PAD_ACTIONS = 8;
+const int PAD_ACTION_IDS[PAD_ACTIONS] = { plat::BIND_LEFT, plat::BIND_RIGHT, plat::BIND_UP, plat::BIND_DOWN, plat::BIND_JUMP, plat::BIND_SHOOT, plat::BIND_BACK, plat::BIND_PAUSE };
+const char* const PAD_ACTION_NAMES[PAD_ACTIONS] = { "Izquierda", "Derecha", "Arriba", "Abajo", "Saltar", "Disparar", "Volver", "Pausa" };
 std::string padLabel(int b) {
     switch (b) {
         case -1: return "-";
@@ -245,11 +246,11 @@ public:
 private:
     Page page = HOME;
     int capturing = -1;   // acción del mando esperando un botón (página Mando)
-    int sel = 0, gameSel = 0;
+    int sel = 0;
     Page back = HOME;
     std::vector<Row> rows;
     bool quit = false;
-    bool startV1 = false;   // se arranca fuera de update(), en el bucle principal
+    bool startV1 = false, startV2 = false;   // se arrancan fuera de update(), en el bucle principal
     bool hasNext = false; Page nextPage = HOME; int nextSel = 0;
 
     void go(Page p, int s = 0) { hasNext = true; nextPage = p; nextSel = s; }
@@ -260,7 +261,6 @@ private:
     void updateHome(); void drawHome();
     void updateList(); void drawList();
     void updateMapping(); void drawMapping();
-    void updateGame(); void drawGame();
     static const char* pageTitle(Page p);
     // Botones del inicio (a la derecha del emblema).
     float homeBtnW() const { return std::min(230.0f, W() * 0.3f); }
@@ -382,7 +382,7 @@ void Launcher::updateHome() {
     if (act) {
         click();
         if (sel == 0) startV1 = true;
-        else if (sel == 1) { gameSel = sel; go(GAME); }
+        else if (sel == 1) startV2 = true;
         else if (sel == 2) go(OPTIONS);
         else quit = true;
     }
@@ -499,33 +499,12 @@ void Launcher::drawMapping() {
     button("Listo", W() * 0.5f + 85, cy, 150, 40, true);
 }
 
-// ---------------- Juego (en desarrollo) ----------------
-void Launcher::updateGame() {
-    const float by = H() - 46;
-    if (plat::pressed(plat::BTN_ACCEPT) || plat::pressed(plat::BTN_BACK) || g_ptr.tapIn(W() * 0.5f - 80, by - 20, 160, 40)) { click(); go(HOME, gameSel); }
-}
-
-void Launcher::drawGame() {
-    rays(W() * 0.5f, H() * 0.4f, 0.2f);
-    textC(gameSel == 0 ? "Vascolet 1" : "Vascolet 2", W() * 0.5f, 18, 0.9f, YELLOW);
-    const float pw = std::min(440.0f, W() - 60), px = (W() - pw) * 0.5f;
-    panel(px, 70, pw, 220);
-    plat::Image* c = gameSel == 0 ? img("v1/assets/images/menuelements/menu.jpg") : img("v2/assets/gui/menu/background.jpg");
-    const SDL_Rect src = gameSel == 0 ? SDL_Rect{ 0, 0, 1200, 900 } : SDL_Rect{ 0, 0, 512, 384 };
-    if (c) plat::drawImage(c, src, SDL_FRect{ W() * 0.5f - 88, 88, 176, 132 });
-    textC("Este juego se está adaptando a Android.", W() * 0.5f, 232, 0.5f, WHITE);
-    textC("Va a estar en una próxima versión.", W() * 0.5f, 256, 0.44f, YELLOW);
-    const float by = H() - 46;
-    button("Volver", W() * 0.5f, by, 160, 40, true, g_ptr.pressIn(W() * 0.5f - 80, by - 20, 160, 40));
-}
-
 // ---------------- Bucle ----------------
 void Launcher::update() {
     g_ptr.poll();
     switch (page) {
         case HOME: updateHome(); break;
         case MAPPING: updateMapping(); break;
-        case GAME: updateGame(); break;
         default: updateList(); break;
     }
     if (hasNext) switchPage();
@@ -536,7 +515,6 @@ void Launcher::draw() {
     switch (page) {
         case HOME: drawHome(); break;
         case MAPPING: drawMapping(); break;
-        case GAME: drawGame(); break;
         default: drawList(); break;
     }
 }
@@ -553,6 +531,15 @@ void Launcher::run() {
         const uint32_t now = plat::ticksMs();
         acc = std::min(0.25f, acc + (now - last) / 1000.0f); last = now;
         while (acc >= STEP && !quit) { acc -= STEP; plat::inputPoll(); update(); }
+        if (startV2) {
+            startV2 = false;
+            plat::stopMusic();
+            v2::run();
+            plat::setTouchOverlay(false);
+            plat::playMusic("v1/assets/audio/music/andy.ogg");
+            acc = 0; last = plat::ticksMs();
+            continue;
+        }
         if (startV1) {
             startV1 = false;
             plat::stopMusic();

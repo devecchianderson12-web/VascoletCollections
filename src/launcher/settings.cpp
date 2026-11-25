@@ -29,6 +29,8 @@ static const Field FIELDS[] = {
     { "touchStyle", &Settings::touchStyle, 0, 2 }, { "stickSize", &Settings::stickSize, 0, 3 },
     { "touchColor", &Settings::stickTheme, 0, 4 }, { "touchAlpha", &Settings::touchAlpha, 0, 100 },
     { "v1Unlocked", &Settings::v1Unlocked, 1, 5 },
+    { "v2Unlocked", &Settings::v2Unlocked, 1, 5 }, { "v2Lives", &Settings::v2Lives, 1, 99 },
+    { "v2Coins", &Settings::v2Coins, 0, 9999 }, { "v2Level", &Settings::v2Level, 0, 5 },
 };
 
 void Settings::load() {
@@ -47,6 +49,10 @@ void Settings::load() {
             std::istringstream vs(v);
             for (auto& p : touchPos) { unsigned u = 0xFFFF; if (vs >> u) p = (uint16_t)std::min(u, 0xFFFFu); }
         }
+        if (k == "v2Pct") {
+            std::istringstream vs(v);
+            for (auto& c : v2Pct) { int n = 0; if (vs >> n) c = std::max(0, std::min(100, n)); }
+        }
         if (k == "v1Coins") {
             std::istringstream vs(v);
             for (auto& c : v1Coins) { int n = 0; if (vs >> n) c = std::max(0, std::min(100, n)); }
@@ -61,6 +67,8 @@ void Settings::save() const {
     for (int i = 0; i < 10; i++) out += (i ? " " : "") + std::to_string(touchPos[i]);
     out += "\nv1Coins=";
     for (int i = 0; i < 5; i++) out += (i ? " " : "") + std::to_string(v1Coins[i]);
+    out += "\nv2Pct=";
+    for (int i = 0; i < 5; i++) out += (i ? " " : "") + std::to_string(v2Pct[i]);
     out += "\n";
     plat::saveWrite(std::vector<uint8_t>(out.begin(), out.end()));
     plat::flushSave();

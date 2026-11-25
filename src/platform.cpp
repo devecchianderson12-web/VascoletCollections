@@ -1809,7 +1809,7 @@ static SDL_Texture* touchSprite(int i) {
 // ---- Gráficos de los controles: un juego por estilo, recoloreado de verdad según el color elegido ----
 // No es un filtro: el rojo de los botones (y la perilla azul) pasa al tono del color elegido y el
 // resto (bordes negros, aros dorados, íconos blancos) se conserva; con "Blanco" los íconos pasan a oscuros.
-enum { TA_BACK, TA_PAUSE, TA_JUMP, TA_BASE, TA_KNOB, TA_COUNT };
+enum { TA_BACK, TA_PAUSE, TA_JUMP, TA_BASE, TA_KNOB, TA_SHOOT, TA_COUNT };
 static SDL_Texture* g_art[3][5][TA_COUNT];
 static bool g_artTried[3][5][TA_COUNT];
 static void recolor(SDL_Surface* s, int theme, bool knob) {
@@ -1848,7 +1848,7 @@ static SDL_Texture* artTexture(int part) {
     if (g_artTried[st][th][part]) return g_art[st][th][part];
     g_artTried[st][th][part] = true;
     static const char* STYLE[3] = { "brillante", "plano", "aro" };
-    static const char* PART[TA_COUNT] = { "back", "pause", "jump", "base", "knob" };
+    static const char* PART[TA_COUNT] = { "back", "pause", "jump", "base", "knob", "shoot" };   // shoot: ícono provisorio (boomerang de Vascolet 2)
     auto data = assetRead(std::string("data/ui/touch_") + STYLE[st] + "_" + PART[part] + ".png");
     SDL_Surface* raw = data.empty() ? nullptr : IMG_Load_RW(SDL_RWFromConstMem(data.data(), (int)data.size()), 1);
     if (!raw) return nullptr;
@@ -1969,8 +1969,8 @@ static void drawTouchOverlay() {
     // Gráficos del estilo elegido, recoloreados con el color elegido. Se respetan tamaño, mapeo y opacidad.
     if (artTexture(TA_BASE) && artTexture(TA_KNOB) && artTexture(TA_JUMP) && artTexture(TA_PAUSE) && artTexture(TA_BACK)) {
         auto art = [&](int s, float cx, float cy, float size, bool down) {
-            if (s == TS_SHOOT) { spriteAt(s, cx, cy, size, 0, down ? HOT : AS(235)); return; }
-            SDL_Texture* t = artTexture(s == TS_BASE ? TA_BASE : s == TS_KNOB ? TA_KNOB : s == TS_TRI ? TA_JUMP : s == TS_PAUSE ? TA_PAUSE : TA_BACK);
+            if (s == TS_SHOOT && !artTexture(TA_SHOOT)) { spriteAt(s, cx, cy, size, 0, down ? HOT : AS(235)); return; }
+            SDL_Texture* t = artTexture(s == TS_BASE ? TA_BASE : s == TS_KNOB ? TA_KNOB : s == TS_TRI ? TA_JUMP : s == TS_PAUSE ? TA_PAUSE : s == TS_SHOOT ? TA_SHOOT : TA_BACK);
             const float sz = size * (down ? 0.92f : 1.0f);
             const float push = down ? sz * 0.04f : 0.0f;
             const SDL_FRect d = { cx - sz * 0.5f, cy - sz * 0.5f + push, sz, sz };
@@ -1991,7 +1991,7 @@ static void drawTouchOverlay() {
         }
         art(TS_KNOB, kx, ky, j.r * 0.95f, g_stickActive);
         art(TS_TRI, b[TB_JUMP].x, b[TB_JUMP].y, b[TB_JUMP].r * 2.4f, pressedVis(TB_JUMP));
-        if (g_touchShoot) art(TS_SHOOT, b[TB_SHOOT].x, b[TB_SHOOT].y, b[TB_SHOOT].r * 2.0f, pressedVis(TB_SHOOT));
+        if (g_touchShoot) art(TS_SHOOT, b[TB_SHOOT].x, b[TB_SHOOT].y, b[TB_SHOOT].r * 2.4f, pressedVis(TB_SHOOT));
         art(TS_PAUSE, b[TB_PAUSE].x, b[TB_PAUSE].y, b[TB_PAUSE].r * 2.5f, pressedVis(TB_PAUSE));
         art(TS_BACK, b[TB_BACK].x, b[TB_BACK].y, b[TB_BACK].r * 2.5f, pressedVis(TB_BACK));
         return;
@@ -2252,7 +2252,7 @@ static const Binding DEFAULT_BINDS[BIND_COUNT] = {
     { SDL_SCANCODE_UP,    SDL_CONTROLLER_BUTTON_DPAD_UP,    SDL_SCANCODE_W },
     { SDL_SCANCODE_DOWN,  SDL_CONTROLLER_BUTTON_DPAD_DOWN,  SDL_SCANCODE_S },
     { SDL_SCANCODE_Z,     SDL_CONTROLLER_BUTTON_A,          -1 },
-    { SDL_SCANCODE_X,     -1,                               -1 },
+    { SDL_SCANCODE_X,     SDL_CONTROLLER_BUTTON_X,          -1 },   // disparar (boomerang de Vascolet 2)
     { SDL_SCANCODE_RETURN, SDL_CONTROLLER_BUTTON_START,     -1 },
     { -1,                 SDL_CONTROLLER_BUTTON_B,          -1 },
 };
@@ -2470,7 +2470,7 @@ void inputPoll() {
             g_cur[BTN_START] |= b(SDL_CONTROLLER_BUTTON_START);
             continue;
         }
-        // Mando: solo lo que está mapeado (por defecto cruceta, A saltar, B volver, Start pausa).
+        // Mando: solo lo que está mapeado (por defecto cruceta, A saltar, X disparar, B volver, Start pausa).
         g_cur[BTN_LEFT]   |= Pb(BIND_LEFT);
         g_cur[BTN_RIGHT]  |= Pb(BIND_RIGHT);
         g_cur[BTN_UP]     |= Pb(BIND_UP);

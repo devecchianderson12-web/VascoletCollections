@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
     plat::setLogicalWidth(plat::wideLogicalWidth(vc::WIDE_W, vc::BASE_H));
 #endif
     plat::audioInit();
-    plat::setTouchShoot(false);   // ningún juego de la colección usa el botón de disparo
+    plat::setTouchShoot(false);   // solo Vascolet 2 muestra el botón de disparo (boomerang)
     vc::runLauncher();
     SDL_Quit();
     return 0;

@@ -18,6 +18,9 @@ struct Settings {
     // Progreso
     int v1Unlocked = 1;       // Vascolet 1: épocas habilitadas (se habilita la siguiente al pasar una)
     int v1Coins[5] = {};      // Vascolet 1: mejores monedas juntadas en cada época (de 100)
+    int v2Unlocked = 1;       // Vascolet 2: capítulos habilitados
+    int v2Pct[5] = {};        // Vascolet 2: mejor porcentaje de monedas de cada capítulo
+    int v2Lives = 5, v2Coins = 0, v2Level = 0;   // Vascolet 2: partida guardada (capítulo en curso)
     // Controles táctiles
     int stickType = 0, touchStyle = 0, stickSize = 1, stickTheme = 0, touchAlpha = 100;
     uint16_t touchPos[10] = { 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF };
