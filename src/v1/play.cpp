@@ -21,6 +21,8 @@ const SDL_Rect FULL = { 0, 0, 1200, 900 };
 const char* const INTRO_IMG[LEVELS] = { "intro_prehistoria", "intro_egipto", "intro_castillo", "intro_pirata", "intro_futuro" };
 
 enum Scene { SELECT, STORY, INTRO, PLAY, END_WIN, END_LOSE };
+// Botones del cartel de pausa (alto 548, centrado): Jugar, Opciones, Salir.
+const float PAUSE_BTN_Y[3] = { 62, 118, 174 };
 
 struct Tap {
     bool down = false, was = false, tapped = false; float sx = 0, sy = 0, tx = 0, ty = 0, move = 0;
@@ -144,7 +146,7 @@ void run() {
                         if (plat::pressed(plat::BTN_UP)) pauseSel = (pauseSel + 2) % 3;
                         const float cx = LOGICAL_W * 0.5f, cy = LOGICAL_H * 0.5f;
                         bool act = plat::pressed(plat::BTN_ACCEPT);
-                        for (int i = 0; i < 3; i++) if (g_tap.in(cx - 140, cy - 100 + i * 80.0f, 280, 60)) { pauseSel = i; act = true; }
+                        for (int i = 0; i < 3; i++) if (g_tap.in(cx - 110, cy + PAUSE_BTN_Y[i] - 30, 220, 60)) { pauseSel = i; act = true; }
                         if (plat::pressed(plat::BTN_START) && !plat::pressed(plat::BTN_ACCEPT)) { pauseSel = 0; act = true; }
                         if (act && pauseSel == 1) {
                             plat::setLogicalSize(oldW, oldH);
@@ -204,12 +206,17 @@ void run() {
             case PLAY:
                 if (world) { world->setInterp(plat::highFps() && !paused ? acc / STEP : 1.0f); world->draw(); }
                 if (paused) {
-                    plat::dimScreen(0.55f);
                     const float cx = LOGICAL_W * 0.5f, cy = LOGICAL_H * 0.5f;
-                    text("Pausa", cx, cy - 170, 1.2f, { 255, 222, 60, 255 });
-                    button("Continuar", cx, cy - 70, 280, 56, pauseSel == 0);
-                    button("Opciones", cx, cy + 10, 280, 56, pauseSel == 1);
-                    button("Salir", cx, cy + 90, 280, 56, pauseSel == 2);
+                    // Cartel de pausa del original (emblema + "Pausa") con sus botones rojos.
+                    const ImageMap* pd = imageMap("PAUSE_DIALOG", "AssetsGeneral");
+                    const ImageMap* mb = imageMap("MENU_BUTTON", "AssetsGeneral");
+                    if (pd && !pd->frames.empty()) drawFrame(pd->frames[0], cx, cy);
+                    static const char* const LBL[3] = { "Jugar", "Opciones", "Salir" };
+                    for (int i = 0; i < 3; i++) {
+                        const float by = cy + PAUSE_BTN_Y[i];
+                        if (mb && mb->frames.size() >= 2) drawFrameScaled(mb->frames[pauseSel == i ? 1 : 0], cx, by, 0.85f);
+                        text(LBL[i], cx, by - vc::uiFont().height(0.62f) * 0.5f, 0.62f);
+                    }
                 }
                 break;
             case END_WIN: drawFull("assets/lang/images/intros/fin.jpg"); break;

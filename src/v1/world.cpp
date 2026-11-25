@@ -23,7 +23,12 @@ const char* const LEVEL_NAME[LEVELS] = { "Prehistoria", "Egipto", "Castillo", "P
 // ---- Física del jugador (en píxeles del mapa: un bloque mide 76) ----
 // Valores medidos en el juego original (memoria del proceso): velocidad 250, salto -600, gravedad 1800,
 // caída máxima 1500, caja del jugador 50x90.
-const float RUN = 250, GRAVITY = 1800, JUMP = -900, JUMP_DINO = -600, MAX_FALL = 1500, CLIMB = 150, STOMP = -450;
+const float RUN = 250, GRAVITY = 1800, MAX_FALL = 1500, CLIMB = 150, STOMP = -450;
+// Salto según los Vascolet tomados en el nivel (0-4) y doble salto según los Cereales (0 = no hay).
+// Es la tabla del motor del XA (mismo motor): el salto inicial medido en el original, -600, coincide.
+// Carteles del juego: "¡Cada Vascolet que tomes aumenta tu salto!" / "...aumenta tu salto doble!"
+const float JUMP_BY_VASCOLETS[5] = { -600, -700, -790, -810, -850 };
+const float DJUMP_BY_CEREALS[5] = { 0, -440, -680, -720, -760 };
 const int HUD_SLOTS = 4;   // vasos de Vascolet y bowls de cereales que muestra el HUD
 
 void playSfx(const char* file) { plat::playSound(plat::loadSound(std::string("assets/audio/fx/") + file)); }
@@ -269,10 +274,11 @@ void World::respawn() {
 
 void World::award(const Item& it) {
     const std::string& c = it.counter;
+    if (c == "VASCOLETS" || c == "CEREALS") spawnEffect("POWER", hero.cx(), hero.box.y + hero.box.h * 0.5f);
     if (c == "POINTS") { cnt.points += it.count; playSfx("item.ogg"); }
     else if (c == "LIVES") { cnt.lives = std::min(99, cnt.lives + it.count); playSfx("extra_life.ogg"); }
     else if (c == "VASCOLETS") { cnt.vascolets = std::min(HUD_SLOTS, cnt.vascolets + 1); cnt.points += 100; playSfx("jump_vascolet.ogg"); }
-    else if (c == "CEREALS") { cnt.cereals = std::min(HUD_SLOTS, cnt.cereals + 1); cnt.points += 100; powerT = 8.0f; powerAnim.time = 0; playSfx("powerup.ogg"); }
+    else if (c == "CEREALS") { cnt.cereals = std::min(HUD_SLOTS, cnt.cereals + 1); cnt.points += 100; playSfx("powerup.ogg"); }
     else if (c == "YELLOW_KEY") { cnt.keys[0]++; playSfx("item.ogg"); }
     else if (c == "RED_KEY") { cnt.keys[1]++; playSfx("item.ogg"); }
     else if (c == "GREEN_KEY") { cnt.keys[2]++; playSfx("item.ogg"); }
@@ -334,7 +340,7 @@ void World::updateHero(float dt) {
         }
         bool g = false; float vx = 0, vy = D ? 1 : 0;
         if (D) { moveBox(h.box, vx, vy, 0.0001f, false, &g, nullptr); if (g && !ladderAt(h.cx(), h.bottom() + 2)) { h.state = HS_GROUND; h.onGround = true; } }
-        if (jump && (L || R)) { h.state = HS_AIR; h.vy = JUMP * 0.6f; h.left = L; }
+        if (jump && (L || R)) { h.state = HS_AIR; h.vy = JUMP_BY_VASCOLETS[std::min(cnt.vascolets, 4)]; h.left = L; h.doubleJumped = false; }
         // Como en el original: con izquierda/derecha se baja de la escalera hacia ese lado.
         // Si al costado hay un escalón a la altura de los pies, sube a ese escalón.
         else if ((L || R) && !U && !D) {
@@ -357,8 +363,14 @@ void World::updateHero(float dt) {
         h.vx = target;
         if (L && !R) h.left = true;
         if (R && !L) h.left = false;
+        if (jump && !h.onGround && h.state == HS_AIR && cnt.cereals > 0 && !h.doubleJumped) {
+            // Doble salto: se habilita con el primer Cereal; cada Cereal lo hace más alto.
+            h.vy = DJUMP_BY_CEREALS[std::min(cnt.cereals, 4)]; h.doubleJumped = true;
+            playSfx("jump.ogg");
+            h.anim.play(HA(riding ? "D_JUMP" : "JUMP"), true);
+        }
         if (jump && h.onGround) {
-            h.vy = riding ? JUMP_DINO : JUMP; h.onGround = false; h.state = HS_AIR; h.platform = -1;
+            h.vy = JUMP_BY_VASCOLETS[std::min(cnt.vascolets, 4)]; h.onGround = false; h.state = HS_AIR; h.platform = -1; h.doubleJumped = false;
             playSfx("jump.ogg");
             h.anim.play(HA(riding ? "D_JUMP" : "JUMP"), true);
         }
@@ -385,6 +397,7 @@ void World::updateHero(float dt) {
         }
     const bool wasGround = h.onGround;
     h.onGround = ground;
+    if (ground) h.doubleJumped = false;
     if (ground && !wasGround && h.state == HS_AIR) h.state = HS_GROUND;
     if (!ground && h.state == HS_GROUND) h.state = HS_AIR;
 

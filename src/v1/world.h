@@ -25,7 +25,7 @@ enum HeroState { HS_GROUND, HS_AIR, HS_CLIMB, HS_HURT, HS_DEAD, HS_WIN };
 struct Hero {
     Box box{};
     float vx = 0, vy = 0;
-    bool left = false, onGround = false;
+    bool left = false, onGround = false, doubleJumped = false;
     HeroState state = HS_AIR;
     float invuln = 0, hurtT = 0, deadT = 0;
     int platform = -1;          // plataforma móvil sobre la que está parado
