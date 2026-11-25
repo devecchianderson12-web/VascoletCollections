@@ -58,7 +58,8 @@ struct Shot { float x, y, vx, vy; bool alive = true; const ImageMap* img = nullp
 struct Effect { float x, y; AnimPlayer anim; };
 
 struct Counters {
-    int lives = 3, energy = 8, points = 0, cereals = 0;
+    int lives = 10, points = 0;
+    int vascolets = 0, cereals = 0;   // del nivel actual (4 vasos y 4 bowls en el HUD)
     int keys[4] = {};           // amarilla, roja, verde, azul
 };
 
@@ -110,6 +111,10 @@ private:
     std::vector<Shot> shots;
     std::vector<Effect> effects;
     const Sign* activeSign = nullptr;
+    const Sign* lastSign = nullptr;
+    std::string message;        // franja negra con texto debajo del HUD (carteles, "Juego Salvado")
+    float messageT = 0;
+    void showMessage(const std::string& m, float secs) { message = m; messageT = secs; }
     Counters cnt;
     bool outOfLives = false;
     float winT = 0;

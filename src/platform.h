@@ -65,6 +65,8 @@ void touchLayoutReset();
 void touchMapEdit(bool on);
 // Muestra u oculta los controles táctiles (el mapeo los muestra siempre).
 void setTouchOverlay(bool on);
+// Muestra u oculta el botón de disparo táctil.
+void setTouchShoot(bool on);
 // Calidad de imagen: nitidez 0-2 y texturas HD (2x). Recarga las imágenes si cambia.
 void setImageQuality(int sharpness, bool hd);
 // true con Gráficos > CALIDAD HD: activa también la iluminación y sombras HD.

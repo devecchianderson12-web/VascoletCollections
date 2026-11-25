@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
     plat::setLogicalWidth(plat::wideLogicalWidth(vc::WIDE_W, vc::BASE_H));
 #endif
     plat::audioInit();
+    plat::setTouchShoot(false);   // ningún juego de la colección usa el botón de disparo
     vc::runLauncher();
     SDL_Quit();
     return 0;

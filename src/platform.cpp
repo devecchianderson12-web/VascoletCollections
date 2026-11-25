@@ -1499,10 +1499,15 @@ static SDL_FPoint touchToLogical(float nx, float ny) {
     return { (nx * ow - ox) / s, (ny * oh - oy) / s };
 }
 
+// El botón de disparo se puede sacar (Vascolet no dispara).
+static bool g_touchShoot = true;
+void setTouchShoot(bool on) { g_touchShoot = on; }
+
 static int touchHit(SDL_FPoint p, float* ddx = nullptr, float* ddy = nullptr) {
     TouchBtn b[TB_COUNT]; touchLayout(b);
     int best = -1; float bd = 0;
     for (int i = TB_JUMP; i < TB_COUNT; i++) {
+        if (i == TB_SHOOT && !g_touchShoot) continue;
         float ex = p.x - b[i].x, ey = p.y - b[i].y, dd = std::sqrt(ex * ex + ey * ey);
         float reach = b[i].r * (i >= TB_PAUSE ? 1.7f : 1.35f);
         if (dd < reach && (best < 0 || dd / reach < bd)) { best = i; bd = dd / reach; }
@@ -1746,10 +1751,16 @@ static void geoCircle(float cx, float cy, float r0, float r1, SDL_Color c) {
 }
 
 struct TouchSprite { const char* file; SDL_Rect r; SDL_Texture* tex; bool tried; };
-enum { TS_JUMP, TS_SHOOT, TS_COUNT };
+enum { TS_JUMP, TS_SHOOT, TS_BACK, TS_PAUSE, TS_TRI, TS_BASE, TS_KNOB, TS_COUNT };
 static TouchSprite g_tsprites[TS_COUNT] = {
     { "data/ui/jump.png",  { 0, 0, 0, 0 }, nullptr, false },
     { "data/ui/shoot.png", { 0, 0, 0, 0 }, nullptr, false },
+    // Gráficos de la colección: atrás, pausa, salto (triángulo) y joystick (base + perilla).
+    { "data/ui/touch_back.png",  { 0, 0, 0, 0 }, nullptr, false },
+    { "data/ui/touch_pause.png", { 0, 0, 0, 0 }, nullptr, false },
+    { "data/ui/touch_jump.png",  { 0, 0, 0, 0 }, nullptr, false },
+    { "data/ui/touch_base.png",  { 0, 0, 0, 0 }, nullptr, false },
+    { "data/ui/touch_knob.png",  { 0, 0, 0, 0 }, nullptr, false },
 };
 static SDL_Texture* touchSprite(int i) {
     TouchSprite& s = g_tsprites[i];
@@ -1867,8 +1878,34 @@ static void drawTouchOverlay() {
     // Mapeo: aro resaltado alrededor de cada botón (más fuerte en el que se arrastra).
     if (g_mapEdit)
         for (int i = 0; i < TB_COUNT; i++)
-            geoCircle(b[i].x, b[i].y, b[i].r + 3.0f, b[i].r + (g_mapDrag == i ? 7.0f : 5.0f), Ca(g_mapDrag == i ? th.hot : th.ring, g_mapDrag == i ? 230 : 120));
+            if (i != TB_SHOOT || g_touchShoot) geoCircle(b[i].x, b[i].y, b[i].r + 3.0f, b[i].r + (g_mapDrag == i ? 7.0f : 5.0f), Ca(g_mapDrag == i ? th.hot : th.ring, g_mapDrag == i ? 230 : 120));
     auto pressedVis = [](int i) { return g_tbDown[i] || g_mapDrag == i; };
+
+    // Gráficos de la colección (si están): se respetan tamaño, mapeo, 2D/3D y opacidad.
+    if (touchSprite(TS_BASE) && touchSprite(TS_KNOB) && touchSprite(TS_TRI) && touchSprite(TS_PAUSE) && touchSprite(TS_BACK)) {
+        auto art = [&](int s, float cx, float cy, float size, bool down) {
+            const float sz = size * (down ? 0.92f : 1.0f);
+            const float push = g_btn3d && down ? sz * 0.05f : 0.0f;
+            if (g_btn3d) spriteAt(s, cx + sz * 0.04f, cy + sz * 0.08f, sz, 0, AS(120), false, { 0, 0, 0, 255 }); // sombra 3D
+            spriteAt(s, cx, cy + push, sz, 0, down ? HOT : AS(235), false, down ? SDL_Color{ 255, 250, 225, 255 } : SDL_Color{ 255, 255, 255, 255 });
+        };
+        TouchBtn j = b[TB_DPAD];
+        if (g_stickActive) { j.x = g_stickBase.x; j.y = g_stickBase.y; }
+        art(TS_BASE, j.x, j.y, j.r * 2.15f, false);
+        float kx = j.x, ky = j.y;
+        if (g_stickActive) {
+            float ox = g_stickKnob.x - j.x, oy = g_stickKnob.y - j.y, ol = std::sqrt(ox * ox + oy * oy);
+            const float maxOff = j.r * 0.55f;
+            if (ol > maxOff) { ox *= maxOff / ol; oy *= maxOff / ol; }
+            kx += ox; ky += oy;
+        }
+        art(TS_KNOB, kx, ky, j.r * 0.95f, g_stickActive);
+        art(TS_TRI, b[TB_JUMP].x, b[TB_JUMP].y, b[TB_JUMP].r * 2.2f, pressedVis(TB_JUMP));
+        if (g_touchShoot) art(TS_SHOOT, b[TB_SHOOT].x, b[TB_SHOOT].y, b[TB_SHOOT].r * 2.0f, pressedVis(TB_SHOOT));
+        art(TS_PAUSE, b[TB_PAUSE].x, b[TB_PAUSE].y, b[TB_PAUSE].r * 2.5f, pressedVis(TB_PAUSE));
+        art(TS_BACK, b[TB_BACK].x, b[TB_BACK].y, b[TB_BACK].r * 2.5f, pressedVis(TB_BACK));
+        return;
+    }
 
     TouchBtn d = b[TB_DPAD];
     if (g_stickActive) { d.x = g_stickBase.x; d.y = g_stickBase.y; }
@@ -1941,6 +1978,7 @@ void setTouchOpacity(int) {}
 void setTouchStick(int, int, int, bool) {}
 void setTouchLayout(const uint16_t*) {}
 void setTouchOverlay(bool) {}
+void setTouchShoot(bool) {}
 void touchLayoutGet(uint16_t* pos) { for (int i = 0; i < 10; i++) pos[i] = 0xFFFF; }
 void touchLayoutReset() {}
 void touchMapEdit(bool) {}

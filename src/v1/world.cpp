@@ -21,8 +21,10 @@ const char* const LEVEL_SUFFIX[LEVELS] = { "PREHISTORY", "EGYPT", "CASTLE", "PIR
 const char* const LEVEL_NAME[LEVELS] = { "Prehistoria", "Egipto", "Castillo", "Piratas", "Futuro" };
 
 // ---- Física del jugador (en píxeles del mapa: un bloque mide 76) ----
-const float RUN = 330, GRAVITY = 2500, JUMP = -1080, MAX_FALL = 1300, CLIMB = 260, STOMP = -720;
-const int MAX_ENERGY = 8;
+// Valores medidos en el juego original (memoria del proceso): velocidad 250, salto -600, gravedad 1800,
+// caída máxima 1500, caja del jugador 50x90.
+const float RUN = 250, GRAVITY = 1800, JUMP = -600, MAX_FALL = 1500, CLIMB = 150, STOMP = -450;
+const int HUD_SLOTS = 4;   // vasos de Vascolet y bowls de cereales que muestra el HUD
 
 void playSfx(const char* file) { plat::playSound(plat::loadSound(std::string("assets/audio/fx/") + file)); }
 
@@ -55,7 +57,7 @@ static float frand(float a, float b) { return a + (b - a) * (rand() / (float)RAN
 bool World::load(int level, const Counters& carry) {
     levelNo = level;
     cnt = carry;
-    cnt.energy = MAX_ENERGY;
+    cnt.vascolets = 0; cnt.cereals = 0;
     for (int& k : cnt.keys) k = 0;
     if (!map.load(std::string("assets/data/") + LEVEL_MAP[level] + ".tmx")) return false;
     tiles = plat::loadTileset(map.tilesetImage, map.tileW, map.tileH);
@@ -86,8 +88,8 @@ bool World::load(int level, const Counters& carry) {
         const std::string& t = o.type;
         const std::string asset = o.prop("pAsset");
         if (t == "Vascolet" && asset.empty()) {
-            hero.box = { b.x, b.y, 56, 104 };
-            spawnX = b.x; spawnY = b.y;
+            hero.box = { b.x + (b.w - 50) * 0.5f, b.y + b.h - 90, 50, 90 };
+            spawnX = hero.box.x; spawnY = hero.box.y;
         } else if (t == "Item" || (t == "Vascolet" && !asset.empty())) {
             Item it; it.box = b; it.asset = asset; it.counter = o.prop("pRequiredItem");
             it.count = std::max(1, o.propi("pCount", 1));
@@ -148,7 +150,7 @@ bool World::load(int level, const Counters& carry) {
 void World::refitCamera() {
     cam.w = (float)LOGICAL_W; cam.h = (float)LOGICAL_H;
     cam.minX = boundX0; cam.minY = boundY0;
-    cam.zoneY = 0.72f;   // el piso queda más abajo, como en el original
+    cam.zoneY = 0.85f;   // como en el original: el piso queda al pie de la pantalla
     cam.init(boundX1, boundY1, hero.cx(), hero.bottom());
     camX = cam.x; camY = cam.y; prevCamX = camX; prevCamY = camY;
 }
@@ -236,9 +238,8 @@ void World::moveBox(Box& b, float& vx, float& vy, float dt, bool solidPlatforms,
 // ---------------- Jugador ----------------
 void World::hurtHero(float fromX) {
     if (hero.invuln > 0 || powerT > 0 || hero.state == HS_DEAD || hero.state == HS_WIN) return;
-    cnt.energy--;
-    playSfx(rand() & 1 ? "death_1.ogg" : "death_2.ogg");
-    if (cnt.energy <= 0) { killHero(); return; }
+    // En el original un golpe cuesta una vida.
+    killHero(); return;
     hero.invuln = 1.6f;
     hero.state = HS_HURT; hero.hurtT = 0.45f;
     hero.vx = hero.cx() < fromX ? -260.0f : 260.0f;
@@ -256,7 +257,6 @@ void World::killHero() {
 void World::respawn() {
     cnt.lives--;
     if (cnt.lives < 0) { cnt.lives = 0; outOfLives = true; return; }
-    cnt.energy = MAX_ENERGY;
     hero.box.x = spawnX; hero.box.y = spawnY;
     hero.vx = hero.vy = 0;
     hero.state = HS_AIR; hero.invuln = 2.0f; hero.platform = -1;
@@ -271,8 +271,8 @@ void World::award(const Item& it) {
     const std::string& c = it.counter;
     if (c == "POINTS") { cnt.points += it.count; playSfx("item.ogg"); }
     else if (c == "LIVES") { cnt.lives = std::min(99, cnt.lives + it.count); playSfx("extra_life.ogg"); }
-    else if (c == "VASCOLETS") { cnt.energy = std::min(MAX_ENERGY, cnt.energy + 2); cnt.points += 50; playSfx("jump_vascolet.ogg"); }
-    else if (c == "CEREALS") { cnt.cereals++; cnt.points += 100; powerT = 8.0f; powerAnim.time = 0; playSfx("powerup.ogg"); }
+    else if (c == "VASCOLETS") { cnt.vascolets = std::min(HUD_SLOTS, cnt.vascolets + 1); cnt.points += 100; playSfx("jump_vascolet.ogg"); }
+    else if (c == "CEREALS") { cnt.cereals = std::min(HUD_SLOTS, cnt.cereals + 1); cnt.points += 100; powerT = 8.0f; powerAnim.time = 0; playSfx("powerup.ogg"); }
     else if (c == "YELLOW_KEY") { cnt.keys[0]++; playSfx("item.ogg"); }
     else if (c == "RED_KEY") { cnt.keys[1]++; playSfx("item.ogg"); }
     else if (c == "GREEN_KEY") { cnt.keys[2]++; playSfx("item.ogg"); }
@@ -510,6 +510,7 @@ void World::update(float dt) {
     updateHero(dt);
     updateEnemies(dt);
 
+    if (messageT > 0) messageT -= dt;
     for (auto& ef : effects) ef.anim.update(dt);
     effects.erase(std::remove_if(effects.begin(), effects.end(), [](const Effect& e) { return e.anim.finished(); }), effects.end());
 
@@ -530,10 +531,13 @@ void World::update(float dt) {
             if (!s.active && overlap(hero.box, s.box)) {
                 for (auto& o : saves) o.active = false;
                 s.active = true; spawnX = s.box.x; spawnY = s.box.y + s.box.h - hero.box.h;
+                showMessage("Juego Salvado", 2.5f);
                 playSfx("powerup.ogg");
             }
         activeSign = nullptr;
         for (auto& s : signs) if (overlap(hero.box, s.box)) activeSign = &s;
+        if (activeSign && activeSign != lastSign) showMessage(activeSign->text, 5.0f);
+        lastSign = activeSign;
     }
 
     if (hero.state != HS_DEAD) {
@@ -631,38 +635,38 @@ void World::drawFrameContents() {
 }
 
 void World::drawHud() {
+    // Igual que el original (800x600): sin fondo, cara y vidas, puntos, 4 vasos, 4 bowls y 4 llaves.
     vc::Font& f = vc::uiFont();
-    const ImageMap* bg = imageMap("HUD_BACKGROUND", "AssetsGeneral");
-    if (bg && bg->frames.size() >= 2) {
-        drawFrame(bg->frames[0], 0, 0);
-        drawFrameRect(bg->frames[1], 0, 0, bg->frames[1].w, bg->frames[1].h, (float)LOGICAL_W - bg->frames[1].w, 0);
-        if (LOGICAL_W > 1200) {   // pantallas muy anchas: completa el centro
-            plat::setDrawTint({ 255, 255, 255, 255 });
-            drawFrameRect(bg->frames[0], 300, 0, 300, bg->frames[0].h, 600, 0);
-        }
-    }
-    const SDL_Color white = { 255, 255, 255, 255 }, yellow = { 255, 222, 60, 255 };
-    if (const ImageMap* h = imageMap("HUD_HERO", "AssetsGeneral")) drawFrame(h->frames[0], 10, 4);
+    const SDL_Color white = { 255, 255, 255, 255 };
     char b[32];
-    snprintf(b, sizeof b, "x%d", cnt.lives); f.draw(b, 82, 24, 0.75f, white);
-    f.draw("Puntos", 150, 8, 0.55f, yellow);
-    snprintf(b, sizeof b, "%06d", cnt.points); f.draw(b, 150, 34, 0.7f, white);
+    // Posiciones y tamaños medidos sobre el video del juego original (pantalla de 800x600).
+    if (const ImageMap* h = imageMap("HUD_HERO", "AssetsGeneral")) drawFrameScaled(h->frames[0], 52, 28, 0.6f);
+    snprintf(b, sizeof b, "%d", cnt.lives); f.draw(b, 70, 34, 0.5f, white);
+    f.drawCentered("Puntos", 180, 8, 0.42f, white);
+    snprintf(b, sizeof b, "%06d", cnt.points); f.drawCentered(b, 180, 26, 0.6f, white);
     if (const ImageMap* g = imageMap("HUD_MILK_GLASSES", "AssetsGeneral"); g && g->frames.size() >= 2)
-        for (int i = 0; i < MAX_ENERGY; i++) drawFrame(g->frames[i < cnt.energy ? 0 : 1], 262 + i * 30.0f, 42, false, 255);
+        for (int i = 0; i < HUD_SLOTS; i++) drawFrameScaled(g->frames[i < cnt.vascolets ? 0 : 1], 288 + i * 33.0f, 32, 0.65f);
+    if (const ImageMap* c = imageMap("HUD_CEREALS", "AssetsGeneral"); c && c->frames.size() >= 2)
+        for (int i = 0; i < HUD_SLOTS; i++) drawFrameScaled(c->frames[i < cnt.cereals ? 0 : 1], 430 + i * 48.0f, 32, 0.68f);
     if (const ImageMap* k = imageMap("HUD_KEYS", "AssetsGeneral"); k && k->frames.size() >= 4)
         for (int i = 0; i < 4; i++) {
-            const float x = (float)LOGICAL_W - 262 + i * 64.0f;
-            drawFrame(k->frames[i], x, 4);
-            snprintf(b, sizeof b, "%d", cnt.keys[i]); f.draw(b, x + 44, 42, 0.55f, white);
+            const float x = (float)LOGICAL_W - 152 + i * 39.0f;
+            drawFrameScaled(k->frames[i], x, 28, 0.62f);
+            snprintf(b, sizeof b, "%d", cnt.keys[i]); f.draw(b, x + 8, 36, 0.42f, white);
         }
-    if (activeSign && !activeSign->text.empty()) {
-        // Cartel: recuadro abajo con el texto (puede tener varias líneas).
+    if (messageT > 0 && !message.empty()) {
+        // Como en el original: franja negra debajo del HUD con el texto centrado en blanco.
         std::vector<std::string> lines; std::string cur;
-        for (char c : activeSign->text) { if (c == '\n') { lines.push_back(cur); cur.clear(); } else cur += c; }
+        for (char c : message) { if (c == '\n') { lines.push_back(cur); cur.clear(); } else cur += c; }
         lines.push_back(cur);
-        const float sc = 0.6f, lh = f.height(sc) + 2, bh = lines.size() * lh + 24, by = (float)LOGICAL_H - bh - 20;
-        plat::fillRoundRect({ 40, by, (float)LOGICAL_W - 80, bh }, 16, { 120, 10, 10, 225 });
-        for (size_t i = 0; i < lines.size(); i++) f.drawCentered(lines[i], LOGICAL_W * 0.5f, by + 12 + i * lh, sc, white);
+        const float sc = 0.45f, lh = f.height(sc), top = 92;
+        const float bh = lines.size() * lh + 10;
+        SDL_Renderer* r = plat::renderer();
+        SDL_SetRenderDrawBlendMode(r, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
+        const SDL_FRect band = { 0, top, (float)LOGICAL_W, bh };
+        SDL_RenderFillRectF(r, &band);
+        for (size_t i = 0; i < lines.size(); i++) f.drawCentered(lines[i], LOGICAL_W * 0.5f, top + 5 + i * lh, sc, white);
     }
 }
 

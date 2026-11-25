@@ -104,7 +104,9 @@ def raw(a, n):
     b = rd(a, n) or b''
     for i in range(0, len(b) - 3, 4):
         v = struct.unpack_from('<I', b, i)[0]
-        print('  +%03x %08x %d %s' % (i, S(v), v, rtti(v) if 0x10000 < v < 0x7fff0000 else ''))
+        f = struct.unpack_from('<f', b, i)[0]
+        fs = ('%g' % f) if v and 100 < ((v >> 23) & 0xff) < 160 else ''
+        print('  +%03x %08x %-11d %-12s %s' % (i, S(v), v, fs, rtti(v) if 0x10000 < v < 0x7fff0000 else ''))
 
 def main():
     # Uso: python vdump.py <pid del juego ya abierto> <comando> [args]

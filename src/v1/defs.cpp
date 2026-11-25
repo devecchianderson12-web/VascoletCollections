@@ -167,6 +167,14 @@ void drawFrame(const Frame& fc, float x, float y, bool flipH, uint8_t alpha, boo
     plat::drawImage(img, src, dst, flipH, alpha, flipV);
 }
 
+void drawFrameScaled(const Frame& fc, float cx, float cy, float scale) {
+    Frame& f = const_cast<Frame&>(fc);
+    plat::Image* img = texture(f);
+    if (!img) return;
+    const float w = f.w * scale, h = f.h * scale;
+    plat::drawImage(img, SDL_Rect{ (int)f.x, (int)f.y, (int)f.w, (int)f.h }, SDL_FRect{ cx - w * 0.5f, cy - h * 0.5f, w, h });
+}
+
 bool AnimPlayer::finished() const {
     if (!a || a->loop || a->totalTicks <= 0) return false;
     return time * a->fps >= a->totalTicks;
