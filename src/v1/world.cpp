@@ -29,7 +29,7 @@ const char* const LEVEL_NAME[LEVELS] = { "Prehistoria", "Egipto", "Castillo", "P
 //  - salto según Vascolets: 600/700/790/810/850; doble salto según Cereales: 640/680/720/760.
 //  - en el aire la velocidad horizontal se acelera 20 por cuadro (10 si saltó quieto) hasta 250 y
 //    sin dirección conserva la que traía.
-const float RUN = 250, GRAVITY = 1800, MAX_FALL = 1500, CLIMB = 150, STOMP = -450;
+const float RUN = 250, GRAVITY = 1800, MAX_FALL = 1500, CLIMB = 150, STOMP = -510;   // rebote al pisar: -850 x 0,6 (0x4330f0)
 const float AIR_ACCEL = 20, AIR_ACCEL_STILL = 10;   // por cuadro de 60 Hz
 const float ENEMY_GRAVITY = 1800, ENEMY_MAX_FALL = 1500;
 // Carteles del juego: "¡Cada Vascolet que tomes aumenta tu salto!" / "...aumenta tu salto doble!"
@@ -150,14 +150,13 @@ bool World::load(int level, const Counters& carry) {
             e.still = EM(asset);
             e.left = e.vx < 0 || propf(o, "pLook", 0) < 0;
             if (t == "Enemy") e.kind = EK_WALKER;
-            else if (t == "Jumper") { e.kind = EK_JUMPER; e.jumpVy = -std::max(400.0f, std::fabs(e.vy)); e.vy = 0; }
+            else if (t == "Jumper") { e.kind = EK_JUMPER; e.jumpVy = -600; e.savedVx = e.vx; }
             else if (t == "Bird") e.kind = EK_BIRD;
             else if (t == "Fire") { e.kind = EK_STATIC; e.stompable = asset != "FIRE" && asset != "HEDGEHOG"; }
             else if (t == "Thrower") { e.kind = EK_THROWER; e.bulletVx = e.vx; e.vx = 0; e.left = e.bulletVx < 0; e.timer = frand(e.minT, e.maxT); e.stompable = false; }
             else if (t == "Piranha") { e.kind = EK_PIRANHA; e.timer = frand(e.minT, e.maxT); e.stompable = false; }
             else if (t == "Guillotine") { e.kind = EK_GUILLOTINE; e.stompable = false; }
             else if (t == "Stalactite") { e.kind = EK_STALACTITE; e.ay = std::max(400.0f, e.ay); e.stompable = false; }
-            if (e.kind == EK_WALKER && !e.collidesV) e.collidesV = true;
             if (const Anim* a = EA(e.animName)) e.anim.play(a);
             if (e.kind == EK_PIRANHA) { e.anim.play(EA(e.animName + "_UP")); e.box.y = e.y0; }
             enemies.push_back(e);
@@ -541,8 +540,11 @@ void World::updatePlatforms(float dt) {
 // ---------------- Enemigos ----------------
 void World::updateEnemies(float dt) {
     const Box hb = hero.box;
+    const float sx0 = camX, sy0 = camY, sx1 = camX + cam.w, sy1 = camY + cam.h;
     for (auto& e : enemies) {
         if (e.dead) continue;
+        // Como en el original, cada enemigo funciona solo mientras su pantalla está a la vista.
+        if (!g_cameraFixed && (e.box.x + e.box.w < sx0 || e.box.x > sx1 || e.box.y + e.box.h < sy0 || e.box.y > sy1)) continue;
         e.anim.update(dt);
         switch (e.kind) {
             case EK_WALKER: case EK_JUMPER: {
@@ -551,17 +553,31 @@ void World::updateEnemies(float dt) {
                 bool turn = false;
                 // Darse vuelta en el borde de una plataforma o de un pozo (solo si está parado en el piso).
                 const float feet = e.box.y + e.box.h;
-                const bool standing = e.vy >= 0 && (solidAt(e.box.x + e.box.w * 0.5f, feet + 2) || platformTop(e.box.x + e.box.w * 0.5f, feet + 2, feet));
+                // Los del mapa quedan unos píxeles sobre el piso (no tienen gravedad): se mira hasta 20 abajo.
+                const float probe = feet + 20;
+                const bool standing = e.vy >= 0 && (solidAt(e.box.x + e.box.w * 0.5f, probe) || platformTop(e.box.x + e.box.w * 0.5f, probe, feet));
                 if (e.collidesFloor && e.kind == EK_WALKER && standing && e.vx != 0) {
                     const float ahead = e.vx > 0 ? e.box.x + e.box.w + 2 : e.box.x - 2;
-                    const float below = e.box.y + e.box.h + 4;
+                    const float below = probe;
                     if (!solidAt(ahead, below) && !platformTop(ahead, below, e.box.y + e.box.h)) { turn = true; vx = 0; }
                 }
-                if (e.collidesV) e.vy = std::min(e.vy + ENEMY_GRAVITY * dt, ENEMY_MAX_FALL);
+                // Aceleración del mapa (pyAccel): 0 en los que caminan, 800 en las serpientes saltarinas.
+                e.vy = std::min(e.vy + e.ay * dt, ENEMY_MAX_FALL);
+                if (e.kind == EK_JUMPER && e.landed) {
+                    // Quieto en el piso hasta que termina la animación; después salta de nuevo.
+                    vx = 0; e.vy = 0;
+                    if (e.anim.finished() || (e.landT += dt) > 0.5f) {
+                        e.landed = false; e.landT = 0; e.vx = e.savedVx; e.vy = e.jumpVy; vx = e.vx;
+                        if (const Anim* a = EA(e.animName)) e.anim.play(a, true);
+                    }
+                }
                 moveBox(e.box, vx, e.vy, dt, true, &g, &wall);
                 if (wall) turn = true;
-                if (turn) e.vx = -e.vx;
-                if (e.kind == EK_JUMPER && g) e.vy = e.jumpVy;
+                if (turn) { e.vx = -e.vx; if (e.kind == EK_JUMPER) e.savedVx = e.vx; }
+                if (e.kind == EK_JUMPER && g && !e.landed && e.vy >= 0) {
+                    e.landed = true; e.landT = 0; e.vy = 0;
+                    if (const Anim* a = EA(e.animName)) e.anim.play(a, true);
+                }
                 if (e.vx != 0) e.left = e.vx < 0;
                 break;
             }
@@ -769,7 +785,9 @@ void World::drawFrameContents() {
             continue;
         }
         if (e.kind == EK_PIRANHA && e.timer > 0) continue;
-        const bool flip = (e.anim.a && e.anim.a->facesRight) ? e.left : !e.left;
+        // Como en el original (Enemy 0x43e1e0): la escala X del dibujo es el signo de la velocidad;
+        // todos los dibujos miran a la derecha, así que se espeja solo cuando va a la izquierda.
+        const bool flip = e.left;
         if (hd) hdSpriteShadow(*f, x, y, flip);
         drawFrame(*f, x, y, flip);
     }

@@ -41,6 +41,7 @@ struct Enemy {
     EnemyKind kind = EK_WALKER;
     Box box{};
     float x0 = 0, y0 = 0, h0 = 0, vx = 0, vy = 0, ay = 0, jumpVy = 0;
+    float savedVx = 0, landT = 0; bool landed = false;   // serpiente saltarina
     float dx = 0, dy = 0, duration = 1, t = 0, wait = 0, minT = 1, maxT = 2, timer = 0;
     float offX = 0, offY = 0, bulletVx = 0;
     bool collidesFloor = false, collidesH = false, collidesV = false, left = true, dead = false, stompable = true;
