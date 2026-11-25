@@ -266,7 +266,7 @@ void Launcher::drawHome() {
     const float zoom = 1.0f + 0.025f * (0.5f + 0.5f * std::sin(t * 0.7f));   // respira despacio
     // Ocupa todo el alto; en pantallas poco anchas se achica para que no lo tapen los botones.
     // El 15% derecho del arte son solo rayos: los botones pueden quedar encima.
-    const float baseW = std::min(H() * 4.0f / 3.0f, (W() - bw - 36) / 0.85f), baseH = baseW * 0.75f;
+    const float baseH = H(), baseW = baseH * 4.0f / 3.0f;   // siempre todo el alto, sin bordes
     const float aw = baseW * zoom, ah = baseH * zoom;
     const float ax = std::max(0.0f, (W() - bw - 36 - baseW * 0.85f) * 0.5f) - (aw - baseW) * 0.5f;
     const float ay = (H() - ah) * 0.5f;

@@ -106,6 +106,9 @@ private:
     const char* mount = "";     // prefijo de las animaciones: "D_" dinosaurio, "P_" patineta
     const Anim* heroAnim(const char* name) const;
     float liquidBottom(float x, float y) const;
+    bool fillerCell(int tx, int ty) const;
+    void roomBounds();
+    void centerSmallRoom();
     std::vector<Enemy> enemies;
     std::vector<Item> items;
     std::vector<Door> doors;

@@ -81,8 +81,8 @@ bool World::load(int level, const Counters& carry) {
         for (uint32_t g : map.gids) if (g) count[g]++;
         int best = 0;
         for (auto& kv : count) if (kv.second > best) { best = kv.second; filler = kv.first; }
-        const int fid = (int)filler - map.firstGid;
-        if (!(fid >= 0 && fid < (int)map.tileFlagsById.size() && (map.tileFlagsById[fid] & TF_HARD))) filler = 0;
+        // Es relleno si ocupa más de la mitad del mapa (en Egipto ese bloque no está marcado como sólido).
+        if (best * 2 < (int)map.gids.size()) filler = 0;
         int x0 = map.width, y0 = map.height, x1 = 0, y1 = 0;
         for (int y = 0; y < map.height; y++)
             for (int x = 0; x < map.width; x++) {
@@ -167,8 +167,48 @@ void World::refitCamera() {
     cam.w = (float)LOGICAL_W; cam.h = (float)LOGICAL_H;
     cam.minX = boundX0; cam.minY = boundY0;
     cam.zoneY = 0.85f;   // como en el original: el piso queda al pie de la pantalla
-    cam.init(boundX1, boundY1, hero.cx(), hero.bottom());
+    cam.x = hero.cx() - cam.w * 0.5f; cam.y = hero.bottom() - cam.h * cam.zoneY;
+    roomBounds();
+    cam.init(cam.levelW, cam.levelH, hero.cx(), hero.bottom());
+    centerSmallRoom();
     camX = cam.x; camY = cam.y; prevCamX = camX; prevCamY = camY;
+}
+
+// Límites de la "habitación" donde está el jugador: la cámara no muestra columnas ni filas que sean
+// todo relleno (como en el original, donde cada zona del nivel queda enmarcada por sus paredes).
+bool World::fillerCell(int tx, int ty) const {
+    if (tx < 0 || ty < 0 || tx >= map.width || ty >= map.height) return true;
+    const uint32_t g = map.gids[ty * map.width + tx];
+    return g == filler || (map.flagsAt(tx, ty) & TF_INVISIBLE);
+}
+
+void World::roomBounds() {
+    const int tw = map.tileW, th = map.tileH;
+    const int hx = (int)std::floor(hero.cx() / tw), hy = (int)std::floor((hero.box.y + hero.box.h * 0.5f) / th);
+    auto colFull = [&](int c, int r0, int r1) { for (int r = r0; r <= r1; r++) if (!fillerCell(c, r)) return false; return true; };
+    auto rowFull = [&](int r, int c0, int c1) { for (int c = c0; c <= c1; c++) if (!fillerCell(c, r)) return false; return true; };
+    const int r0 = std::max(0, (int)std::floor(cam.y / th)), r1 = std::min(map.height - 1, (int)std::floor((cam.y + cam.h - 1) / th));
+    int c = hx; while (c >= 0 && !colFull(c, r0, r1)) c--;
+    float x0 = (float)(c + 1) * tw;
+    c = hx; while (c < map.width && !colFull(c, r0, r1)) c++;
+    float x1 = (float)c * tw;
+    x0 = std::max(x0, boundX0); x1 = std::min(x1, boundX1);
+    if (x1 <= x0) { x0 = boundX0; x1 = boundX1; }
+    // Columnas que se verán con esos límites horizontales.
+    const float vx = x1 - x0 < cam.w ? (x0 + x1 - cam.w) * 0.5f : std::max(x0, std::min(x1 - cam.w, cam.x));
+    const int c0 = std::max(0, (int)std::floor(vx / tw)), c1 = std::min(map.width - 1, (int)std::floor((vx + cam.w - 1) / tw));
+    int r = hy; while (r >= 0 && !rowFull(r, c0, c1)) r--;
+    float y0 = (float)(r + 1) * th;
+    r = hy; while (r < map.height && !rowFull(r, c0, c1)) r++;
+    float y1 = (float)r * th;
+    y0 = std::max(y0, boundY0); y1 = std::min(y1, boundY1);
+    if (y1 <= y0) { y0 = boundY0; y1 = boundY1; }
+    cam.minX = x0; cam.levelW = x1; cam.minY = y0; cam.levelH = y1;
+}
+
+void World::centerSmallRoom() {
+    if (cam.levelW - cam.minX < cam.w) cam.x = (cam.minX + cam.levelW - cam.w) * 0.5f;
+    if (cam.levelH - cam.minY < cam.h) cam.y = (cam.minY + cam.levelH - cam.h) * 0.5f;
 }
 
 // ---------------- Colisiones con el mapa ----------------
@@ -599,7 +639,9 @@ void World::update(float dt) {
     }
 
     if (hero.state != HS_DEAD) {
+        roomBounds();
         cam.update(dt, hero.cx(), hero.bottom(), hero.left ? -1 : 1, hero.vy, hero.box.h);
+        centerSmallRoom();
         camX = cam.x; camY = cam.y;
     }
 }
@@ -718,7 +760,7 @@ void World::drawHud() {
 #ifdef HOST
     if (getenv("V1_DEBUG")) {   // diagnóstico (solo PC)
         char d[160];
-        snprintf(d, sizeof d, "st %d x %.0f bot %.0f vy %.0f row %d g %d", (int)hero.state, hero.box.x, hero.bottom(), hero.vy, (int)std::floor((hero.bottom() - 1) / map.tileH), hero.onGround ? 1 : 0);
+        snprintf(d, sizeof d, "st %d x %.0f bot %.0f vy %.0f g %d cam %.0f,%.0f room %.0f-%.0f %.0f-%.0f", (int)hero.state, hero.box.x, hero.bottom(), hero.vy, hero.onGround ? 1 : 0, cam.x, cam.y, cam.minX, cam.levelW, cam.minY, cam.levelH);
         f.draw(d, 10, (float)LOGICAL_H - 40, 0.45f, white);
     }
 #endif
