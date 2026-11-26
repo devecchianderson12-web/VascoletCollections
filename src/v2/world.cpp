@@ -225,6 +225,7 @@ bool World::load(int level, const Progress& p) {
     for (const MapObject& o : map.group("dataExt")) if (o.name == "water") waterRects.push_back({ o.x, o.y, o.w, o.h });
 #ifdef HOST
     if (const char* pos = getenv("V2_POS")) { float x, y; if (sscanf(pos, "%f,%f", &x, &y) == 2) { player->x = player->px = x; player->y = player->py = y; } }
+    if (const char* d = getenv("V2_CAMD")) camD = saveCamD = (float)atof(d);
     if (getenv("V2_ITEMS")) { runEnabled = doubleJumpEnabled = true; keys[0] = keys[1] = keys[2] = keys[3] = 3; }
 #endif
     saveX = player->x; saveY = player->y; saveCamD = 0;
@@ -573,15 +574,16 @@ void World::updatePlayer(float dt) {
             }
             break;
         case P_SWIM: {
-            // Nado (VASCOLET_SWIMMING): todo a media velocidad, cada salto impulsa hacia arriba.
+            // Nado: en el agua el exe pone SetSpeedScale 0.5 (todo el personaje va a media velocidad): las
+            // velocidades quedan a la mitad y las aceleraciones (gravedad, fuerza 800) a un cuarto.
             p.gravity = p.def->gravity * 0.25f;
-            p.maxFall = 120;
-            force(800);
+            p.maxFall = 500 * 0.5f;
+            p.friction = 50;
+            force(800 * 0.25f);
             if (jumpPressed()) {
                 p.vy = p.b > 0 ? -375.0f * 0.5f : -250.0f * 0.5f;
                 p.b = 0.4f;
                 p.anim.play("swimming", true);
-                sfx("swim");
             }
             if (p.b > 0) p.b -= dt;
             if (attackPressed() && attackEnabled && countOf("Boomerang") <= 2) {
@@ -591,7 +593,7 @@ void World::updatePlayer(float dt) {
             }
             if (!water) {
                 p.gravity = p.def->gravity; p.maxFall = 500;
-                if (p.vy < -60) { sfx("jumpWater"); playerState(P_JUMP); p.vy = -500; }
+                if (p.vy < -60) { sfx("jumpAir"); playerState(P_JUMP); }   // 'underwaterOut' → standJump
                 else if (p.onFloor) playerState(P_STAND);
                 else playerState(P_FALL);
             }
@@ -685,7 +687,7 @@ void World::updateActor(Actor& a, float dt) {
             case 0:
                 a.vx = a.left ? -320.0f : 320.0f; a.vy = 0;
                 physics(a, dt);
-                if (a.hitWall) { a.state = 2; a.stateT = 0; a.vy = -120; a.vx = a.left ? 60.0f : -60.0f; a.gravity = 960; sfx("boomerang_wall_hit"); }
+                if (a.hitWall) { a.state = 2; a.stateT = 0; a.vy = -120; a.vx = a.left ? 60.0f : -60.0f; a.gravity = 960; sfx("enemy_boomerang_hit"); Actor* fx = spawn("Effect", a.x, a.y); fx->anim.play("getPowerUp"); }
                 else if (a.stateT > 0.35f) { a.state = 1; a.stateT = 0; }
                 break;
             case 1: {
@@ -696,7 +698,7 @@ void World::updateActor(Actor& a, float dt) {
                 if (sp > 240) { a.vx *= 240 / sp; a.vy *= 240 / sp; }
                 a.solidCollide = false;
                 physics(a, dt);
-                if (overlap(a.box(), p.box())) { a.removed = true; break; }
+                if (overlap(a.box(), p.box())) { sfx("boomerang_wall_hit"); a.removed = true; break; }
                 if (a.stateT > 4) a.removed = true;
                 break;
             }
@@ -731,7 +733,7 @@ void World::updateActor(Actor& a, float dt) {
     const float dist = std::hypot(pcx - a.x, pcy - (a.y - a.h() * 0.5f));
     // Jefes: esperan quietos hasta que el jugador llega (a 192 y en pantalla); Malmark aparece, vuela
     // hasta el jefe y lo despierta (MALMARK_GOING_TO_BOSS); ahí empieza la música del jefe.
-    auto bossWake = [&](const char* icon) -> bool {
+    auto bossWake = [&](const char* icon, float transformT) -> bool {
         if (a.phase == 0) {
             if (std::fabs(pcx - a.x) < 192 + a.w() && a.x > camX && a.x < camX + VIEW_W && a.y > camY && a.y - a.h() < camY + VIEW_H) {
                 a.phase = 1;
@@ -749,7 +751,7 @@ void World::updateActor(Actor& a, float dt) {
             return false;
         }
         if (a.phase == 2) {
-            if (a.stateT < 1.5f) return false;
+            if (a.stateT < transformT) return false;
             a.phase = 3; bossBar = 1; bossIcon = icon;
             return true;
         }
@@ -955,7 +957,7 @@ void World::updateActor(Actor& a, float dt) {
     } else if (t == "Ogre") {
         // Jefe del bosque (OGRE_*): estatua → se transforma → camina 3 s hacia el jugador →
         // ataca (golpe con temblor) → queda aturdido 2 s (ahí se lo pisa) → se recupera.
-        if (a.phase < 3) { if (a.phase == 0) a.anim.play("statue"); if (bossWake("headOgre")) { a.state = 2; a.stateT = 0; } }
+        if (a.phase < 3) { if (a.phase == 0) a.anim.play("statue"); if (bossWake("headOgre", 1.5f)) { a.state = 2; a.stateT = 0; } }
         else switch (a.state) {
             case 2:
                 a.anim.play("walk");
@@ -978,96 +980,122 @@ void World::updateActor(Actor& a, float dt) {
         a.harmful = a.phase == 3 && (a.state == 2 || a.state == 3);
         physics(a, dt);
     } else if (t == "Iguana") {
-        // Jefe del lago: nada buscando al jugador (120, enojado 240). Solo lo lastiman las anguilas
-        // electrificadas (que se activan con el boomerang).
-        if (a.phase < 3) { if (a.phase == 0) { a.anim.play("original"); facePlayer(); } if (bossWake("headTriton")) { a.state = 0; a.stateT = 0; } a.px = a.x; a.py = a.y; }
-        else {
+        // IGUANA_* (jefe del lago): espera → Malmark → se transforma 1 s → nada hacia el jugador
+        // (SeekObject 30 / tope 120; fuera del agua gravedad 900 y si toca el piso salta -60). Solo lo lastiman
+        // las anguilas electrificadas: daño 1, queda quieto 1 s y se enoja 4 s (180 / 240).
+        if (a.phase < 3) { if (a.phase == 0) { a.anim.play("original"); facePlayer(); } if (bossWake("headTriton", 1.0f)) { a.state = 0; a.stateT = 0; } a.px = a.x; a.py = a.y; }
+        else if (a.state == 10) {
+            // ENEMY_DEAD: VelX -60, salto -120, gravedad 560, muere al salir del área.
+            a.px = a.x; a.py = a.y; a.vy += 560 * dt; a.x += a.vx * dt; a.y += a.vy * dt;
+            if (a.stateT > 2.5f && a.c == 0) { a.c = 1; bossDefeated(); }
+        } else if (a.state == 9) {
+            a.vx = a.vy = 0; a.px = a.x; a.py = a.y;
+            if (a.anim.flagFirst("PlaySound")) sfx("v_explosion");
+            if (a.stateT > 1.0f) { a.state = 1; a.stateT = 0; }
+        } else {
             const bool wet = inWater(a);
-            if (a.state == 9) { a.vx = a.vy = 0; if (a.stateT > 0.5f) { a.state = 1; a.stateT = 0; a.anim.play("angry"); } }
-            else if (a.state == 10) { a.gravity = 900; a.solidCollide = false; physics(a, dt); if (a.stateT > 3 && a.c == 0) { a.c = 1; bossDefeated(); } }
-            else {
-                facePlayer();
-                a.anim.play(a.state == 1 ? "angry" : "normal");
-                seek(pcx, pcy, a.state == 1 ? 180.0f : 30.0f, a.state == 1 ? 240.0f : 120.0f);
-                a.gravity = wet ? 0 : 900;
-                if (a.state == 1 && a.stateT > 4) { a.state = 0; a.stateT = 0; }
-                physics(a, dt);
-                if (a.onFloor) a.vy = -60;
-                if (a.anim.flagFirst("PlaySound")) sfx("boomerang_wall_hit");
-                for (auto& o : actors)
-                    if (o->type == "Anguila" && o->state == 3 && !o->removed && overlap(a.box(), o->box())) {
-                        a.life--; bossBar = std::max(0.0f, a.life / 5.0f); sfx("v_explosion"); a.anim.play("damage", true);
-                        o->state = 0;
-                        if (a.life <= 0) { a.state = 10; a.stateT = 0; a.vy = -300; a.dead = false; }
-                        else { a.state = 9; a.stateT = 0; }
-                        break;
-                    }
-            }
+            facePlayer();
+            a.anim.play(a.state == 1 ? "angry" : "normal");
+            seek(pcx, pcy, a.state == 1 ? 180.0f : 30.0f, a.state == 1 ? 240.0f : 120.0f);
+            a.gravity = wet ? 0 : 900;
+            if (a.state == 1 && a.stateT > 4) { a.state = 0; a.stateT = 0; }
+            physics(a, dt);
+            if (a.onFloor) a.vy = -60;
+            if (a.anim.flagFirst("PlaySound")) sfx("boomerang_wall_hit");
+            for (auto& o : actors)
+                if (o->type == "Anguila" && o->state == 3 && !o->removed && overlap(a.box(), o->box())) {
+                    a.life--; bossBar = std::max(0.0f, a.life / 5.0f); a.anim.play("damage", true);
+                    if (a.life <= 0) { a.state = 10; a.stateT = 0; a.vx = a.left ? 60.0f : -60.0f; a.vy = -120; sfx("v_explosion"); a.anim.play("damage", true); }
+                    else { a.state = 9; a.stateT = 0; }
+                    break;
+                }
         }
         a.harmful = a.phase == 3 && a.state != 10; a.stompable = false;
     } else if (t == "Dragon") {
-        // Jefe volador del mundo de los dragones: persigue al jugador y escupe fuego cada 2 s; lo
-        // lastima el fuego de Willy (70 de vida).
-        if (a.phase < 3) { if (a.phase == 0) { a.anim.play("original"); facePlayer(); } if (bossWake("headDragon")) { a.state = 0; a.stateT = 0; a.b = 2; } a.px = a.x; a.py = a.y; }
-        else if (a.state == 10) { a.anim.play("dead"); a.vy += 900 * dt; fly(); if (a.stateT > 3 && a.c == 0) { a.c = 1; bossDefeated(); } }
-        else {
+        // DRAGON_*: se transforma 1 s → persigue al jugador (SeekObject 120, tope 120) y cada 2 s abre la
+        // boca 1 s y escupe fuego (Fireball a 52). Lo lastima el fuego de Willy (70 de vida, parpadeo 0,2 s).
+        if (a.phase < 3) { if (a.phase == 0) { a.anim.play("original"); facePlayer(); } if (bossWake("headDragon", 1.0f)) { a.state = 0; a.stateT = 0; a.b = 2; } a.px = a.x; a.py = a.y; }
+        else if (a.state == 10) {
+            a.anim.play("dead");
+            a.px = a.x; a.py = a.y; a.vy += 560 * dt; a.x += a.vx * dt; a.y += a.vy * dt;
+            if (a.stateT > 2.5f && a.c == 0) { a.c = 1; bossDefeated(); }
+        } else {
             facePlayer();
             seek(pcx, pcy, 120, 120);
             fly();
             a.b -= dt;
             if (a.b <= 0) {
-                a.b = 2; a.anim.play("flyingAttack", true); a.a = 0.5f;
-                Actor* f = spawn("Fireball", a.x + (a.left ? -52.0f : 52.0f), a.y - a.h() * 0.5f); f->left = a.left; f->props["enemy"] = "1";
+                a.b = 2; a.a = 1.0f; a.anim.play("flyingAttack", true);
+                Actor* f = spawn("Fireball", a.x + (a.left ? -52.0f : 52.0f), a.y - 52); f->left = a.left; f->props["enemy"] = "1";
                 sfx("willyFire");
             }
             if (a.a > 0) { a.a -= dt; if (a.a <= 0) a.anim.play("flying"); }
         }
         a.harmful = a.phase == 3 && a.state != 10; a.stompable = false;
     } else if (t == "Golem") {
-        // Jefe de la montaña: la cabeza (se la pisa), el torso y el puño que cae y suelta rocas.
+        // GOLEM_*: estatua (beforeGolem) → Malmark → se arma: torso a 20, cabeza a 96 y puño a 158 sobre los
+        // pies (con una mini explosión en cada parte). El puño cae a 640 hasta el piso, tiembla la pantalla
+        // 1 s, caen 4 rocas, espera 2 s, sube a 60 durante 1 s y vuelve a caer. La cabeza se pisa (5 vidas).
         if (a.phase < 3) {
             if (a.phase == 0) a.anim.play("original");
-            if (bossWake("headGolem")) { a.state = 0; a.stateT = 0; a.b = 0; a.anim.play("head"); a.c = 0; a.props["fistY"] = std::to_string(a.y - 220); }
+            if (bossWake("headGolem", 0.0f)) {
+                a.state = 0; a.stateT = 0; a.b = 1; a.c = a.y - 158; a.anim.play("headAttack");
+                for (float off : { 20.0f, 96.0f, 158.0f }) { Actor* fx = spawn("Effect", a.x, a.y - off); fx->anim.play("miniExplosion"); }
+            }
             a.px = a.x; a.py = a.y;
         } else {
-            // Puño (a.a = x, a.b = estado): sube, se ubica sobre el jugador y cae a 640.
-            float& fx = a.a; float& fs = a.b;
-            const float fyTop = (float)atof(a.props["fistY"].c_str());
-            if (fx == 0) fx = a.x - 120;
-            float& fy = a.c;
-            if (fy == 0) fy = fyTop;
-            if (a.state == 10) { if (a.stateT > 3 && a.props["won"].empty()) { a.props["won"] = "1"; bossDefeated(); } }
-            else if (a.state == 9) { if (a.stateT > 0.6f) { a.state = 0; a.stateT = 0; a.anim.play("head"); } }
-            else if (fs == 0) { fx += std::max(-120 * dt, std::min(120 * dt, pcx - fx)); fy = fyTop; if (a.stateT > 2.5f) { fs = 1; a.stateT = 0; } }
-            else if (fs == 1) {
-                fy += 640 * dt;
-                if (solidAt(fx, fy + 4) || fy > a.y) {
-                    fs = 2; a.stateT = 0; shakeT = 0.5f; sfx("v_explosion");
-                    for (int i = 0; i < 4; i++) { Actor* r = spawn("Rocks", camX + 60 + (rand() % (VIEW_W - 120)), camY - 20); r->anim.play("bigRock"); }
-                }
-            } else if (fs == 2) { if (a.stateT > 2) { fs = 3; a.stateT = 0; } }
-            else { fy -= 240 * dt; if (fy <= fyTop) { fy = fyTop; fs = 0; a.stateT = 0; } }
-            a.props["fx"] = std::to_string(fx);
-            // El puño lastima al caer.
-            const SDL_FRect fist = { fx - 40, fy - 70, 80, 70 };
-            if (fs == 1 && overlap(fist, p.box())) hurtPlayer(false);
+            float& fs = a.b; float& fy = a.c;   // puño: 1 cae, 2 en el piso (espera 2 s), 3 sube 1 s
+            if (a.state == 10) {
+                // Muerto: la cabeza cae (ENEMY_DEAD) y el puño y el torso se caen.
+                fy += 300 * dt;
+                if (a.stateT > 3 && a.props["won"].empty()) { a.props["won"] = "1"; bossDefeated(); }
+            } else {
+                if (a.state == 9 && a.anim.ended) { a.state = 0; a.anim.play("head"); }
+                if (a.state == 0 && a.anim.name == "headAttack" && a.stateT > 1.0f) a.anim.play("head");   // 'changeAnim' 1 s
+                if (fs == 1) {
+                    fy += 640 * dt;
+                    if (solidAt(a.x, fy + 1, true, fy) || fy >= a.y) {
+                        if (fy > a.y) fy = a.y;
+                        fs = 2; a.t2 = 0; shakeT = std::max(shakeT, 1.0f); sfx("v_explosion");
+                        const float dir = a.left ? -1.0f : 1.0f;
+                        for (float off : { 0.0f, 60.0f, 30.0f, 96.0f }) { Actor* r = spawn("Rocks", a.x + dir * off - 40, camY - 10); r->anim.play("bigRock"); }
+                    }
+                } else if (fs == 2) { a.t2 += dt; if (a.t2 > 2) { fs = 3; a.t2 = 0; } }
+                else { a.t2 += dt; fy -= 60 * dt; if (a.t2 > 1) fs = 1; }
+            }
+            a.props["fx"] = std::to_string(a.x);
+            if (fs == 1 && a.state != 10 && overlap({ a.x - 40, fy - 90, 80, 90 }, p.box())) hurtPlayer(false);
             a.px = a.x; a.py = a.y;
         }
         a.harmful = false; a.stompable = a.phase == 3 && a.state < 9;
     } else if (t == "Malmark") {
-        // Jefe final: vuela sobre el jugador, tira bolas de fuego (que congeladas sirven de trampolín).
-        if (a.phase == 0) { a.anim.play("normal"); if (a.x > camX && a.x < camX + VIEW_W && a.y > camY && a.y - a.h() < camY + VIEW_H) { a.phase = 3; bossBar = 1; bossIcon = "headMalmark"; music = map.prop("music,finalBoss", "boss.ogg"); v2::music(music); a.state = 0; a.stateT = 0; } a.px = a.x; a.py = a.y; }
-        else if (a.state == 10) { a.vx = a.vy = 0; a.flashT = 7 - a.stateT; shakeT = std::max(shakeT, 0.2f); a.px = a.x; a.py = a.y; if (a.stateT > 7 && a.c == 0) { a.c = 1; bossDefeated(); } }
-        else {
+        // MALMARK_*: aparece al entrar en cámara (música finalBoss y barra). Busca al jugador (SeekObject 120,
+        // tope 60; 60 si el jugador está abajo) sin bajar rápido (si vy > 120 empuja -60). Cada 2 s, con menos
+        // de 5 bolas, ataca y tira una MalmarkFireball. Al pisarlo: daño, vel (0,120), parpadeo y temblor 0,2 s;
+        // vuelve a la normalidad a los 2 s si está por encima del jugador. Al morir: 8 s de temblor y 7 de parpadeo.
+        if (a.phase == 0) {
+            a.anim.play("normal");
+            if (a.x > camX && a.x < camX + VIEW_W && a.y > camY && a.y - a.h() < camY + VIEW_H) {
+                a.phase = 3; bossBar = 1; bossIcon = "headMalmark"; music = map.prop("music,finalBoss", "boss.ogg"); v2::music(music); a.state = 0; a.stateT = 0;
+            }
+            a.px = a.x; a.py = a.y;
+        } else if (a.state == 10) {
+            a.vx = a.vy = 0; a.px = a.x; a.py = a.y;
+            a.flashT = std::max(0.0f, 7 - a.stateT); shakeT = std::max(shakeT, 8 - a.stateT);
+            if (a.stateT > 7 && a.c == 0) { a.c = 1; bossDefeated(); }
+        } else {
             facePlayer();
-            seek(pcx, pcy - 140, 60 * 3, a.state == 2 ? 120.0f : 120.0f);
+            const bool below = pcy > a.y;   // IsDownToObject: el jugador está más abajo
+            if (a.state == 2) seek(pcx, pcy, 120, 120);
+            else seek(pcx, pcy, below ? 60.0f : 120.0f, 60);
+            if (a.vy > 120) a.vy -= 60 * dt;
             fly();
-            if (a.state == 0 && a.stateT > 2 && countOf("MalmarkFireball") < 4) { a.state = 1; a.stateT = 0; a.anim.play("attack", true); a.b = 0; }
+            if (a.state == 0 && a.stateT > 2 && countOf("MalmarkFireball") <= 4) { a.state = 1; a.stateT = 0; a.anim.play("attack", true); a.b = 0; }
             if (a.state == 1) {
                 if (a.anim.flag("Custom") && a.b == 0) { a.b = 1; Actor* f = spawn("MalmarkFireball", a.x + (a.left ? -32.0f : 32.0f), a.y - 40); f->anim.play("appear", true); }
                 if (a.anim.ended) { a.state = 0; a.stateT = 0; a.anim.play("normal"); }
             }
-            if (a.state == 2) { if (a.stateT > 2) { a.state = 0; a.stateT = 0; a.anim.play("normal"); } }
+            if (a.state == 2 && a.stateT > 2 && a.y < pcy) { a.state = 0; a.stateT = 0; a.anim.play("normal"); }
         }
         a.harmful = false; a.stompable = a.phase == 3 && a.state != 2 && a.state != 10;
     } else {
@@ -1180,7 +1208,7 @@ void World::interactions() {
         if (t == "Portal" || t == "Platform" || t == "Effect" || t == "MalmarkFx") continue;
         if (t == "Golem" && a.phase == 3 && a.state < 9) {
             // Cabeza del gólem: se la pisa desde arriba.
-            const SDL_FRect head = { a.x - 28, a.y - 150, 56, 50 };
+            const SDL_FRect head = { a.x - 25, a.y - 127, 50, 52 };   // cabeza a 96 sobre los pies (sprite 50x52, eje 28,31)
             if (overlap(pb, head)) {
                 if ((p.vy > 0 || p.py < p.y) && p.py <= head.y + 20) {
                     sfx("enemy_hit"); Actor* fx = spawn("Effect", a.x, head.y); fx->anim.play("miniExplosion");
@@ -1217,7 +1245,7 @@ void World::interactions() {
                 a.life--; a.state = 6; a.stateT = 0; a.anim.play("damage", true); a.vx = 0; a.vy = -120;
                 bossBar = std::max(0.0f, a.life / 5.0f); shakeT = 0.5f;
             } else if (t == "Malmark") {
-                a.life--; a.state = a.life <= 0 ? 10 : 2; a.stateT = 0; a.anim.play("damage", true); a.flashT = 0.2f;
+                a.life--; a.state = a.life <= 0 ? 10 : 2; a.stateT = 0; a.anim.play("damage", true); a.flashT = 0.2f; a.vx = 0; a.vy = 120;
                 bossBar = std::max(0.0f, a.life / 5.0f); shakeT = 0.2f;
             } else if (t == "MalmarkFireball") {
                 if (a.state == 0) { a.state = 1; a.stateT = 0; }
@@ -1251,17 +1279,19 @@ void World::updateCamera(bool snap) {
         if (snap) { pcamX = camX; pcamY = camY; }
         return;
     }
-    // Zona muerta como en el video: la cámara solo se mueve si el jugador sale de la franja central
-    // (38%-62% del ancho); de alto, parado queda con los pies a ~68% y al saltar no sube hasta pasar el 35%.
-    float tx = snap ? p.x - VIEW_W * 0.5f : camX, ty = snap ? p.y - VIEW_H * 0.68f : camY;
-    if (!snap) {
-        if (p.x - tx < VIEW_W * 0.38f) tx = p.x - VIEW_W * 0.38f;
-        if (p.x - tx > VIEW_W * 0.62f) tx = p.x - VIEW_W * 0.62f;
-        const float feet = p.y - ty;
-        if (p.onFloor || p.state == P_SWIM || p.state == P_FLY) ty = p.y - VIEW_H * 0.68f;
-        else if (feet < VIEW_H * 0.35f + p.h()) ty = p.y - VIEW_H * 0.35f - p.h();
-        else if (feet > VIEW_H * 0.82f) ty = p.y - VIEW_H * 0.82f;
-    }
+    // AutoCamera del exe (0x4a4c40, parámetros de 0x4a4b70):
+    // - X: centro = jugador + "adelanto"; el adelanto suma lo que se mueve el jugador, con tope ±60, y no
+    //   vuelve solo (al correr a la derecha el jugador queda 60 px a la izquierda del centro).
+    // - Y: objetivo con los pies 10 px por encima del centro + medio alto + alto de la caja (60) → pies a 262.
+    //   Si el objetivo baja, la cámara lo sigue al instante; si sube, va a (distancia·3) px/s entre 15 y 480.
+    const float dt = 1.0f / 60.0f;
+    if (snap) { camLead = 0; camLastX = p.x; camRawY = p.y - 10 - VIEW_H * 0.5f - p.h(); }
+    camLead = std::max(-60.0f, std::min(60.0f, camLead + (p.x - camLastX)));
+    camLastX = p.x;
+    const float targetY = std::round(p.y - 10) - VIEW_H * 0.5f - p.h();
+    if (targetY >= camRawY) camRawY = targetY;
+    else camRawY = std::max(targetY, camRawY - std::max(15.0f, std::min(480.0f, (camRawY - targetY) * 3.0f)) * dt);
+    float tx = std::round(p.x + camLead) - VIEW_W * 0.5f, ty = std::round(camRawY);
     for (int it = 0; it < 2; it++) {
         for (const MapObject& l : camLines) {
             if (l.w == 0 && l.h > 0) {           // pared vertical
@@ -1277,11 +1307,9 @@ void World::updateCamera(bool snap) {
     }
     pcamX = snap ? tx : camX; pcamY = snap ? ty : camY;
     if (snap) { camX = tx; camY = ty; return; }
-    // Seguimiento suave (como el original, que alcanza al jugador en pocos cuadros).
-    camX += (tx - camX) * 0.3f;
-    camY += (ty - camY) * 0.12f;
-    if (std::fabs(tx - camX) < 0.5f) camX = tx;
-    if (std::fabs(ty - camY) < 0.5f) camY = ty;
+    // Al pasar de una zona de cámara a otra el límite cambia de golpe: ese salto se hace en unos cuadros.
+    camX = std::fabs(tx - camX) > 24 ? camX + (tx - camX) * 0.2f : tx;
+    camY = std::fabs(ty - camY) > 24 ? camY + (ty - camY) * 0.2f : ty;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1374,19 +1402,19 @@ void World::drawHud(float uiW, bool messages) {
     auto spr = [&](const char* k, float x, float y) { drawSprite(hud->get(k), x, y); };
     const float s = VIEW_H / 384.0f; (void)s;
     // Vidas
-    spr("lives", 44, 20);
+    spr("lives", 46, 24);   // posiciones medidas sobre el video (1:31), en píxeles de 512x384
     char buf[32];
     snprintf(buf, sizeof buf, "%d", prog.lives);
-    drawText(buf, 80 - textWidth(buf, 0.8f, FONT_HUD) * 0.5f, 19 - textHeight(0.8f, FONT_HUD) * 0.5f, 0.8f, { 255, 255, 255, 255 }, FONT_HUD);
-    for (int i = 0; i < 5; i++) spr(i < prog.energy ? "colorHeart" : "blackHeart", 18 + i * 13, 46);
+    drawText(buf, 79 - textWidth(buf, 0.8f, FONT_HUD) * 0.5f, 23 - textHeight(0.8f, FONT_HUD) * 0.5f, 0.8f, { 255, 255, 255, 255 }, FONT_HUD);
+    for (int i = 0; i < 5; i++) spr(i < prog.energy ? "colorHeart" : "blackHeart", 21 + i * 14.5f, 52);
     // Monedas
-    spr("coins", 138, 20);
+    spr("coins", 138, 23);
     snprintf(buf, sizeof buf, "%d/%d", prog.coins, coinTotal);
-    drawText(buf, 155 - textWidth(buf, 0.8f, FONT_HUD) * 0.5f, 19 - textHeight(0.8f, FONT_HUD) * 0.5f, 0.8f, { 255, 255, 255, 255 }, FONT_HUD);
+    drawText(buf, 155 - textWidth(buf, 0.8f, FONT_HUD) * 0.5f, 23 - textHeight(0.8f, FONT_HUD) * 0.5f, 0.8f, { 255, 255, 255, 255 }, FONT_HUD);
     // Zapatilla (correr) y resorte (doble salto)
     const float mid = uiW * 0.5f;
-    spr(runEnabled ? "colorSneaker" : "greySneaker", mid + 5, 26);
-    spr(doubleJumpEnabled ? "colorSpring" : "greySpring", mid + 46, 28);
+    spr(runEnabled ? "colorSneaker" : "greySneaker", mid + 4, 30);
+    spr(doubleJumpEnabled ? "colorSpring" : "greySpring", mid + 45, 32);
     // Llaves
     static const char* const KEY[3] = { "redKey", "greenKey", "blueKey" };
     for (int i = 0; i < 3; i++) {

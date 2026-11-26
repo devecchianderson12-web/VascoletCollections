@@ -83,6 +83,7 @@ private:
     std::vector<std::unique_ptr<Actor>> actors;
     Actor* player = nullptr;
     float camX = 0, camY = 0, pcamX = 0, pcamY = 0;
+    float camLead = 0, camLastX = 0, camRawY = 0;   // estado de la AutoCamera del exe
     float interp = 1;
     // Estado del jugador
     bool runEnabled = false, doubleJumpEnabled = false, attackEnabled = false, canDoubleJump = false;

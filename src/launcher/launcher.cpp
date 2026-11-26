@@ -525,6 +525,9 @@ void Launcher::run() {
     plat::setTouchOverlay(false);
     plat::setCursorMenus(true);
     plat::playMusic("v1/assets/audio/music/andy.ogg");
+#ifdef HOST
+    if (getenv("V2_LEVEL") || getenv("V2_CUT")) startV2 = true;   // pruebas: entra directo a Vascolet 2
+#endif
     const float STEP = 1.0f / 60.0f;
     float acc = 0;
     uint32_t last = plat::ticksMs();

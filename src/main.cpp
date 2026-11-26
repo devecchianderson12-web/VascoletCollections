@@ -24,6 +24,10 @@ int main(int argc, char** argv) {
     SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
 #endif
+#ifdef HOST
+    // Capturas automáticas (XA_SHOT): la ventana no toma el foco para no molestar al usuario.
+    if (getenv("XA_SHOT")) SDL_SetHint("SDL_WINDOW_ACTIVATE_WHEN_SHOWN", "0");
+#endif
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER) < 0) {
         plat::fatal("SDL_Init: %s", SDL_GetError());
         return 1;
