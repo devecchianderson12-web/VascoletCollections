@@ -40,7 +40,7 @@ struct Actor {
     float x0 = 0, y0 = 0;      // posición inicial
     float vx = 0, vy = 0;
     float ax = 0;              // fuerza horizontal de este paso
-    float gravity = 0, maxVx = 9999, friction = 0, maxFall = 900;
+    float gravity = 0, maxVx = 9999, friction = 0, maxFall = 500;   // 500: velocidad vertical máxima por defecto del estado (0x481b60)
     bool left = false;         // mirando a la izquierda
     bool onFloor = false, hitWall = false, hitFloor = false, hitCeil = false, solidCollide = true;
     int state = 0;
@@ -49,7 +49,7 @@ struct Actor {
     bool dead = false, removed = false;
     bool stompable = true, harmful = true, invincible = false;
     float flashT = 0;          // parpadeo
-    float t = 0;               // reloj libre
+    float t = 0, t2 = 0;       // relojes libres
     float px = 0, py = 0;      // posición anterior (interpolación)
     int phase = 0;             // dato libre por tipo
     float a = 0, b = 0, c = 0; // datos libres por tipo
@@ -99,7 +99,7 @@ private:
     int enemyFire() const;
     float bossBar = -1;            // vida del jefe (0..1) o -1 sin barra
     std::string bossIcon;
-    std::string msg; float msgT = 0; bool msgLinger = false;
+    std::string msg, msgImage; float msgT = 0; bool msgLinger = false;
     const Actor* msgSign = nullptr;
     std::string music;
     struct Zone { float x, y, w, h; float alpha = 1; };

@@ -167,13 +167,29 @@ bool World::load(int level, const Progress& p) {
         }
         if (name == "SecretZone") { secrets.push_back({ o.x, o.y, w, h, 1 }); return; }
         if (name.rfind("Portal", 0) == 0) { spawn("Portal", o.x + w * 0.5f, o.y + h, "", &o.props); return; }
-        if (name == "Circle") {   // plataformas girando en círculo
-            const int n = std::max(1, atoi(o.prop("count", "1").c_str()));
+        // Plataformas móviles (0x4973b0 / 0x4a56f0): "Circle" = "count" plataformas repartidas en una
+        // elipse; un objeto sin nombre de ancho o alto 0 = una que va y viene por esa línea. Velocidad del
+        // exe: una vuelta tarda perímetro/64 s y un tramo de línea largo/32 s; "timeScale" la multiplica
+        // (negativo = al revés).
+        const bool line = name.empty() && (o.w == 0) != (o.h == 0);
+        if ((name == "Circle" || line) && map.prop("platforms", "Platform") == "Platform") {
+            const int n = line ? 1 : std::max(1, atoi(o.prop("count", "1").c_str()));
+            const float ts = (float)atof(o.prop("timeScale", "1").c_str());
             for (int i = 0; i < n; i++) {
-                Actor* pl = spawn(map.prop("platforms", "Platform") == "Platform" ? "Platform" : "Platform", o.x + w * 0.5f, o.y + h * 0.5f);
-                pl->a = o.x + w * 0.5f; pl->b = o.y + h * 0.5f; pl->c = (float)i / n * 6.2831853f;
-                pl->props["rx"] = std::to_string(w * 0.5f); pl->props["ry"] = std::to_string(h * 0.5f);
-                pl->phase = 1;
+                Actor* pl = spawn("Platform", o.x, o.y);
+                if (line) {
+                    pl->phase = 2;
+                    pl->a = o.x; pl->b = o.y;
+                    pl->props["dx"] = std::to_string(o.w); pl->props["dy"] = std::to_string(o.h);
+                    pl->props["period"] = std::to_string(std::max(1.0f, (o.w + o.h) / 32.0f) * 2);
+                } else {
+                    const float rx = o.w * 0.5f, ry = o.h * 0.5f;
+                    const float period = 6.2831853f * std::sqrt((rx * rx + ry * ry) * 0.5f) / 64.0f;
+                    pl->phase = 1;
+                    pl->a = o.x + rx; pl->b = o.y + ry; pl->c = (float)i / n * 6.2831853f;
+                    pl->props["rx"] = std::to_string(rx); pl->props["ry"] = std::to_string(ry);
+                    pl->props["w"] = std::to_string(6.2831853f / std::max(0.1f, period) * ts);
+                }
             }
             return;
         }
@@ -185,6 +201,10 @@ bool World::load(int level, const Progress& p) {
         }
         Actor* a = spawn(name, o.x + w * 0.5f, o.y + h, o.type, &o.props);
         if (name == "Info") a->props["info"] = o.prop("info");
+        // Carteles, puntos de guardado y armaduras (descriptor con -100 en 0xac): el motor los apoya en
+        // el piso que tengan abajo aunque en el mapa estén puestos en el aire.
+        if (name == "Info" || name == "Save" || name == "Body")
+            for (int i = 0; i < 40 && !solidAt(a->x, a->y + 1, true, a->y); i++) a->y = a->y0 = a->py = std::floor(a->y / 32) * 32 + 32;
     };
     for (const char* g : { "Platforms", "Items", "General", "Enemies" })
         for (const MapObject& o : map.group(g)) add(o);
@@ -325,7 +345,13 @@ Actor* World::find(const std::string& type) {
 }
 
 void World::showMsg(const std::string& key, bool sign) {
-    msg = text(key);
+    // "texto#imagen": el texto va en el cartel rojo y la imagen (largeJump, doubleJump de hud.xml) se
+    // dibuja con su anclaje en el mismo punto que el cartel.
+    const size_t h = key.find('#');
+    msgImage = h == std::string::npos ? "" : key.substr(h + 1);
+    const std::string k = h == std::string::npos ? key : key.substr(0, h);
+    msg = k.empty() ? "" : text(k);
+    if (msg == k) msg = (k.rfind("st", 0) == 0 && k.find('-') != std::string::npos) ? "" : msg;
     msgT = 1.2f;
     msgLinger = sign;
 }
@@ -356,7 +382,7 @@ void World::playerState(int s) {
             p.vy = -240; p.vx = p.left ? 240 : -240;
             prog.energy = std::max(0, prog.energy - 1);
             sfx("v_death1");
-            invT = 2.0f;
+            invT = 1.0f;   // SetInvTime 1.0
             p.anim.play(inWater(p) ? "damageUnderWater" : "damage", true);
             break;
         case P_DAMAGE_FALL: p.friction = 800; p.maxVx = 200; p.vx = 0; p.anim.play("damageFall", true); sfx("fall1"); break;
@@ -402,7 +428,7 @@ void World::updatePlayer(float dt) {
     // Reglas persistentes (VASCOLET_STATIC_STATE)
     const bool canAct = p.state != P_DAMAGE && p.state != P_DAMAGE_FALL && p.state != P_DAMAGE_RAISE && p.state != P_LOSING && p.state != P_GONE && winT < 0;
     if (canAct && p.state != P_SWIM && p.state != P_FLY) {
-        if (attackPressed() && attackEnabled && p.state != P_ATTACK && countOf("Boomerang") < 2) playerState(P_ATTACK);
+        if (attackPressed() && attackEnabled && p.state != P_ATTACK && countOf("Boomerang") <= 2) playerState(P_ATTACK);
         if (water) { playerState(P_SWIM); p.vy *= 0.5f; }
         if (!water && (tileFlags(p.x, p.y - 4) & T_DAMAGE || tileFlags(p.x - p.fw(), p.y - 4) & T_DAMAGE || tileFlags(p.x + p.fw(), p.y - 4) & T_DAMAGE ||
                        tileFlags(p.x, p.y + 1) & T_DAMAGE)) hurtPlayer(true);
@@ -521,7 +547,8 @@ void World::updatePlayer(float dt) {
             if (p.onFloor && p.stateT > 0.05f && !water) playerState(P_DAMAGE_FALL);
             break;
         case P_DAMAGE_FALL:
-            if (p.stateT > 0.4f) playerState(P_DAMAGE_RAISE);
+            invT = std::max(invT, 1.0f);   // 'invTime': SetTimer 1.0 mientras está en el piso
+            if (p.stateT > 1.0f) playerState(P_DAMAGE_RAISE);
             break;
         case P_DAMAGE_RAISE:
             if (p.anim.ended) playerState(P_STAND);
@@ -557,13 +584,13 @@ void World::updatePlayer(float dt) {
                 sfx("swim");
             }
             if (p.b > 0) p.b -= dt;
-            if (attackPressed() && attackEnabled && countOf("Boomerang") < 2) {
+            if (attackPressed() && attackEnabled && countOf("Boomerang") <= 2) {
                 Actor* b = spawn("Boomerang", p.x + (p.left ? -24.0f : 24.0f), p.y - 30, "");
                 b->left = p.left; b->vx = p.left ? -320.0f : 320.0f;
                 sfx("boomerang");
             }
             if (!water) {
-                p.gravity = p.def->gravity; p.maxFall = 900;
+                p.gravity = p.def->gravity; p.maxFall = 500;
                 if (p.vy < -60) { sfx("jumpWater"); playerState(P_JUMP); p.vy = -500; }
                 else if (p.onFloor) playerState(P_STAND);
                 else playerState(P_FALL);
@@ -574,7 +601,7 @@ void World::updatePlayer(float dt) {
         default: break;
     }
     if (p.state == P_DAMAGE && water) { p.gravity = p.def->gravity * 0.25f; p.maxFall = 120; }
-    else if (p.state != P_SWIM && p.state != P_LOSING && p.state != P_GONE) { p.gravity = p.def->gravity; p.maxFall = 900; }
+    else if (p.state != P_SWIM && p.state != P_LOSING && p.state != P_GONE) { p.gravity = p.def->gravity; p.maxFall = 500; }
 
     if (p.state != P_GONE) {
         const float scale = (p.state == P_SWIM || (water && p.state == P_DAMAGE)) ? 0.5f : 1.0f;
@@ -633,9 +660,14 @@ void World::updateActor(Actor& a, float dt) {
     if (t == "Platform") {
         a.px = a.x; a.py = a.y;
         if (a.phase == 1) {
-            a.c += dt * 0.9f;
+            a.c += dt * (float)atof(a.props["w"].c_str());
             const float rx = (float)atof(a.props["rx"].c_str()), ry = (float)atof(a.props["ry"].c_str());
             a.x = a.a + std::cos(a.c) * rx; a.y = a.b + std::sin(a.c) * ry;
+        } else if (a.phase == 2) {
+            // Va y viene por la línea (ida + vuelta = period), frenando suave en las puntas.
+            a.t2 += dt;
+            const float k = 0.5f - 0.5f * std::cos(a.t2 / (float)atof(a.props["period"].c_str()) * 6.2831853f);
+            a.x = a.a + (float)atof(a.props["dx"].c_str()) * k; a.y = a.b + (float)atof(a.props["dy"].c_str()) * k;
         }
         a.anim.update(dt);
         return;
@@ -725,6 +757,16 @@ void World::updateActor(Actor& a, float dt) {
     };
     auto bossDefeated = [&] {
         bossBar = -1;
+        // Solo el jefe final del capítulo gana el nivel (winCondition); en el castillo los jefes
+        // anteriores ("withKey") sueltan una llave calavera (ThrowAsItem SkullKey) para las puertas calavera.
+        static const char* const FINAL[6] = { "", "Ogre", "Iguana", "Dragon", "Golem", "Malmark" };
+        if (t != FINAL[lvl]) {
+            sfx("boss_death");
+            music = map.prop("music,normal", "level5.ogg"); v2::music(music);
+            if (a.has("withKey")) { Actor* k = spawn("SkullKey", a.x, a.y - 40); k->vy = -120; k->gravity = 600; }
+            a.removed = t != "Ogre";
+            return;
+        }
         if (winT < 0) { winT = 0; plat::stopMusic(); sfx("boss_death"); v2::music(map.prop("music,win", "win_level.ogg"), false); }
     };
 
@@ -768,8 +810,15 @@ void World::updateActor(Actor& a, float dt) {
             a.vx = a.vy = 0;
             if (dist < 240) { a.state = 1; a.stateT = 0; facePlayer(); a.anim.play("flyingDown"); }
         } else {
-            if (a.stateT < 0.5f) { a.vy = std::min(240.0f, a.vy + 240 * 4 * dt); a.vx = 0; }
-            else { a.anim.play("flying"); a.vx = a.left ? -240.0f : 240.0f; a.vy = std::max(-120.0f, a.vy - 480 * dt); }
+            // BIRD_ATTACKING: 0,5 s fuerza (0, 240) hacia abajo; después (240 adelante, -120), sin subir nunca
+            // (si vy deja de ser positiva queda en 0).
+            if (a.stateT < 0.5f) a.vy += 240 * dt;
+            else {
+                a.anim.play("flying");
+                a.vx += (a.left ? -240.0f : 240.0f) * dt;
+                a.vy -= 120 * dt;
+                if (a.vy <= 0) a.vy = 0;
+            }
         }
         fly();
     } else if (t == "Spyke") {
@@ -804,13 +853,13 @@ void World::updateActor(Actor& a, float dt) {
         facePlayer();
         if (a.state == 0) { a.vx = a.vy = 0; if (std::fabs(pcx - a.x) < 40 + VIEW_W * 0.5f && dist < 300) { a.state = 1; a.stateT = 0; } }
         else if (t == "PterodactilGreen") { a.vx = std::max(-100.0f, std::min(100.0f, a.vx + (a.left ? -100.0f : 100.0f) * dt)); a.vy = 0; }
-        else seek(pcx, pcy, 60 * 3, 80);
+        else seek(pcx, pcy, 60, 80);
         fly();
     } else if (t == "Blowfish") {
         // Pez globo: se infla cuando el jugador está a 200 y lo sigue despacio; se desinfla lejos.
         facePlayer();
         if (a.state == 0) { a.anim.play("normal"); a.vx = a.vy = 0; if (dist < 200) { a.state = 1; a.anim.play("activated", true); } }
-        else if (a.state == 1) { seek(pcx, pcy, 50 * 2, 50); if (dist > 250) { a.state = 2; a.stateT = 0; } }
+        else if (a.state == 1) { seek(pcx, pcy, 50, 50); if (dist > 250) { a.state = 2; a.stateT = 0; } }
         else { a.vx *= 0.95f; a.vy *= 0.95f; if (a.stateT > 2) a.state = 0; }
         fly();
     } else if (t == "Fish") {
@@ -818,12 +867,12 @@ void World::updateActor(Actor& a, float dt) {
         physics(a, dt);
         if (a.hitWall) a.left = !a.left;
     } else if (t == "Bat") {
-        seek(pcx, pcy, 60 * 3, 120);
+        seek(pcx, pcy, 60, 120);
         facePlayer();
         fly();
     } else if (t == "Ghost") {
         if (a.state == 0) { a.anim.play("normal"); facePlayer(); a.vx = a.vy = 0; if (dist < 200) { a.state = 1; a.anim.play("attack"); } }
-        else { seek(pcx, pcy, 120 * 2, 240); a.left = a.vx < 0; }
+        else { seek(pcx, pcy, 120, 240); a.left = a.vx < 0; }
         fly();
     } else if (t == "Axe" || t == "Fireball2") {
         // Hacha / bola de fuego del castillo: invisible hasta que el jugador se acerca (hacha a 250,
@@ -832,13 +881,21 @@ void World::updateActor(Actor& a, float dt) {
             case 0: a.c = 0; a.vx = a.vy = 0; if ((t == "Axe" && dist < 250) || (t == "Fireball2" && a.stateT > 2.0f && dist < 400)) { a.state = 1; a.stateT = 0; a.anim.play("appear", true); } break;
             case 1: if (a.anim.ended) { a.state = 2; a.stateT = 0; a.anim.play("normal"); } break;
             case 2:
-                if (a.stateT > (t == "Axe" ? 0.5f : 2.0f)) { a.vy += 960 * 0.25f * dt; a.vx += (pcx > a.x ? 100.0f : -100.0f) * dt; a.vx = std::max(-100.0f, std::min(100.0f, a.vx)); }
+                if (a.stateT > (t == "Axe" ? 0.5f : 2.0f)) {
+                    a.vx = std::max(-100.0f, std::min(100.0f, a.vx + (pcx > a.x ? 100.0f : -100.0f) * dt));
+                    a.gravity = 960; a.maxFall = 500;
+                    const float vy0 = a.vy, vx0 = a.vx;
+                    physics(a, dt);
+                    if (a.hitFloor) a.vy = -vy0 * 0.6f;
+                    if (a.hitWall) a.vx = -vx0 * 0.95f;
+                    break;
+                }
                 if (a.stateT > 7) { a.state = 3; a.anim.play("disappear", true); }
                 break;
             case 3: if (a.anim.ended) { a.state = 0; a.stateT = 0; a.x = a.x0; a.y = a.y0; a.anim.play("normal"); } break;
         }
-        a.harmful = a.state == 2; a.stompable = false;
-        fly();
+        a.harmful = a.state == 2; a.stompable = a.state == 2;
+        if (a.state != 2 || a.stateT <= (t == "Axe" ? 0.5f : 2.0f)) fly();
     } else if (t == "Head" || t == "Body") {
         // Armaduras del castillo: el cuerpo es decorado; la cabeza se tira sobre el jugador a 150.
         if (t == "Body") { a.harmful = false; a.stompable = false; a.px = a.x; a.py = a.y; }
@@ -931,7 +988,7 @@ void World::updateActor(Actor& a, float dt) {
             else {
                 facePlayer();
                 a.anim.play(a.state == 1 ? "angry" : "normal");
-                seek(pcx, pcy, a.state == 1 ? 180.0f * 3 : 30.0f * 3, a.state == 1 ? 240.0f : 120.0f);
+                seek(pcx, pcy, a.state == 1 ? 180.0f : 30.0f, a.state == 1 ? 240.0f : 120.0f);
                 a.gravity = wet ? 0 : 900;
                 if (a.state == 1 && a.stateT > 4) { a.state = 0; a.stateT = 0; }
                 physics(a, dt);
@@ -955,7 +1012,7 @@ void World::updateActor(Actor& a, float dt) {
         else if (a.state == 10) { a.anim.play("dead"); a.vy += 900 * dt; fly(); if (a.stateT > 3 && a.c == 0) { a.c = 1; bossDefeated(); } }
         else {
             facePlayer();
-            seek(pcx, pcy, 120 * 2, 120);
+            seek(pcx, pcy, 120, 120);
             fly();
             a.b -= dt;
             if (a.b <= 0) {
@@ -1019,6 +1076,22 @@ void World::updateActor(Actor& a, float dt) {
     a.anim.update(dt);
 }
 
+// Prioridad de interacción de cada enemigo en su estado (SetInteractionPriority del exe). El jugador,
+// el boomerang y el fuego de Willy tienen 3: ganan (pisan / matan) solo contra prioridades menores.
+static int interactionPriority(const Actor& e) {
+    const std::string& t = e.type;
+    if (t == "Scorpion" || t == "Bird" || t == "PterodactilRed" || t == "PterodactilGreen" || t == "UglyDragon" ||
+        t == "Fish" || t == "Bat" || t == "Piranha" || t == "Malmark" || t == "MalmarkFireball") return 0;
+    if (t == "Head") return 0;
+    if (t == "Witch" || t == "Golem") return 2;
+    if (t == "Anguila") return e.state == 3 ? 10002 : 2;
+    if (t == "Axe" || t == "Fireball2") return e.state == 2 ? 0 : 999;
+    if (t == "Blowfish") return e.state == 1 ? 0 : 999;            // solo inflado se lo puede vencer
+    if (t == "Ogre") return e.state == 4 ? 0 : 999;               // OGRE_FAIL
+    if (t == "Hedgehog") return 9999;
+    return 999;   // FeetBall, Ghost, Fenix, Spyke, Rocks, Iguana, Dragon, Body...
+}
+
 // Golpe de boomerang / fuego de Willy sobre un enemigo.
 bool World::shotHits(Actor& s, bool fire) {
     for (auto& eu : actors) {
@@ -1026,8 +1099,7 @@ bool World::shotHits(Actor& s, bool fire) {
         if (e.removed || e.dead || !isEnemy(e.type) || &e == &s) continue;
         const std::string& et = e.type;
         if (!overlap(s.box(), e.box())) continue;
-        if (et == "Spyke" || et == "Hedgehog" || et == "Body" || et == "Rocks" || et == "MalmarkFireball") continue;
-        if ((et == "Axe" || et == "Fireball2") && e.state != 2) continue;
+        if (et == "Body" || et == "Rocks" || et == "MalmarkFireball" || ((et == "Axe" || et == "Fireball2") && e.state != 2)) continue;
         if (et == "Anguila") { if (!fire) { e.state = 3; e.stateT = 0; sfx("v_explosion"); return true; } continue; }
         if (isBoss(et)) {
             if (et == "Dragon" && fire && e.phase == 3 && e.state != 10) {
@@ -1038,6 +1110,7 @@ bool World::shotHits(Actor& s, bool fire) {
             if (!fire) return true;   // el boomerang rebota en los jefes
             continue;
         }
+        if (interactionPriority(e) >= 3) return true;   // invulnerable: el disparo rebota
         killEnemy(e, false);
         sfx(fire ? "enemy_hit" : "enemy_boomerang_hit");
         return true;
@@ -1124,7 +1197,7 @@ void World::interactions() {
             Actor* fx = spawn("Effect", a.x, a.y - 16); fx->anim.play("getPowerUp");
             if (t == "Coin") { prog.coins++; static const char* C[4] = { "coin", "coin2", "coin3", "coin4" }; sfx(C[rand() & 3]); continue; }
             if (t == "Energy") { prog.energy = std::min(5, prog.energy + 1); sfx("energy"); }
-            else if (t == "Energy2") { prog.energy = std::min(5, prog.energy + 2); sfx("energy"); }
+            else if (t == "Energy2") { prog.energy = std::min(5, prog.energy + 1); sfx("energy"); }
             else if (t == "ExtraLive") { prog.lives = std::min(99, prog.lives + 1); sfx("extraLife"); }
             else if (t == "ItemVascolet") { runEnabled = true; sfx("vascolet"); }
             else if (t == "Cereals") { doubleJumpEnabled = true; sfx("vascolet"); }
@@ -1135,7 +1208,7 @@ void World::interactions() {
         // Pisotón: el jugador cae y sus pies venían por encima de la mitad de arriba del enemigo.
         const bool falling = p.vy > 0 || p.py < p.y;
         const bool fromAbove = falling && p.py <= ab.y + std::min(24.0f, ab.h * 0.5f);
-        if (fromAbove && a.stompable) {
+        if (fromAbove && a.stompable && interactionPriority(a) < 3) {
             sfx("enemy_hit");
             Actor* fx = spawn("Effect", a.x, ab.y); fx->anim.play("miniExplosion");
             canDoubleJump = true;
@@ -1178,9 +1251,17 @@ void World::updateCamera(bool snap) {
         if (snap) { pcamX = camX; pcamY = camY; }
         return;
     }
-    float tx = p.x - VIEW_W * 0.5f;
-    // Como en el video: los pies del jugador quedan a unos 3/4 de la altura de la pantalla.
-    float ty = p.y - VIEW_H * 0.74f;
+    // Zona muerta como en el video: la cámara solo se mueve si el jugador sale de la franja central
+    // (38%-62% del ancho); de alto, parado queda con los pies a ~68% y al saltar no sube hasta pasar el 35%.
+    float tx = snap ? p.x - VIEW_W * 0.5f : camX, ty = snap ? p.y - VIEW_H * 0.68f : camY;
+    if (!snap) {
+        if (p.x - tx < VIEW_W * 0.38f) tx = p.x - VIEW_W * 0.38f;
+        if (p.x - tx > VIEW_W * 0.62f) tx = p.x - VIEW_W * 0.62f;
+        const float feet = p.y - ty;
+        if (p.onFloor || p.state == P_SWIM || p.state == P_FLY) ty = p.y - VIEW_H * 0.68f;
+        else if (feet < VIEW_H * 0.35f + p.h()) ty = p.y - VIEW_H * 0.35f - p.h();
+        else if (feet > VIEW_H * 0.82f) ty = p.y - VIEW_H * 0.82f;
+    }
     for (int it = 0; it < 2; it++) {
         for (const MapObject& l : camLines) {
             if (l.w == 0 && l.h > 0) {           // pared vertical
@@ -1197,8 +1278,8 @@ void World::updateCamera(bool snap) {
     pcamX = snap ? tx : camX; pcamY = snap ? ty : camY;
     if (snap) { camX = tx; camY = ty; return; }
     // Seguimiento suave (como el original, que alcanza al jugador en pocos cuadros).
-    camX += (tx - camX) * 0.25f;
-    camY += (ty - camY) * 0.18f;
+    camX += (tx - camX) * 0.3f;
+    camY += (ty - camY) * 0.12f;
     if (std::fabs(tx - camX) < 0.5f) camX = tx;
     if (std::fabs(ty - camY) < 0.5f) camY = ty;
 }
@@ -1314,6 +1395,13 @@ void World::drawHud(float uiW, bool messages) {
         snprintf(buf, sizeof buf, "%d", keys[i]);
         drawText(buf, kx - textWidth(buf, 0.8f, FONT_HUD) * 0.5f, 41 - textHeight(0.8f, FONT_HUD) * 0.5f, 0.8f, { 255, 255, 255, 255 }, FONT_HUD);
     }
+    // Llave calavera (castillo): aparece al lado de las otras cuando se tiene alguna.
+    if (keys[3] > 0) {
+        const float kx = uiW - 133;
+        spr("skullKeyColor", kx, 26);
+        snprintf(buf, sizeof buf, "%d", keys[3]);
+        drawText(buf, kx - textWidth(buf, 0.8f, FONT_HUD) * 0.5f, 41 - textHeight(0.8f, FONT_HUD) * 0.5f, 0.8f, { 255, 255, 255, 255 }, FONT_HUD);
+    }
     // Barra del jefe
     if (bossBar >= 0) {
         spr("bossEnergyBase", uiW - 150, VIEW_H - 30);
@@ -1332,6 +1420,7 @@ void World::drawHud(float uiW, bool messages) {
     }
 #endif
     // Cartel rojo de mensajes (tips, "Juego salvado.")
+    if (messages && msgT > 0 && !msgImage.empty()) drawSprite(hud->get(msgImage), uiW * 0.5f, 70);
     if (messages && msgT > 0 && !msg.empty()) {
         const Sprite* bn = hud->get("cartelDialogos");
         const float bx = uiW * 0.5f, by = 70;

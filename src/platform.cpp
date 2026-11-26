@@ -1690,7 +1690,8 @@ static void drawCursor() {
     const bool hidden = g_cursorHidden;
     g_cursorHidden = false;
     if (hidden || !g_cursorMenus || !g_mouseSeen || !g_ren || !(SDL_GetWindowFlags(g_win) & SDL_WINDOW_MOUSE_FOCUS)) return;
-    if (!g_cursorImg) g_cursorImg = loadImage("assets/images/menuElements/cursor.png");
+    static bool cursorTried = false;   // si no existe, no se reintenta en cada cuadro
+    if (!g_cursorImg && !cursorTried) { cursorTried = true; g_cursorImg = loadImage("assets/images/menuElements/cursor.png"); }
     if (!g_cursorImg) return;
     restoreLogical();
     resetViewport();
